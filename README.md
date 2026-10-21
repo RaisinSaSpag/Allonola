@@ -16,13 +16,13 @@ Allonola is a complete, multi-page static website for a fictional online retail 
 
 ## 🚀 How to Open and Run the Website
 
-This website is built with vanilla HTML5, CSS3, and modern vanilla JavaScript (ES2020) with no build step, no Node.js runtime, no backend server, and no database.
+This website is built with vanilla HTML5, CSS3, and modern vanilla JavaScript (ES2020) with no build step, no Node.js runtime, no backend server, and no database. The only external dependencies are Chart.js (CDN) and Google Fonts.
 
 ### 1. Opening Directly from the Local File System (`file://`)
 You can open the website offline directly in any modern browser:
-1. Navigate to the project directory: `D:\Projects\allonola\`.
+1. Open the folder that contains `index.html`.
 2. Double-click `index.html` (or right-click → Open with Chrome / Edge / Firefox / Safari).
-3. The site runs completely within the browser. Data is bundled directly in `js/data.js` to ensure browsers do not block local `fetch()` requests under the `file://` protocol.
+3. All data is bundled directly in `js/data.js`, so the site does not need a server or local `fetch()` requests. The one exception is Chart.js, which is loaded from a CDN: the charts need an internet connection the first time the site is opened, and the browser's cache keeps them available afterwards.
 
 ### 2. Hosting on GitHub Pages
 To publish this repository on GitHub Pages:
@@ -79,6 +79,10 @@ allonola/
 │       ├── svm.js               # Max-margin fraud thresholding & keyword category lookup
 │       ├── decision-tree.js     # Hierarchical rule evaluation & delivery risk path generator
 │       └── ann.js               # Training loss epoch slices & shopper churn lookup
+│   └── demo/                   # Page controllers that connect the ML modules to the interactive demos
+│       ├── linear-regression-demo.js
+│       ├── knn-demo.js
+│       └── naive-bayes-demo.js
 ├── assets/
 │   └── icons/                  # Inline SVGs utilized directly in HTML templates
 └── test/

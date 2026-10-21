@@ -185,7 +185,7 @@
       sr = document.createElement("div");
       sr.className = "sr-only sr-only-chart-summary";
       sr.setAttribute("aria-live", "polite");
-      parent.insertBefore(sr, canvas);
+      canvas.parentNode.insertBefore(sr, canvas);
     }
     sr.textContent = meta.srSummary || meta.title || "Illustrative chart visualization.";
 
@@ -203,7 +203,9 @@
    * Rebuilds all registered charts when theme changes.
    */
   function rebuildAll() {
-    chartRegistry.forEach((entry, canvasId) => {
+    // Iterate over a snapshot: rebuilding a chart deletes and re-adds its registry entry,
+    // and a Map visits entries added during iteration, which would loop forever.
+    Array.from(chartRegistry.values()).forEach((entry) => {
       if (typeof entry.buildFn === "function") {
         entry.buildFn();
       }

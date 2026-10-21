@@ -119,7 +119,7 @@
       k: clampedK,
       allSimilarities,
       neighbors,
-      recommendations,
+      recommendations: recommendations.filter((r) => r.predictedScore > 0),
       unboughtItems,
     };
   }

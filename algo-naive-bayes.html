@@ -104,7 +104,12 @@
               <h2>Interactive demo</h2>
               <label for="nb-text">Review text</label>
               <textarea id="nb-text" rows="4">Amazing quality and super fast delivery, thanks team!</textarea>
-              <div class="action-row"><button class="btn btn--primary" id="nb-run" type="button">Classify review</button></div>
+              <div class="action-row"><button class="btn btn--primary" id="nb-run" type="button">Classify review</button>
+              <div class="action-row">
+                <button class="btn" type="button" data-nb-example="Battery lasts all day, great value">Try a positive review</button>
+                <button class="btn" type="button" data-nb-example="Not what I ordered, wrong color.">Try a negative review</button>
+                <button class="btn" type="button" data-nb-example="WIN a free gift card now, click this link!!!">Try a spam review</button>
+              </div></div>
               <div id="nb-output" class="output-box">Ready to classify.</div>
             </div>
           </div>
@@ -156,21 +161,12 @@
   </div>
 </footer>
 
-  <script src="js/app.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
-
-        <script>
-          window.addEventListener('DOMContentLoaded', function () {
-            const text = document.getElementById('nb-text');
-            const output = document.getElementById('nb-output');
-            const button = document.getElementById('nb-run');
-            if (!text || !output || !button || !window.Allonola || !window.Allonola.ml || !window.Allonola.ml.naiveBayes) return;
-            button.addEventListener('click', function () {
-              const result = window.Allonola.ml.naiveBayes.classify(text.value || '');
-              output.textContent = 'Prediction: ' + result.predictedClass + ' | Positive: ' + result.probabilities.Positive + ' | Negative: ' + result.probabilities.Negative + ' | Spam: ' + result.probabilities.Spam;
-            });
-          });
-        </script>
-        
+  <script defer src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <script defer src="js/data.js"></script>
+  <script defer src="js/app.js"></script>
+  <script defer src="js/charts.js"></script>
+  <script defer src="js/table.js"></script>
+  <script defer src="js/ml/naive-bayes.js"></script>
+  <script defer src="js/demo/naive-bayes-demo.js"></script>
 </body>
 </html>

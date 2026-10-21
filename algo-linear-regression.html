@@ -100,7 +100,44 @@
         </section>
         <section class="section section--compact">
           <div class="container reveal-on-scroll">
-            <div class="card"><h2>Sample forecast</h2><div id="lr-output" class="output-box">Loading forecast…</div></div>
+            <div class="card demo-container">
+              <div class="demo-header">
+                <h2>Interactive demo</h2>
+                <span class="demo-badge">Illustrative</span>
+              </div>
+              <p class="text-small text-muted">A simplified illustration of the price and promotion effects in the model. It is not a trained model, and all forecast values are illustrative.</p>
+              <div class="demo-layout">
+                <div class="demo-controls">
+                  <div class="form-group">
+                    <label class="form-label" for="lr-product">Product</label>
+                    <select class="form-control" id="lr-product">
+                      <option value="Ceramic mug">Ceramic mug</option>
+                      <option value="Running shoes (P-220)" selected>Running shoes (P-220)</option>
+                      <option value="Phone stand">Phone stand</option>
+                    </select>
+                  </div>
+                  <div class="slider-group">
+                    <div class="slider-label-row"><label class="form-label" for="lr-price">Price (₱)</label><output id="lr-price-val" for="lr-price"></output></div>
+                    <input class="slider-input" type="range" id="lr-price" step="1">
+                  </div>
+                  <div class="form-group">
+                    <label class="form-checkbox-label"><input type="checkbox" id="lr-promo"> Promotion on</label>
+                  </div>
+                  <p class="form-hint" id="lr-range-note"></p>
+                </div>
+                <div>
+                  <div class="demo-big-stat">
+                    <div class="demo-big-stat__label">Predicted units sold</div>
+                    <div class="demo-big-stat__number" id="lr-units">–</div>
+                  </div>
+                  <div id="lr-output" class="demo-output" aria-live="polite"></div>
+                  <figure class="chart-card">
+                    <div class="chart-wrapper" style="height:320px"><canvas id="lr-chart" role="img" aria-label="Line chart of predicted units sold across the price range"></canvas></div>
+                    <figcaption class="chart-figcaption">Illustrative. Predicted units sold against price, with the current promotion setting.</figcaption>
+                  </figure>
+                </div>
+              </div>
+            </div>
           </div>
         </section>
         
@@ -150,18 +187,12 @@
   </div>
 </footer>
 
-  <script src="js/app.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
-
-        <script>
-          window.addEventListener('DOMContentLoaded', function () {
-            const output = document.getElementById('lr-output');
-            if (!output || !window.Allonola || !window.Allonola.ml || !window.Allonola.ml.linearRegression) return;
-            const forecast = window.Allonola.ml.linearRegression.predictUnits('Running shoes (P-220)', 1999, true);
-            const impact = window.Allonola.ml.linearRegression.calculate10PercentCutImpact('Running shoes (P-220)', 1999, true);
-            output.textContent = 'Forecast: ' + forecast + ' units at ₱1,999 with promotion on. 10% discount impact: +' + impact + ' units sold.';
-          });
-        </script>
-        
+  <script defer src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <script defer src="js/data.js"></script>
+  <script defer src="js/app.js"></script>
+  <script defer src="js/charts.js"></script>
+  <script defer src="js/table.js"></script>
+  <script defer src="js/ml/linear-regression.js"></script>
+  <script defer src="js/demo/linear-regression-demo.js"></script>
 </body>
 </html>
