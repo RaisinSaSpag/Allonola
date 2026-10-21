@@ -1,0 +1,819 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Decision Tree | Allonola</title>
+  <meta name="description" content="Explainable Decision Tree rules for delivery risk classification, courier delays, and order return mitigation.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/layout.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/algorithm.css">
+  <style>
+    .tree-step-pill {
+      display: inline-block;
+      padding: 0.2rem 0.6rem;
+      border-radius: var(--radius-pill);
+      font-size: 0.75rem;
+      font-weight: 700;
+      margin-right: 0.4rem;
+    }
+  </style>
+</head>
+<body data-page="decision-tree">
+  <a href="#main-content" class="skip-link">Skip to main content</a>
+
+  <!-- Header -->
+  <header class="site-header">
+    <div class="container header-inner">
+      <a href="index.html" class="site-logo" aria-label="Allonola Home">
+        <svg class="logo-icon" width="28" height="28" viewBox="0 0 28 28" fill="none" aria-hidden="true">
+          <circle cx="6" cy="20" r="3.5" fill="currentColor" />
+          <circle cx="22" cy="20" r="3.5" fill="currentColor" />
+          <circle cx="14" cy="7" r="3.5" fill="currentColor" />
+          <line x1="6" y1="20" x2="14" y2="7" stroke="currentColor" stroke-width="1.75" />
+          <line x1="14" y1="7" x2="22" y2="20" stroke="currentColor" stroke-width="1.75" />
+          <line x1="6" y1="20" x2="22" y2="20" stroke="currentColor" stroke-width="1.75" />
+        </svg>
+        <span>Allonola</span>
+      </a>
+
+      <nav class="nav-desktop" aria-label="Primary navigation">
+        <a href="index.html" class="nav-link">Home</a>
+        <a href="about.html" class="nav-link">About</a>
+        <div class="nav-dropdown">
+          <button type="button" class="nav-link nav-dropdown-toggle nav-link--active" aria-expanded="false" aria-haspopup="true">
+            <span>Algorithms</span>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+              <polyline points="6 9 12 15 18 9"></polyline>
+            </svg>
+          </button>
+          <div class="nav-dropdown-menu" role="menu">
+            <a href="algorithms.html" class="nav-dropdown-item" role="menuitem">
+              <span class="nav-dropdown-title">Overview & Comparison</span>
+              <span class="nav-dropdown-desc">Compare all six ML approaches</span>
+            </a>
+            <a href="algo-linear-regression.html" class="nav-dropdown-item" role="menuitem">
+              <span class="nav-dropdown-title">Linear Regression</span>
+              <span class="nav-dropdown-desc">Demand forecasting & price elasticity</span>
+            </a>
+            <a href="algo-naive-bayes.html" class="nav-dropdown-item" role="menuitem">
+              <span class="nav-dropdown-title">Naive Bayes</span>
+              <span class="nav-dropdown-desc">Sentiment & fake review filtering</span>
+            </a>
+            <a href="algo-knn.html" class="nav-dropdown-item" role="menuitem">
+              <span class="nav-dropdown-title">K-Nearest Neighbors</span>
+              <span class="nav-dropdown-desc">Collaborative recommendations</span>
+            </a>
+            <a href="algo-svm.html" class="nav-dropdown-item" role="menuitem">
+              <span class="nav-dropdown-title">Support Vector Machine</span>
+              <span class="nav-dropdown-desc">Order fraud & auto-categorization</span>
+            </a>
+            <a href="algo-decision-tree.html" class="nav-dropdown-item" role="menuitem">
+              <span class="nav-dropdown-title">Decision Tree</span>
+              <span class="nav-dropdown-desc">Delivery risk & return rules</span>
+            </a>
+            <a href="algo-ann.html" class="nav-dropdown-item" role="menuitem">
+              <span class="nav-dropdown-title">Artificial Neural Network</span>
+              <span class="nav-dropdown-desc">Personalization & shopper churn</span>
+            </a>
+          </div>
+        </div>
+        <a href="dashboard.html" class="nav-link">Dashboard demo</a>
+        <a href="contact.html" class="nav-link">Contact</a>
+      </nav>
+
+      <div class="header-actions">
+        <button type="button" id="theme-toggle" class="btn-icon" aria-label="Switch to light theme" title="Switch to light theme">
+          <svg class="theme-icon-sun" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+            <circle cx="12" cy="12" r="5"></circle>
+            <line x1="12" y1="1" x2="12" y2="3"></line>
+            <line x1="12" y1="21" x2="12" y2="23"></line>
+            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+            <line x1="1" y1="12" x2="3" y2="12"></line>
+            <line x1="21" y1="12" x2="23" y2="12"></line>
+            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+          </svg>
+          <svg class="theme-icon-moon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="display:none;" aria-hidden="true">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+          </svg>
+        </button>
+
+        <button type="button" id="hamburger-btn" class="btn-icon hamburger-btn" aria-label="Open mobile menu" aria-expanded="false" aria-controls="nav-drawer">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <line x1="3" y1="12" x2="21" y2="12"></line>
+            <line x1="3" y1="6" x2="21" y2="6"></line>
+            <line x1="3" y1="18" x2="21" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Mobile Drawer -->
+  <div id="nav-backdrop" class="nav-backdrop"></div>
+  <aside id="nav-drawer" class="nav-drawer" aria-label="Mobile navigation">
+    <div style="display: flex; justify-content: space-between; align-items: center;">
+      <span class="site-logo">
+        <svg class="logo-icon" width="24" height="24" viewBox="0 0 28 28" fill="none" aria-hidden="true">
+          <circle cx="6" cy="20" r="3.5" fill="currentColor" />
+          <circle cx="22" cy="20" r="3.5" fill="currentColor" />
+          <circle cx="14" cy="7" r="3.5" fill="currentColor" />
+          <line x1="6" y1="20" x2="14" y2="7" stroke="currentColor" stroke-width="1.75" />
+          <line x1="14" y1="7" x2="22" y2="20" stroke="currentColor" stroke-width="1.75" />
+          <line x1="6" y1="20" x2="22" y2="20" stroke="currentColor" stroke-width="1.75" />
+        </svg>
+        <span>Allonola</span>
+      </span>
+    </div>
+    <ul class="nav-mobile-list">
+      <li><a href="index.html" class="mobile-nav-link">Home</a></li>
+      <li><a href="about.html" class="mobile-nav-link">About</a></li>
+      <li>
+        <button type="button" id="algo-accordion-btn" class="mobile-accordion-btn" aria-expanded="false">
+          <span>Algorithms</span>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <polyline points="6 9 12 15 18 9"></polyline>
+          </svg>
+        </button>
+        <ul id="algo-accordion-menu" class="mobile-sublist" hidden>
+          <li><a href="algorithms.html" class="mobile-sublink">Overview & Comparison</a></li>
+          <li><a href="algo-linear-regression.html" class="mobile-sublink">Linear Regression</a></li>
+          <li><a href="algo-naive-bayes.html" class="mobile-sublink">Naive Bayes</a></li>
+          <li><a href="algo-knn.html" class="mobile-sublink">K-Nearest Neighbors</a></li>
+          <li><a href="algo-svm.html" class="mobile-sublink">Support Vector Machine</a></li>
+          <li><a href="algo-decision-tree.html" class="mobile-sublink">Decision Tree</a></li>
+          <li><a href="algo-ann.html" class="mobile-sublink">Artificial Neural Network</a></li>
+        </ul>
+      </li>
+      <li><a href="dashboard.html" class="mobile-nav-link">Dashboard demo</a></li>
+      <li><a href="contact.html" class="mobile-nav-link">Contact</a></li>
+    </ul>
+  </aside>
+
+  <!-- Breadcrumbs -->
+  <nav class="breadcrumbs-bar" aria-label="Breadcrumbs">
+    <div class="container">
+      <ol class="breadcrumbs-list">
+        <li class="breadcrumb-item"><a href="index.html">Home</a></li>
+        <li class="breadcrumb-separator" aria-hidden="true">›</li>
+        <li class="breadcrumb-item"><a href="algorithms.html">Algorithms</a></li>
+        <li class="breadcrumb-separator" aria-hidden="true">›</li>
+        <li class="breadcrumb-item breadcrumb-item--current" aria-current="page">Decision Tree</li>
+      </ol>
+    </div>
+  </nav>
+
+  <main id="main-content" class="section">
+    <div class="container">
+      <!-- 1. Header Block -->
+      <header class="algo-header">
+        <div class="algo-header__pills">
+          <span class="pill">Task: Classify with explainable rules</span>
+          <span class="pill pill--teal">Used in: Admin delivery and return-rate charts; late-delivery warnings</span>
+        </div>
+        <h1>Decision Tree</h1>
+        <p class="algo-header__question">"Will this order be late or returned, and why?"</p>
+      </header>
+
+      <!-- 2. What it is -->
+      <section class="section--compact content-reading">
+        <h2>What it is</h2>
+        <p>
+          A Decision Tree is a flowchart of yes/no questions—for example, "Is the seller rating below 3.5? Is the shipping distance long?"—that branches systematically down to a clear operational prediction such as "likely late".
+        </p>
+      </section>
+
+      <!-- 3. Why Allonola uses it -->
+      <section class="section--compact content-reading">
+        <h2>Why Allonola uses it</h2>
+        <p>
+          Allonola does not operate its own fulfillment trucks; third-party couriers carry orders from independent sellers directly to buyers. When packages are delayed or returned, support staff must know the exact root cause to coordinate constructively with couriers and merchants. Transparent decision branches provide full auditability, advancing Operational Goal #4 (reach 92% on-time delivery) and Operational Goal #5 (keep return rate below 6% of orders).
+        </p>
+      </section>
+
+      <!-- 4. How it works -->
+      <section class="section--compact content-reading">
+        <h2>How it works</h2>
+        <p>
+          The algorithm evaluates candidate features and selects the question split that best separates outcomes by minimizing impurity. Each branch represents a human-readable condition, and each leaf node produces a final prediction with associated confidence.
+        </p>
+
+        <div class="formula-box">
+Gini Impurity: Gini(D) = 1 - ∑ [p_i]²
+
+Information Gain: Gain(D, Feature) = Entropy(D) - ∑ (|D_v| / |D|) × Entropy(D_v)
+        </div>
+
+        <p class="text-small text-muted">
+          The primary strength of decision trees is total explainability: staff can inspect the exact sequence of thresholds that triggered an operational warning. Overfitting is prevented by limiting maximum tree depth and pruning branches with minimal sample support.
+        </p>
+      </section>
+
+      <!-- 5. Data used and why -->
+      <section class="section--compact">
+        <h2>Data used and why</h2>
+        <div class="table-responsive-wrapper" tabindex="0" role="region" aria-label="Decision tree features and reasons">
+          <table class="data-table">
+            <caption>Features used for transit delay and return probability evaluation. Illustrative / synthetically generated.</caption>
+            <thead>
+              <tr>
+                <th scope="col">Feature</th>
+                <th scope="col">Type / Range</th>
+                <th scope="col">Operational Rationale</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <th scope="row">Product type</th>
+                <td>Standard, Fragile, Perishable</td>
+                <td>Sensitive goods encounter careful packing delays and cold-chain constraints.</td>
+              </tr>
+              <tr>
+                <th scope="row">Seller rating</th>
+                <td>1.0 to 5.0 stars</td>
+                <td>Low-rated merchants suffer from dispatch backlogs and packaging errors.</td>
+              </tr>
+              <tr>
+                <th scope="row">Courier partner</th>
+                <td>Courier A, B, or C</td>
+                <td>Reflects regional carrier workload and local distribution hub congestion.</td>
+              </tr>
+              <tr>
+                <th scope="row">Shipping distance</th>
+                <td>Kilometers (km)</td>
+                <td>Cross-zone provincial transit routes have higher vulnerability to delay.</td>
+              </tr>
+              <tr>
+                <th scope="row">Return history</th>
+                <td>Prior return count</td>
+                <td>Signals chronic delivery address ambiguity or buyer availability issues.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="text-small text-muted">Output: late or on time; returned or not; or customer segmentation group.</p>
+      </section>
+
+      <!-- 6. Sample dataset -->
+      <section class="section--compact">
+        <h2>Sample dataset</h2>
+        <div class="table-responsive-wrapper" tabindex="0" role="region" aria-label="Sample delivery records">
+          <table class="data-table">
+            <caption>Sample historical dispatches. Late column indicates actual delayed delivery (1 = late). Illustrative / synthetically generated.</caption>
+            <thead>
+              <tr>
+                <th scope="col">Order</th>
+                <th scope="col">Product type</th>
+                <th scope="col">Seller rating</th>
+                <th scope="col">Courier</th>
+                <th scope="col">Distance (km)</th>
+                <th scope="col">Return history</th>
+                <th scope="col">Late flag</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <th scope="row">R-01</th>
+                <td>Standard</td>
+                <td class="tabular-nums">4.8</td>
+                <td>Courier A</td>
+                <td class="tabular-nums">6</td>
+                <td class="tabular-nums">0</td>
+                <td><span class="pill pill--teal">0 (On time)</span></td>
+              </tr>
+              <tr>
+                <th scope="row">R-02</th>
+                <td>Fragile</td>
+                <td class="tabular-nums">3.2</td>
+                <td>Courier B</td>
+                <td class="tabular-nums">28</td>
+                <td class="tabular-nums">2</td>
+                <td><span class="pill pill--coral">1 (Late)</span></td>
+              </tr>
+              <tr>
+                <th scope="row">R-03</th>
+                <td>Standard</td>
+                <td class="tabular-nums">4.1</td>
+                <td>Courier A</td>
+                <td class="tabular-nums">14</td>
+                <td class="tabular-nums">0</td>
+                <td><span class="pill pill--teal">0 (On time)</span></td>
+              </tr>
+              <tr>
+                <th scope="row">R-04</th>
+                <td>Perishable</td>
+                <td class="tabular-nums">3.4</td>
+                <td>Courier C</td>
+                <td class="tabular-nums">31</td>
+                <td class="tabular-nums">1</td>
+                <td><span class="pill pill--coral">1 (Late)</span></td>
+              </tr>
+              <tr>
+                <th scope="row">R-05</th>
+                <td>Standard</td>
+                <td class="tabular-nums">4.6</td>
+                <td>Courier B</td>
+                <td class="tabular-nums">9</td>
+                <td class="tabular-nums">0</td>
+                <td><span class="pill pill--teal">0 (On time)</span></td>
+              </tr>
+              <tr>
+                <th scope="row">R-06</th>
+                <td>Fragile</td>
+                <td class="tabular-nums">3.9</td>
+                <td>Courier C</td>
+                <td class="tabular-nums">22</td>
+                <td class="tabular-nums">3</td>
+                <td><span class="pill pill--coral">1 (Late)</span></td>
+              </tr>
+              <tr>
+                <th scope="row">R-07</th>
+                <td>Standard</td>
+                <td class="tabular-nums">3.1</td>
+                <td>Courier B</td>
+                <td class="tabular-nums">19</td>
+                <td class="tabular-nums">0</td>
+                <td><span class="pill pill--coral">1 (Late)</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- 7. Interactive Demo -->
+      <section class="demo-container">
+        <div class="demo-header">
+          <div>
+            <h2>Interactive demo</h2>
+            <p class="text-muted text-small">Configure order attributes below or click the rules tree to trace the exact decision trail.</p>
+          </div>
+          <span class="demo-badge">Live demo: explainable rule hierarchy</span>
+        </div>
+
+        <!-- Flowchart Diagram -->
+        <div class="card card--solid" style="padding: 1.5rem; margin-bottom: 2rem;">
+          <h3 style="font-size: 1.05rem; margin-bottom: 0.5rem;">Visual Decision Hierarchy</h3>
+          <p class="text-small text-muted" style="margin-bottom: 1.25rem;">
+            Confidence percentages displayed below are illustrative display values for this teaching diagram. Active evaluation path is highlighted with glowing borders.
+          </p>
+
+          <div class="tree-diagram">
+            <!-- Root -->
+            <div id="tree-root" class="tree-node tree-node--active">
+              <span class="tree-step-pill pill">Root Check</span>
+              <span class="tree-node__condition">Seller rating below 3.5?</span>
+            </div>
+
+            <div class="tree-branches">
+              <!-- Yes Branch from Root -->
+              <div id="branch-rating-yes" class="tree-branch tree-branch--active">
+                <span class="tree-branch__label" style="color: var(--teal);">Yes (Rating &lt; 3.5)</span>
+                
+                <div id="node-distance" class="tree-node tree-node--active">
+                  <span class="tree-step-pill pill">Step 2</span>
+                  <span class="tree-node__condition">Distance above 25 km?</span>
+                </div>
+
+                <div class="tree-branches" style="grid-template-columns: 1fr 1fr; gap: 0.75rem;">
+                  <div id="branch-dist-yes" class="tree-branch tree-branch--active">
+                    <span class="tree-branch__label" style="color: var(--teal);">Yes (&gt; 25 km)</span>
+                    <div id="node-prod" class="tree-node tree-node--active">
+                      <span class="tree-node__condition" style="font-size: 0.85rem;">Perishable or Fragile?</span>
+                    </div>
+                    <div style="display: flex; flex-direction: column; gap: 0.5rem; margin-top: 0.5rem;">
+                      <div id="leaf-1" class="tree-leaf tree-leaf--late">
+                        <span>Yes → LIKELY LATE</span>
+                        <span class="tabular-nums">82%</span>
+                      </div>
+                      <div id="leaf-2" class="tree-leaf tree-leaf--ontime">
+                        <span>No → ON TIME</span>
+                        <span class="tabular-nums">60%</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div id="branch-dist-no" class="tree-branch">
+                    <span class="tree-branch__label" style="color: var(--text-muted);">No (≤ 25 km)</span>
+                    <div id="node-courier" class="tree-node">
+                      <span class="tree-node__condition" style="font-size: 0.85rem;">Courier C?</span>
+                    </div>
+                    <div style="display: flex; flex-direction: column; gap: 0.5rem; margin-top: 0.5rem;">
+                      <div id="leaf-3" class="tree-leaf tree-leaf--late">
+                        <span>Yes → LIKELY LATE</span>
+                        <span class="tabular-nums">55%</span>
+                      </div>
+                      <div id="leaf-4" class="tree-leaf tree-leaf--ontime">
+                        <span>No → ON TIME</span>
+                        <span class="tabular-nums">70%</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- No Branch from Root -->
+              <div id="branch-rating-no" class="tree-branch">
+                <span class="tree-branch__label" style="color: var(--text-muted);">No (Rating ≥ 3.5)</span>
+                
+                <div id="node-return" class="tree-node">
+                  <span class="tree-step-pill pill">Step 2</span>
+                  <span class="tree-node__condition">Return history 2 or more?</span>
+                </div>
+
+                <div style="display: flex; flex-direction: column; gap: 0.75rem; margin-top: 0.75rem;">
+                  <div id="leaf-5" class="tree-leaf tree-leaf--late">
+                    <span>Yes (≥ 2 returns) → LIKELY LATE</span>
+                    <span class="tabular-nums">58%</span>
+                  </div>
+                  <div id="leaf-6" class="tree-leaf tree-leaf--ontime">
+                    <span>No (&lt; 2 returns) → ON TIME</span>
+                    <span class="tabular-nums">90%</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Form: Try an Order -->
+        <div class="demo-layout">
+          <div class="demo-controls">
+            <h3 style="font-size: 1.1rem;">Try an order</h3>
+            
+            <div class="form-group">
+              <label for="dt-product-type" class="form-label">Product type:</label>
+              <select id="dt-product-type" class="form-control">
+                <option value="Perishable" selected>Perishable (e.g., fresh produce, baked goods)</option>
+                <option value="Fragile">Fragile (e.g., glassware, electronics)</option>
+                <option value="Standard">Standard (e.g., apparel, books, phone stand)</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <div class="slider-label-row">
+                <label for="dt-seller-rating" class="form-label">Seller rating:</label>
+                <span id="dt-seller-rating-val" class="tabular-nums" style="color: var(--teal); font-weight: 700;">3.4</span>
+              </div>
+              <input type="range" id="dt-seller-rating" class="slider-input" min="1.0" max="5.0" step="0.1" value="3.4">
+            </div>
+
+            <div class="form-group">
+              <label for="dt-courier" class="form-label">Assigned courier partner:</label>
+              <select id="dt-courier" class="form-control">
+                <option value="Courier C" selected>Courier C (Regional hub congestion)</option>
+                <option value="Courier A">Courier A (High reliability metric)</option>
+                <option value="Courier B">Courier B (Standard fleet service)</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <div class="slider-label-row">
+                <label for="dt-distance" class="form-label">Transit distance (km):</label>
+                <span id="dt-distance-val" class="tabular-nums" style="color: var(--teal); font-weight: 700;">31 km</span>
+              </div>
+              <input type="range" id="dt-distance" class="slider-input" min="2" max="60" step="1" value="31">
+            </div>
+
+            <div class="form-group">
+              <div class="slider-label-row">
+                <label for="dt-returns" class="form-label">Buyer past returns:</label>
+                <span id="dt-returns-val" class="tabular-nums" style="color: var(--teal); font-weight: 700;">1</span>
+              </div>
+              <input type="range" id="dt-returns" class="slider-input" min="0" max="5" step="1" value="1">
+            </div>
+
+            <button type="button" id="dt-load-r04-btn" class="btn btn--subtle btn--small">
+              Load Sample R-04 Preset
+            </button>
+          </div>
+
+          <div class="demo-output">
+            <div class="demo-big-stat">
+              <div id="dt-prediction-badge" class="demo-big-stat__number" style="font-size: 2.2rem; color: var(--coral);">
+                LIKELY LATE
+              </div>
+              <div class="demo-big-stat__label">Predicted Outcome (<span id="dt-confidence-badge">82%</span> confidence)</div>
+            </div>
+
+            <div class="card card--solid" style="padding: 1.25rem;">
+              <h4 style="font-size: 0.95rem; margin-bottom: 0.5rem; color: var(--teal);">Decision Audit Trail:</h4>
+              <p id="dt-sentence-path" class="text-small" style="margin-bottom: 0.75rem; color: var(--text);">
+                Order flagged as LIKELY LATE with 82% confidence because seller rating is below 3.5 (3.4), distance is 31 km (>25 km), and product is Perishable.
+              </p>
+              <div class="card" style="padding: 0.75rem 1rem; background: var(--surface);">
+                <span class="text-small text-muted" style="font-weight: 600;">Sequential rule evaluation steps:</span>
+                <ol id="dt-path-steps-list" style="padding-left: 1.25rem; margin-top: 0.35rem; font-size: 0.85rem; color: var(--text-muted); display: flex; flex-direction: column; gap: 0.25rem;">
+                  <!-- Populated dynamically -->
+                </ol>
+              </div>
+            </div>
+
+            <div class="card card--solid" style="padding: 1rem;">
+              <p class="text-small text-muted" style="margin: 0;">
+                <strong>Explainability Note:</strong> Because tree branches are evaluated hierarchically, if seller rating is below 3.5 and distance exceeds 25 km, customer return history is never evaluated. This explainable structure ensures operations specialists understand precisely why a shipment was flagged.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 8. Illustrative results and interpretation -->
+      <section class="section--compact">
+        <h2>Illustrative results and interpretation</h2>
+        <div class="grid-3" style="margin-bottom: 1.5rem;">
+          <div class="metric-card">
+            <span class="metric-label">Benchmark Order R-04</span>
+            <span class="metric-value tabular-nums" style="color: var(--coral);">82% Late</span>
+            <span class="metric-subtext">R-04 followed rules to "likely late" (arrived 1 day late)</span>
+          </div>
+
+          <div class="metric-card">
+            <span class="metric-label">Model Accuracy</span>
+            <span class="metric-value tabular-nums">85.8%</span>
+            <span class="metric-subtext">Evaluated on test set of 1,200 orders</span>
+          </div>
+
+          <div class="metric-card">
+            <span class="metric-label">Late Recall</span>
+            <span class="metric-value tabular-nums">0.75</span>
+            <span class="metric-subtext">180 of 240 delayed shipments caught early (precision 0.62)</span>
+          </div>
+        </div>
+
+        <!-- Confusion Matrix Table -->
+        <div class="table-responsive-wrapper" tabindex="0" role="region" aria-label="Decision tree confusion matrix">
+          <table class="data-table">
+            <caption>Confusion matrix on 1,200 held-out test orders (rows = actual, columns = predicted). Illustrative / synthetically generated.</caption>
+            <thead>
+              <tr>
+                <th scope="col">Actual Outcome</th>
+                <th scope="col">Predicted On Time</th>
+                <th scope="col">Predicted Late</th>
+                <th scope="col">Total Actual</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <th scope="row">Actually On Time</th>
+                <td class="tabular-nums" style="color: var(--teal); font-weight: 700;">850 (True Negatives)</td>
+                <td class="tabular-nums" style="color: var(--coral);">110 (False Alarms)</td>
+                <td class="tabular-nums">960 orders</td>
+              </tr>
+              <tr>
+                <th scope="row">Actually Late</th>
+                <td class="tabular-nums" style="color: var(--coral);">60 (Missed Delays)</td>
+                <td class="tabular-nums" style="color: var(--teal); font-weight: 700;">180 (True Positives)</td>
+                <td class="tabular-nums">240 orders</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="grid-2">
+          <div class="card card--solid">
+            <h3 style="font-size: 1.1rem; margin-bottom: 0.5rem;">Interpretation</h3>
+            <p class="text-small text-muted" style="margin: 0;">
+              Late precision is 0.62 (180 of 290 total warnings correct); late recall is 0.75 (180 of 240 actual late orders caught). The tree is deliberately tuned to favor recall over precision: a missed late delivery hurts the customer far more than an unnecessary warning hurts operational efficiency.
+            </p>
+          </div>
+
+          <div class="card card--solid">
+            <h3 style="font-size: 1.1rem; margin-bottom: 0.5rem;">Business Impact</h3>
+            <p class="text-small text-muted" style="margin: 0;">
+              Our logistics operations team reviews 290 flagged high-risk orders rather than blindly auditing all 1,200 shipments, catching 75% of delivery delays in advance. Specific rule trails turn carrier performance reviews into constructive, root-cause conversations.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- 9. Strengths and limitations -->
+      <section class="section--compact">
+        <h2>Strengths and limitations</h2>
+        <div class="strengths-limitations-grid">
+          <div class="card">
+            <h3 style="color: var(--teal); font-size: 1.1rem; margin-bottom: 0.75rem;">Strengths</h3>
+            <ul class="bullet-list">
+              <li>Completely transparent and easy for non-technical staff to audit.</li>
+              <li>Generates natural, plain-English operational decision trails.</li>
+              <li>Requires no feature normalization or standard scaling.</li>
+              <li>Handles mixed categorical and continuous numerical features naturally.</li>
+            </ul>
+          </div>
+
+          <div class="card">
+            <h3 style="color: var(--coral); font-size: 1.1rem; margin-bottom: 0.75rem;">Limitations</h3>
+            <ul class="bullet-list bullet-list--coral">
+              <li>Can quickly overfit and memorize training noise if tree depth is unconstrained.</li>
+              <li>Axis-aligned orthogonal splits struggle with diagonal linear feature combinations.</li>
+              <li>Small changes or revisions in the training dataset can alter the entire tree layout.</li>
+              <li>Can be biased toward features with more unique categories or levels.</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <!-- 10. Previous / Next Links -->
+      <nav class="algo-pagination" aria-label="Algorithm series pagination">
+        <a href="algo-svm.html" class="algo-pagination__btn">
+          <span class="algo-pagination__label">← Previous Algorithm</span>
+          <span class="algo-pagination__title">Support Vector Machine</span>
+        </a>
+
+        <a href="algo-ann.html" class="algo-pagination__btn" style="text-align: right;">
+          <span class="algo-pagination__label">Next Algorithm</span>
+          <span class="algo-pagination__title">Artificial Neural Network →</span>
+        </a>
+      </nav>
+    </div>
+  </main>
+
+  <!-- Global Footer -->
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-top">
+        <div class="footer-brand">
+          <span class="site-logo">
+            <svg class="logo-icon" width="22" height="22" viewBox="0 0 28 28" fill="none" aria-hidden="true">
+              <circle cx="6" cy="20" r="3.5" fill="currentColor" />
+              <circle cx="22" cy="20" r="3.5" fill="currentColor" />
+              <circle cx="14" cy="7" r="3.5" fill="currentColor" />
+              <line x1="6" y1="20" x2="14" y2="7" stroke="currentColor" stroke-width="1.75" />
+              <line x1="14" y1="7" x2="22" y2="20" stroke="currentColor" stroke-width="1.75" />
+              <line x1="6" y1="20" x2="22" y2="20" stroke="currentColor" stroke-width="1.75" />
+            </svg>
+            <span>Allonola</span>
+          </span>
+          <p>
+            To give every customer an easy, trustworthy, and personalized online shopping experience at fair prices, and to help sellers reach more buyers without needing a physical shop.
+          </p>
+        </div>
+
+        <div class="footer-col">
+          <h4>Platform</h4>
+          <ul class="footer-links">
+            <li><a href="index.html" class="footer-link">Home</a></li>
+            <li><a href="about.html" class="footer-link">About Allonola</a></li>
+            <li><a href="dashboard.html" class="footer-link">Dashboard Demo</a></li>
+            <li><a href="contact.html" class="footer-link">Contact Support</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <h4>Algorithms</h4>
+          <ul class="footer-links">
+            <li><a href="algorithms.html" class="footer-link">Overview & Comparison</a></li>
+            <li><a href="algo-linear-regression.html" class="footer-link">Linear Regression</a></li>
+            <li><a href="algo-naive-bayes.html" class="footer-link">Naive Bayes</a></li>
+            <li><a href="algo-knn.html" class="footer-link">K-Nearest Neighbors</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <h4>Machine Learning</h4>
+          <ul class="footer-links">
+            <li><a href="algo-svm.html" class="footer-link">Support Vector Machine</a></li>
+            <li><a href="algo-decision-tree.html" class="footer-link">Decision Tree</a></li>
+            <li><a href="algo-ann.html" class="footer-link">Artificial Neural Network</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <p class="disclaimer-badge">All data shown is illustrative and synthetically generated.</p>
+        <p>&copy; 2026 Allonola. Fictional company for academic use.</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Script Execution Order -->
+  <script defer src="js/data.js"></script>
+  <script defer src="js/app.js"></script>
+  <script defer src="js/charts.js"></script>
+  <script defer src="js/table.js"></script>
+  <script defer src="js/ml/decision-tree.js"></script>
+  <script defer>
+    document.addEventListener("DOMContentLoaded", function () {
+      const prodType = document.getElementById("dt-product-type");
+      const ratingSlider = document.getElementById("dt-seller-rating");
+      const ratingVal = document.getElementById("dt-seller-rating-val");
+      const courierSelect = document.getElementById("dt-courier");
+      const distSlider = document.getElementById("dt-distance");
+      const distVal = document.getElementById("dt-distance-val");
+      const returnsSlider = document.getElementById("dt-returns");
+      const returnsVal = document.getElementById("dt-returns-val");
+      const loadR04Btn = document.getElementById("dt-load-r04-btn");
+
+      const predBadge = document.getElementById("dt-prediction-badge");
+      const confBadge = document.getElementById("dt-confidence-badge");
+      const sentencePath = document.getElementById("dt-sentence-path");
+      const pathList = document.getElementById("dt-path-steps-list");
+
+      const ml = window.Allonola.ml.decisionTree;
+
+      function updateDecisionTree() {
+        const order = {
+          productType: prodType.value,
+          sellerRating: parseFloat(ratingSlider.value),
+          courier: courierSelect.value,
+          distanceKm: parseFloat(distSlider.value),
+          returnHistory: parseInt(returnsSlider.value, 10),
+        };
+
+        ratingVal.textContent = order.sellerRating.toFixed(1);
+        distVal.textContent = order.distanceKm + " km";
+        returnsVal.textContent = order.returnHistory;
+
+        const result = ml.predictDeliveryRisk(order);
+
+        predBadge.textContent = result.prediction;
+        confBadge.textContent = result.confidence;
+
+        if (result.prediction === "LIKELY LATE") {
+          predBadge.style.color = "var(--coral)";
+        } else {
+          predBadge.style.color = "var(--teal)";
+        }
+
+        sentencePath.textContent = result.explanation;
+
+        pathList.innerHTML = result.pathSteps
+          .map((step, idx) => `<li><strong>Step ${idx + 1}:</strong> ${step}</li>`)
+          .join("");
+
+        highlightTreeDiagram(order, result.leafId);
+      }
+
+      function highlightTreeDiagram(order, activeLeafId) {
+        // Reset all classes
+        document.querySelectorAll(".tree-node, .tree-branch, .tree-leaf").forEach((el) => {
+          el.classList.remove("tree-node--active", "tree-branch--active");
+          el.style.boxShadow = "none";
+        });
+
+        // Always highlight root
+        const root = document.getElementById("tree-root");
+        if (root) root.classList.add("tree-node--active");
+
+        const ratingYes = order.sellerRating < 3.5;
+        const branchRatingYes = document.getElementById("branch-rating-yes");
+        const branchRatingNo = document.getElementById("branch-rating-no");
+
+        if (ratingYes) {
+          if (branchRatingYes) branchRatingYes.classList.add("tree-branch--active");
+          const nodeDist = document.getElementById("node-distance");
+          if (nodeDist) nodeDist.classList.add("tree-node--active");
+
+          const distYes = order.distanceKm > 25;
+          const branchDistYes = document.getElementById("branch-dist-yes");
+          const branchDistNo = document.getElementById("branch-dist-no");
+
+          if (distYes) {
+            if (branchDistYes) branchDistYes.classList.add("tree-branch--active");
+            const nodeProd = document.getElementById("node-prod");
+            if (nodeProd) nodeProd.classList.add("tree-node--active");
+          } else {
+            if (branchDistNo) branchDistNo.classList.add("tree-branch--active");
+            const nodeCourier = document.getElementById("node-courier");
+            if (nodeCourier) nodeCourier.classList.add("tree-node--active");
+          }
+        } else {
+          if (branchRatingNo) branchRatingNo.classList.add("tree-branch--active");
+          const nodeReturn = document.getElementById("node-return");
+          if (nodeReturn) nodeReturn.classList.add("tree-node--active");
+        }
+
+        // Highlight active leaf
+        const leaf = document.getElementById(activeLeafId);
+        if (leaf) {
+          leaf.style.boxShadow = "0 0 14px " + (activeLeafId.includes("late") || activeLeafId === "leaf-1" || activeLeafId === "leaf-3" || activeLeafId === "leaf-5" ? "rgba(242, 107, 91, 0.5)" : "rgba(46, 196, 182, 0.5)");
+          leaf.style.transform = "scale(1.02)";
+        }
+      }
+
+      // Presets
+      loadR04Btn.addEventListener("click", () => {
+        prodType.value = "Perishable";
+        ratingSlider.value = 3.4;
+        courierSelect.value = "Courier C";
+        distSlider.value = 31;
+        returnsSlider.value = 1;
+        updateDecisionTree();
+      });
+
+      prodType.addEventListener("change", updateDecisionTree);
+      ratingSlider.addEventListener("input", updateDecisionTree);
+      courierSelect.addEventListener("change", updateDecisionTree);
+      distSlider.addEventListener("input", updateDecisionTree);
+      returnsSlider.addEventListener("input", updateDecisionTree);
+
+      updateDecisionTree();
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>About | Allonola</title>
+  <meta name="description" content="Learn about Allonola's marketplace mission, operational goals, ethical approach to data, and team members.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/layout.css">
+  <link rel="stylesheet" href="css/components.css">
+</head>
+<body data-page="about">
+  <a href="#main-content" class="skip-link">Skip to main content</a>
+
+  <!-- Header -->
+  <header class="site-header">
+    <div class="container header-inner">
+      <a href="index.html" class="site-logo" aria-label="Allonola Home">
+        <svg class="logo-icon" width="28" height="28" viewBox="0 0 28 28" fill="none" aria-hidden="true">
+          <circle cx="6" cy="20" r="3.5" fill="currentColor" />
+          <circle cx="22" cy="20" r="3.5" fill="currentColor" />
+          <circle cx="14" cy="7" r="3.5" fill="currentColor" />
+          <line x1="6" y1="20" x2="14" y2="7" stroke="currentColor" stroke-width="1.75" />
+          <line x1="14" y1="7" x2="22" y2="20" stroke="currentColor" stroke-width="1.75" />
+          <line x1="6" y1="20" x2="22" y2="20" stroke="currentColor" stroke-width="1.75" />
+        </svg>
+        <span>Allonola</span>
+      </a>
+
+      <nav class="nav-desktop" aria-label="Primary navigation">
+        <a href="index.html" class="nav-link">Home</a>
+        <a href="about.html" class="nav-link nav-link--active">About</a>
+        <div class="nav-dropdown">
+          <button type="button" class="nav-link nav-dropdown-toggle" aria-expanded="false" aria-haspopup="true">
+            <span>Algorithms</span>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+              <polyline points="6 9 12 15 18 9"></polyline>
+            </svg>
+          </button>
+          <div class="nav-dropdown-menu" role="menu">
+            <a href="algorithms.html" class="nav-dropdown-item" role="menuitem">
+              <span class="nav-dropdown-title">Overview & Comparison</span>
+              <span class="nav-dropdown-desc">Compare all six ML approaches</span>
+            </a>
+            <a href="algo-linear-regression.html" class="nav-dropdown-item" role="menuitem">
+              <span class="nav-dropdown-title">Linear Regression</span>
+              <span class="nav-dropdown-desc">Demand forecasting & price elasticity</span>
+            </a>
+            <a href="algo-naive-bayes.html" class="nav-dropdown-item" role="menuitem">
+              <span class="nav-dropdown-title">Naive Bayes</span>
+              <span class="nav-dropdown-desc">Sentiment & fake review filtering</span>
+            </a>
+            <a href="algo-knn.html" class="nav-dropdown-item" role="menuitem">
+              <span class="nav-dropdown-title">K-Nearest Neighbors</span>
+              <span class="nav-dropdown-desc">Collaborative recommendations</span>
+            </a>
+            <a href="algo-svm.html" class="nav-dropdown-item" role="menuitem">
+              <span class="nav-dropdown-title">Support Vector Machine</span>
+              <span class="nav-dropdown-desc">Order fraud & auto-categorization</span>
+            </a>
+            <a href="algo-decision-tree.html" class="nav-dropdown-item" role="menuitem">
+              <span class="nav-dropdown-title">Decision Tree</span>
+              <span class="nav-dropdown-desc">Delivery risk & return rules</span>
+            </a>
+            <a href="algo-ann.html" class="nav-dropdown-item" role="menuitem">
+              <span class="nav-dropdown-title">Artificial Neural Network</span>
+              <span class="nav-dropdown-desc">Personalization & shopper churn</span>
+            </a>
+          </div>
+        </div>
+        <a href="dashboard.html" class="nav-link">Dashboard demo</a>
+        <a href="contact.html" class="nav-link">Contact</a>
+      </nav>
+
+      <div class="header-actions">
+        <button type="button" id="theme-toggle" class="btn-icon" aria-label="Switch to light theme" title="Switch to light theme">
+          <svg class="theme-icon-sun" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+            <circle cx="12" cy="12" r="5"></circle>
+            <line x1="12" y1="1" x2="12" y2="3"></line>
+            <line x1="12" y1="21" x2="12" y2="23"></line>
+            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+            <line x1="1" y1="12" x2="3" y2="12"></line>
+            <line x1="21" y1="12" x2="23" y2="12"></line>
+            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+          </svg>
+          <svg class="theme-icon-moon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="display:none;" aria-hidden="true">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+          </svg>
+        </button>
+
+        <button type="button" id="hamburger-btn" class="btn-icon hamburger-btn" aria-label="Open mobile menu" aria-expanded="false" aria-controls="nav-drawer">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <line x1="3" y1="12" x2="21" y2="12"></line>
+            <line x1="3" y1="6" x2="21" y2="6"></line>
+            <line x1="3" y1="18" x2="21" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Mobile Drawer -->
+  <div id="nav-backdrop" class="nav-backdrop"></div>
+  <aside id="nav-drawer" class="nav-drawer" aria-label="Mobile navigation">
+    <div style="display: flex; justify-content: space-between; align-items: center;">
+      <span class="site-logo">
+        <svg class="logo-icon" width="24" height="24" viewBox="0 0 28 28" fill="none" aria-hidden="true">
+          <circle cx="6" cy="20" r="3.5" fill="currentColor" />
+          <circle cx="22" cy="20" r="3.5" fill="currentColor" />
+          <circle cx="14" cy="7" r="3.5" fill="currentColor" />
+          <line x1="6" y1="20" x2="14" y2="7" stroke="currentColor" stroke-width="1.75" />
+          <line x1="14" y1="7" x2="22" y2="20" stroke="currentColor" stroke-width="1.75" />
+          <line x1="6" y1="20" x2="22" y2="20" stroke="currentColor" stroke-width="1.75" />
+        </svg>
+        <span>Allonola</span>
+      </span>
+    </div>
+    <ul class="nav-mobile-list">
+      <li><a href="index.html" class="mobile-nav-link">Home</a></li>
+      <li><a href="about.html" class="mobile-nav-link">About</a></li>
+      <li>
+        <button type="button" id="algo-accordion-btn" class="mobile-accordion-btn" aria-expanded="false">
+          <span>Algorithms</span>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <polyline points="6 9 12 15 18 9"></polyline>
+          </svg>
+        </button>
+        <ul id="algo-accordion-menu" class="mobile-sublist" hidden>
+          <li><a href="algorithms.html" class="mobile-sublink">Overview & Comparison</a></li>
+          <li><a href="algo-linear-regression.html" class="mobile-sublink">Linear Regression</a></li>
+          <li><a href="algo-naive-bayes.html" class="mobile-sublink">Naive Bayes</a></li>
+          <li><a href="algo-knn.html" class="mobile-sublink">K-Nearest Neighbors</a></li>
+          <li><a href="algo-svm.html" class="mobile-sublink">Support Vector Machine</a></li>
+          <li><a href="algo-decision-tree.html" class="mobile-sublink">Decision Tree</a></li>
+          <li><a href="algo-ann.html" class="mobile-sublink">Artificial Neural Network</a></li>
+        </ul>
+      </li>
+      <li><a href="dashboard.html" class="mobile-nav-link">Dashboard demo</a></li>
+      <li><a href="contact.html" class="mobile-nav-link">Contact</a></li>
+    </ul>
+  </aside>
+
+  <!-- Breadcrumbs -->
+  <nav class="breadcrumbs-bar" aria-label="Breadcrumbs">
+    <div class="container">
+      <ol class="breadcrumbs-list">
+        <li class="breadcrumb-item"><a href="index.html">Home</a></li>
+        <li class="breadcrumb-separator" aria-hidden="true">›</li>
+        <li class="breadcrumb-item breadcrumb-item--current" aria-current="page">About</li>
+      </ol>
+    </div>
+  </nav>
+
+  <main id="main-content" class="section">
+    <div class="container">
+      <div class="content-reading">
+        <div class="pill pill--teal" style="margin-bottom: 0.75rem;">Company Context</div>
+        <h1>About Allonola</h1>
+        <p class="lead">
+          Allonola is an online-only retail marketplace. We have no physical stores, warehouses, or offices.
+        </p>
+        <p>
+          Independent sellers keep and pack their own stock; delivery partners (couriers) carry orders. Allonola runs the platform connecting buyers, sellers, and couriers. It uses machine learning to suggest products, flag fake reviews and suspicious orders, and warn staff about likely late deliveries or returns.
+        </p>
+      </div>
+
+      <!-- a) Mission & Vision Highlight Blocks -->
+      <div class="grid-2" style="margin: 2.5rem 0;">
+        <div class="card card--solid" style="border-left: 4px solid var(--primary);">
+          <div class="pill" style="margin-bottom: 0.75rem;">Our Mission</div>
+          <h2 style="font-size: 1.35rem;">To give every customer an easy, trustworthy, and personalized experience.</h2>
+          <p class="text-small text-muted" style="margin-bottom: 0;">
+            To give every customer an easy, trustworthy, and personalized online shopping experience at fair prices, and to help sellers reach more buyers without needing a physical shop.
+          </p>
+        </div>
+
+        <div class="card card--solid" style="border-left: 4px solid var(--teal);">
+          <div class="pill pill--teal" style="margin-bottom: 0.75rem;">Our Vision</div>
+          <h2 style="font-size: 1.35rem;">To become the most customer-friendly online marketplace.</h2>
+          <p class="text-small text-muted" style="margin-bottom: 0;">
+            To become the most customer-friendly online marketplace in our region, where finding a product, paying for it, and receiving it feels simple and stress-free.
+          </p>
+        </div>
+      </div>
+
+      <!-- b) Operational Goals Table -->
+      <section class="section section--compact">
+        <h2>Operational goals</h2>
+        <p class="text-muted">Measurable targets established to track user experience, platform integrity, and machine learning efficacy.</p>
+        
+        <div class="table-responsive-wrapper" tabindex="0" role="region" aria-label="Operational goals data table">
+          <table class="data-table">
+            <caption>Operational goals and machine learning alignment. Illustrative / synthetically generated.</caption>
+            <thead>
+              <tr>
+                <th scope="col">No.</th>
+                <th scope="col">Operational Goal</th>
+                <th scope="col">Target Metric</th>
+                <th scope="col">Supporting Algorithm / Engineering</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <th scope="row">1</th>
+                <td>Make product discovery faster</td>
+                <td>Cut median time from first search to first add-to-cart by 20%</td>
+                <td><span class="pill pill--teal">KNN recommendations, ANN homepage</span></td>
+              </tr>
+              <tr>
+                <th scope="row">2</th>
+                <td>Improve seller forecasting</td>
+                <td>Keep MAPE under 20% for top 200 sellers</td>
+                <td><span class="pill">Linear Regression</span></td>
+              </tr>
+              <tr>
+                <th scope="row">3</th>
+                <td>Limit fraud losses</td>
+                <td>Keep fraud-related losses below 0.5% of GMV</td>
+                <td><span class="pill pill--coral">SVM, Naive Bayes</span></td>
+              </tr>
+              <tr>
+                <th scope="row">4</th>
+                <td>Improve delivery reliability</td>
+                <td>Reach 92% on-time delivery</td>
+                <td><span class="pill">Decision Tree</span></td>
+              </tr>
+              <tr>
+                <th scope="row">5</th>
+                <td>Reduce returns</td>
+                <td>Keep return rate below 6% of orders</td>
+                <td><span class="pill">Decision Tree</span></td>
+              </tr>
+              <tr>
+                <th scope="row">6</th>
+                <td>Retain customers</td>
+                <td>Raise repeat-buyer rate from 28% to 35%</td>
+                <td><span class="pill pill--teal">ANN</span></td>
+              </tr>
+              <tr>
+                <th scope="row">7</th>
+                <td>Keep the platform dependable</td>
+                <td>Maintain 99.5% uptime</td>
+                <td><span class="pill">Core engineering</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- c) Target Groups & Marketplace Scope -->
+      <section class="section section--compact">
+        <h2>Target groups & platform scope</h2>
+        <p class="text-muted">Allonola launches in one country, supporting four core stakeholder groups with clear operational boundaries.</p>
+
+        <div class="grid-4" style="margin-top: 1.5rem;">
+          <div class="card">
+            <h3 class="card-title">Buyers</h3>
+            <p class="text-small text-muted">
+              Everyday retail shoppers looking for an uncluttered browsing experience, fair pricing, and predictable order arrivals.
+            </p>
+          </div>
+          <div class="card">
+            <h3 class="card-title">Sellers</h3>
+            <p class="text-small text-muted">
+              Small and medium businesses and individual sellers who pack and warehouse their own inventory without physical retail premises.
+            </p>
+          </div>
+          <div class="card">
+            <h3 class="card-title">Couriers</h3>
+            <p class="text-small text-muted">
+              Third-party logistics partners responsible for vehicle routing, pickup coordination, and regional last-mile delivery.
+            </p>
+          </div>
+          <div class="card">
+            <h3 class="card-title">Allonola Staff</h3>
+            <p class="text-small text-muted">
+              Marketplace administrators, customer support representatives, and fraud analysts reviewing machine-flagged anomalies.
+            </p>
+          </div>
+        </div>
+
+        <div class="grid-2" style="margin-top: 1.5rem;">
+          <div class="card card--solid">
+            <h3 style="color: var(--teal); margin-bottom: 0.75rem;">Included Services</h3>
+            <ul class="bullet-list">
+              <li>Product browsing and search</li>
+              <li>Seller marketplace</li>
+              <li>Cart and checkout (e-wallet, card, cash on delivery)</li>
+              <li>Order tracking</li>
+              <li>Returns, refunds, and support</li>
+              <li>Seller and admin dashboards</li>
+              <li>Reviews and ratings</li>
+              <li>Personalized suggestions and offers</li>
+            </ul>
+          </div>
+          <div class="card card--solid">
+            <h3 style="color: var(--coral); margin-bottom: 0.75rem;">Not Included</h3>
+            <ul class="bullet-list bullet-list--coral">
+              <li>Physical stores</li>
+              <li>Warehouses or centralized fulfillment centers</li>
+              <li>In-person retail services</li>
+              <li>Native downloadable apps (web-first marketplace)</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <!-- d) Our Approach to Data -->
+      <section class="section section--compact">
+        <h2>Our approach to data</h2>
+        <p class="text-muted">
+          Allonola is committed to responsible, transparent data stewardship. Our machine learning algorithms operate under strict governance principles.
+        </p>
+
+        <div class="grid-3" style="margin-top: 1.5rem;">
+          <div class="card">
+            <h3 style="font-size: 1.1rem; margin-bottom: 0.5rem;">Consent & Transparency</h3>
+            <p class="text-small text-muted">
+              Shoppers and sellers know what data is captured (interactions, purchases, reviews) and why it is used to improve discovery and safeguard accounts.
+            </p>
+          </div>
+          <div class="card">
+            <h3 style="font-size: 1.1rem; margin-bottom: 0.5rem;">Data Minimization</h3>
+            <p class="text-small text-muted">
+              Models receive only the features necessary to answer specific business questions. Personal phone numbers and passwords are never fed to ML features.
+            </p>
+          </div>
+          <div class="card">
+            <h3 style="font-size: 1.1rem; margin-bottom: 0.5rem;">Pseudonymization</h3>
+            <p class="text-small text-muted">
+              User identities are represented by synthetic identifiers (e.g., U1, S-01) during model inference and recommendation lookups.
+            </p>
+          </div>
+          <div class="card">
+            <h3 style="font-size: 1.1rem; margin-bottom: 0.5rem;">Retention Limits</h3>
+            <p class="text-small text-muted">
+              Temporary session clickstreams and raw web telemetry expire automatically after scheduled retention windows.
+            </p>
+          </div>
+          <div class="card">
+            <h3 style="font-size: 1.1rem; margin-bottom: 0.5rem;">Human Review</h3>
+            <p class="text-small text-muted">
+              Machine learning provides decision support; sensitive high-impact decisions (fraud account suspensions, merchant disputes) always route to staff analysts.
+            </p>
+          </div>
+          <div class="card">
+            <h3 style="font-size: 1.1rem; margin-bottom: 0.5rem;">Fair Treatment & Limits</h3>
+            <p class="text-small text-muted">
+              Algorithms are treated as probabilistic estimators rather than absolute arbiters. Confidence thresholds and clear reasoning trails accompany operational flags.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- e) Simple Milestone Timeline -->
+      <section class="section section--compact">
+        <h2>Milestone roadmap</h2>
+        <p class="text-muted">Planned platform phases. <span class="disclaimer-badge">Illustrative / synthetically generated.</span></p>
+
+        <div class="grid-3" style="margin-top: 1.5rem;">
+          <div class="card card--solid" style="border-top: 3px solid var(--primary);">
+            <span class="pill" style="margin-bottom: 0.5rem;">Phase 1</span>
+            <h3 style="font-size: 1.15rem;">Pilot launch</h3>
+            <p class="text-small text-muted">
+              Single country launch focusing on top 200 merchant partners, baseline recommendation engine, and courier integration.
+            </p>
+          </div>
+          <div class="card card--solid" style="border-top: 3px solid var(--teal);">
+            <span class="pill pill--teal" style="margin-bottom: 0.5rem;">Phase 2</span>
+            <h3 style="font-size: 1.15rem;">First 12 months targets</h3>
+            <p class="text-small text-muted">
+              Reach 92% on-time delivery, keep return rate under 6%, cut search-to-cart latency by 20%, and maintain 99.5% uptime.
+            </p>
+          </div>
+          <div class="card card--solid" style="border-top: 3px solid var(--warning);">
+            <span class="pill" style="margin-bottom: 0.5rem;">Phase 3</span>
+            <h3 style="font-size: 1.15rem;">Expansion planned</h3>
+            <p class="text-small text-muted">
+              Rollout of deep personalized homepage feeds, real-time courier dispatch rerouting, and cross-border seller onboarding.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- f) Team -->
+      <section class="section section--compact">
+        <h2>Project team</h2>
+        <p class="text-muted">The team behind the Allonola academic marketplace demonstration.</p>
+
+        <div class="grid-3" style="margin-top: 1.5rem;">
+          <div class="card" style="text-align: center;">
+            <div class="card-icon" style="margin: 0 auto 1rem;">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                <circle cx="12" cy="7" r="4"></circle>
+              </svg>
+            </div>
+            <h3 style="font-size: 1.2rem; margin-bottom: 0.25rem;">Attos</h3>
+            <p class="text-muted text-small" style="margin-bottom: 0;">Group member</p>
+          </div>
+
+          <div class="card" style="text-align: center;">
+            <div class="card-icon" style="margin: 0 auto 1rem;">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                <circle cx="12" cy="7" r="4"></circle>
+              </svg>
+            </div>
+            <h3 style="font-size: 1.2rem; margin-bottom: 0.25rem;">Millondaga</h3>
+            <p class="text-muted text-small" style="margin-bottom: 0;">Group member</p>
+          </div>
+
+          <div class="card" style="text-align: center;">
+            <div class="card-icon" style="margin: 0 auto 1rem;">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                <circle cx="12" cy="7" r="4"></circle>
+              </svg>
+            </div>
+            <h3 style="font-size: 1.2rem; margin-bottom: 0.25rem;">Enola</h3>
+            <p class="text-muted text-small" style="margin-bottom: 0;">Group member</p>
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-top">
+        <div class="footer-brand">
+          <span class="site-logo">
+            <svg class="logo-icon" width="22" height="22" viewBox="0 0 28 28" fill="none" aria-hidden="true">
+              <circle cx="6" cy="20" r="3.5" fill="currentColor" />
+              <circle cx="22" cy="20" r="3.5" fill="currentColor" />
+              <circle cx="14" cy="7" r="3.5" fill="currentColor" />
+              <line x1="6" y1="20" x2="14" y2="7" stroke="currentColor" stroke-width="1.75" />
+              <line x1="14" y1="7" x2="22" y2="20" stroke="currentColor" stroke-width="1.75" />
+              <line x1="6" y1="20" x2="22" y2="20" stroke="currentColor" stroke-width="1.75" />
+            </svg>
+            <span>Allonola</span>
+          </span>
+          <p>
+            To give every customer an easy, trustworthy, and personalized online shopping experience at fair prices, and to help sellers reach more buyers without needing a physical shop.
+          </p>
+        </div>
+
+        <div class="footer-col">
+          <h4>Platform</h4>
+          <ul class="footer-links">
+            <li><a href="index.html" class="footer-link">Home</a></li>
+            <li><a href="about.html" class="footer-link">About Allonola</a></li>
+            <li><a href="dashboard.html" class="footer-link">Dashboard Demo</a></li>
+            <li><a href="contact.html" class="footer-link">Contact Support</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <h4>Algorithms</h4>
+          <ul class="footer-links">
+            <li><a href="algorithms.html" class="footer-link">Overview & Comparison</a></li>
+            <li><a href="algo-linear-regression.html" class="footer-link">Linear Regression</a></li>
+            <li><a href="algo-naive-bayes.html" class="footer-link">Naive Bayes</a></li>
+            <li><a href="algo-knn.html" class="footer-link">K-Nearest Neighbors</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <h4>Machine Learning</h4>
+          <ul class="footer-links">
+            <li><a href="algo-svm.html" class="footer-link">Support Vector Machine</a></li>
+            <li><a href="algo-decision-tree.html" class="footer-link">Decision Tree</a></li>
+            <li><a href="algo-ann.html" class="footer-link">Artificial Neural Network</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <p class="disclaimer-badge">All data shown is illustrative and synthetically generated.</p>
+        <p>&copy; 2026 Allonola. Fictional company for academic use.</p>
+      </div>
+    </div>
+  </footer>
+
+  <script defer src="js/data.js"></script>
+  <script defer src="js/app.js"></script>
+  <script defer src="js/charts.js"></script>
+  <script defer src="js/table.js"></script>
+</body>
+</html>

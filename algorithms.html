@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Algorithms Overview | Allonola</title>
+  <meta name="description" content="Comparison matrix and filtering guide for the six core machine learning algorithms powering Allonola's online marketplace.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/layout.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/algorithm.css">
+  <style>
+    .filter-btn-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin: 1.5rem 0 2rem;
+    }
+    .sortable-th {
+      cursor: pointer;
+      user-select: none;
+      transition: background-color var(--transition-speed) ease;
+    }
+    .sortable-th:hover {
+      background: rgba(74, 159, 216, 0.15) !important;
+    }
+    .sort-icon {
+      display: inline-block;
+      margin-left: 0.35rem;
+      vertical-align: middle;
+      font-size: 0.75rem;
+      opacity: 0.6;
+    }
+  </style>
+</head>
+<body data-page="algorithms">
+  <a href="#main-content" class="skip-link">Skip to main content</a>
+
+  <!-- Header -->
+  <header class="site-header">
+    <div class="container header-inner">
+      <a href="index.html" class="site-logo" aria-label="Allonola Home">
+        <svg class="logo-icon" width="28" height="28" viewBox="0 0 28 28" fill="none" aria-hidden="true">
+          <circle cx="6" cy="20" r="3.5" fill="currentColor" />
+          <circle cx="22" cy="20" r="3.5" fill="currentColor" />
+          <circle cx="14" cy="7" r="3.5" fill="currentColor" />
+          <line x1="6" y1="20" x2="14" y2="7" stroke="currentColor" stroke-width="1.75" />
+          <line x1="14" y1="7" x2="22" y2="20" stroke="currentColor" stroke-width="1.75" />
+          <line x1="6" y1="20" x2="22" y2="20" stroke="currentColor" stroke-width="1.75" />
+        </svg>
+        <span>Allonola</span>
+      </a>
+
+      <nav class="nav-desktop" aria-label="Primary navigation">
+        <a href="index.html" class="nav-link">Home</a>
+        <a href="about.html" class="nav-link">About</a>
+        <div class="nav-dropdown">
+          <button type="button" class="nav-link nav-dropdown-toggle nav-link--active" aria-expanded="false" aria-haspopup="true">
+            <span>Algorithms</span>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+              <polyline points="6 9 12 15 18 9"></polyline>
+            </svg>
+          </button>
+          <div class="nav-dropdown-menu" role="menu">
+            <a href="algorithms.html" class="nav-dropdown-item" role="menuitem">
+              <span class="nav-dropdown-title">Overview & Comparison</span>
+              <span class="nav-dropdown-desc">Compare all six ML approaches</span>
+            </a>
+            <a href="algo-linear-regression.html" class="nav-dropdown-item" role="menuitem">
+              <span class="nav-dropdown-title">Linear Regression</span>
+              <span class="nav-dropdown-desc">Demand forecasting & price elasticity</span>
+            </a>
+            <a href="algo-naive-bayes.html" class="nav-dropdown-item" role="menuitem">
+              <span class="nav-dropdown-title">Naive Bayes</span>
+              <span class="nav-dropdown-desc">Sentiment & fake review filtering</span>
+            </a>
+            <a href="algo-knn.html" class="nav-dropdown-item" role="menuitem">
+              <span class="nav-dropdown-title">K-Nearest Neighbors</span>
+              <span class="nav-dropdown-desc">Collaborative recommendations</span>
+            </a>
+            <a href="algo-svm.html" class="nav-dropdown-item" role="menuitem">
+              <span class="nav-dropdown-title">Support Vector Machine</span>
+              <span class="nav-dropdown-desc">Order fraud & auto-categorization</span>
+            </a>
+            <a href="algo-decision-tree.html" class="nav-dropdown-item" role="menuitem">
+              <span class="nav-dropdown-title">Decision Tree</span>
+              <span class="nav-dropdown-desc">Delivery risk & return rules</span>
+            </a>
+            <a href="algo-ann.html" class="nav-dropdown-item" role="menuitem">
+              <span class="nav-dropdown-title">Artificial Neural Network</span>
+              <span class="nav-dropdown-desc">Personalization & shopper churn</span>
+            </a>
+          </div>
+        </div>
+        <a href="dashboard.html" class="nav-link">Dashboard demo</a>
+        <a href="contact.html" class="nav-link">Contact</a>
+      </nav>
+
+      <div class="header-actions">
+        <button type="button" id="theme-toggle" class="btn-icon" aria-label="Switch to light theme" title="Switch to light theme">
+          <svg class="theme-icon-sun" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+            <circle cx="12" cy="12" r="5"></circle>
+            <line x1="12" y1="1" x2="12" y2="3"></line>
+            <line x1="12" y1="21" x2="12" y2="23"></line>
+            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+            <line x1="1" y1="12" x2="3" y2="12"></line>
+            <line x1="21" y1="12" x2="23" y2="12"></line>
+            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+          </svg>
+          <svg class="theme-icon-moon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="display:none;" aria-hidden="true">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+          </svg>
+        </button>
+
+        <button type="button" id="hamburger-btn" class="btn-icon hamburger-btn" aria-label="Open mobile menu" aria-expanded="false" aria-controls="nav-drawer">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <line x1="3" y1="12" x2="21" y2="12"></line>
+            <line x1="3" y1="6" x2="21" y2="6"></line>
+            <line x1="3" y1="18" x2="21" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Mobile Drawer -->
+  <div id="nav-backdrop" class="nav-backdrop"></div>
+  <aside id="nav-drawer" class="nav-drawer" aria-label="Mobile navigation">
+    <div style="display: flex; justify-content: space-between; align-items: center;">
+      <span class="site-logo">
+        <svg class="logo-icon" width="24" height="24" viewBox="0 0 28 28" fill="none" aria-hidden="true">
+          <circle cx="6" cy="20" r="3.5" fill="currentColor" />
+          <circle cx="22" cy="20" r="3.5" fill="currentColor" />
+          <circle cx="14" cy="7" r="3.5" fill="currentColor" />
+          <line x1="6" y1="20" x2="14" y2="7" stroke="currentColor" stroke-width="1.75" />
+          <line x1="14" y1="7" x2="22" y2="20" stroke="currentColor" stroke-width="1.75" />
+          <line x1="6" y1="20" x2="22" y2="20" stroke="currentColor" stroke-width="1.75" />
+        </svg>
+        <span>Allonola</span>
+      </span>
+    </div>
+    <ul class="nav-mobile-list">
+      <li><a href="index.html" class="mobile-nav-link">Home</a></li>
+      <li><a href="about.html" class="mobile-nav-link">About</a></li>
+      <li>
+        <button type="button" id="algo-accordion-btn" class="mobile-accordion-btn" aria-expanded="false">
+          <span>Algorithms</span>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <polyline points="6 9 12 15 18 9"></polyline>
+          </svg>
+        </button>
+        <ul id="algo-accordion-menu" class="mobile-sublist" hidden>
+          <li><a href="algorithms.html" class="mobile-sublink">Overview & Comparison</a></li>
+          <li><a href="algo-linear-regression.html" class="mobile-sublink">Linear Regression</a></li>
+          <li><a href="algo-naive-bayes.html" class="mobile-sublink">Naive Bayes</a></li>
+          <li><a href="algo-knn.html" class="mobile-sublink">K-Nearest Neighbors</a></li>
+          <li><a href="algo-svm.html" class="mobile-sublink">Support Vector Machine</a></li>
+          <li><a href="algo-decision-tree.html" class="mobile-sublink">Decision Tree</a></li>
+          <li><a href="algo-ann.html" class="mobile-sublink">Artificial Neural Network</a></li>
+        </ul>
+      </li>
+      <li><a href="dashboard.html" class="mobile-nav-link">Dashboard demo</a></li>
+      <li><a href="contact.html" class="mobile-nav-link">Contact</a></li>
+    </ul>
+  </aside>
+
+  <!-- Breadcrumbs -->
+  <nav class="breadcrumbs-bar" aria-label="Breadcrumbs">
+    <div class="container">
+      <ol class="breadcrumbs-list">
+        <li class="breadcrumb-item"><a href="index.html">Home</a></li>
+        <li class="breadcrumb-separator" aria-hidden="true">›</li>
+        <li class="breadcrumb-item breadcrumb-item--current" aria-current="page">Algorithms</li>
+      </ol>
+    </div>
+  </nav>
+
+  <main id="main-content" class="section">
+    <div class="container">
+      <div class="content-reading">
+        <div class="pill pill--teal" style="margin-bottom: 0.75rem;">Algorithms Architecture</div>
+        <h1>Six machine learning methods, each answering a different business question.</h1>
+        <p class="lead">
+          Explore how Allonola matches each operational challenge to the appropriate statistical and machine learning technique, balancing speed, explainability, and predictive depth.
+        </p>
+      </div>
+
+      <!-- Filter Buttons -->
+      <div class="filter-btn-group" role="group" aria-label="Filter algorithms by task type">
+        <button type="button" class="btn btn--primary btn--small filter-btn active" data-filter="all">All</button>
+        <button type="button" class="btn btn--secondary btn--small filter-btn" data-filter="predict">Predict a number</button>
+        <button type="button" class="btn btn--secondary btn--small filter-btn" data-filter="classify">Classify</button>
+        <button type="button" class="btn btn--secondary btn--small filter-btn" data-filter="similar">Find similar items</button>
+      </div>
+
+      <!-- Comparison Table -->
+      <div class="table-responsive-wrapper" tabindex="0" role="region" aria-label="Machine learning algorithm comparison table">
+        <table class="data-table" id="algo-comparison-table">
+          <caption>Comparison of Allonola's six core machine learning methods. Click column headers to sort. Illustrative / synthetically generated.</caption>
+          <thead>
+            <tr>
+              <th scope="col" class="sortable-th" data-col="0">Method <span class="sort-icon" aria-hidden="true">⇅</span></th>
+              <th scope="col" class="sortable-th" data-col="1">Task type <span class="sort-icon" aria-hidden="true">⇅</span></th>
+              <th scope="col" class="sortable-th" data-col="2">Strength <span class="sort-icon" aria-hidden="true">⇅</span></th>
+              <th scope="col" class="sortable-th" data-col="3">Limitation <span class="sort-icon" aria-hidden="true">⇅</span></th>
+              <th scope="col" class="sortable-th" data-col="4">Business question it answers <span class="sort-icon" aria-hidden="true">⇅</span></th>
+              <th scope="col">Page link</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr data-category="predict">
+              <th scope="row">Linear Regression</th>
+              <td><span class="pill">Predict a number</span></td>
+              <td>Simple, fast, easy to interpret</td>
+              <td>Assumes a roughly straight-line relationship</td>
+              <td>How many units will sell, and at what price?</td>
+              <td><a href="algo-linear-regression.html" class="btn btn--subtle btn--small">Explore Demo</a></td>
+            </tr>
+            <tr data-category="classify">
+              <th scope="row">Naive Bayes</th>
+              <td><span class="pill pill--teal">Classify text</span></td>
+              <td>Very fast, works with little data</td>
+              <td>Assumes inputs are independent</td>
+              <td>Is this review genuine, negative, or spam?</td>
+              <td><a href="algo-naive-bayes.html" class="btn btn--subtle btn--small">Explore Demo</a></td>
+            </tr>
+            <tr data-category="similar">
+              <th scope="row">KNN</th>
+              <td><span class="pill">Find similar items</span></td>
+              <td>No training, intuitive</td>
+              <td>Slow on very large data, sensitive to scaling</td>
+              <td>Which items do shoppers like this one also buy?</td>
+              <td><a href="algo-knn.html" class="btn btn--subtle btn--small">Explore Demo</a></td>
+            </tr>
+            <tr data-category="classify">
+              <th scope="row">SVM</th>
+              <td><span class="pill pill--coral">Classify with clear boundaries</span></td>
+              <td>Strong with many input variables</td>
+              <td>Slower to train on huge datasets, harder to tune</td>
+              <td>Is this order suspicious, and which category does this product belong to?</td>
+              <td><a href="algo-svm.html" class="btn btn--subtle btn--small">Explore Demo</a></td>
+            </tr>
+            <tr data-category="classify">
+              <th scope="row">Decision Tree</th>
+              <td><span class="pill">Classify with explainable rules</span></td>
+              <td>Easy to explain and audit</td>
+              <td>Can overfit if too deep</td>
+              <td>Will this order be late or returned, and why?</td>
+              <td><a href="algo-decision-tree.html" class="btn btn--subtle btn--small">Explore Demo</a></td>
+            </tr>
+            <tr data-category="classify">
+              <th scope="row">ANN</th>
+              <td><span class="pill pill--teal">Learn complex patterns</span></td>
+              <td>Highest potential accuracy</td>
+              <td>Needs lots of data, harder to explain</td>
+              <td>What will this shopper browse, and are they at risk of leaving?</td>
+              <td><a href="algo-ann.html" class="btn btn--subtle btn--small">Explore Demo</a></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- d) Choosing a Method Guide -->
+      <section class="section section--compact">
+        <div class="card card--solid content-reading">
+          <h2>Choosing a method</h2>
+          <p>
+            When predicting a numerical target like weekly sales volume, Linear Regression provides immediate, transparent price-elasticity estimates.
+          </p>
+          <p>
+            When grouping text or categorizing orders where operations staff must understand the exact reasoning, Decision Trees and Naive Bayes deliver fast, explainable rules.
+          </p>
+          <p>
+            When discovering subtle browsing patterns across millions of item interactions, high-capacity models like K-Nearest Neighbors and Artificial Neural Networks maximize recommendation relevance where human auditing is secondary to personal affinity.
+          </p>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <!-- Global Footer -->
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-top">
+        <div class="footer-brand">
+          <span class="site-logo">
+            <svg class="logo-icon" width="22" height="22" viewBox="0 0 28 28" fill="none" aria-hidden="true">
+              <circle cx="6" cy="20" r="3.5" fill="currentColor" />
+              <circle cx="22" cy="20" r="3.5" fill="currentColor" />
+              <circle cx="14" cy="7" r="3.5" fill="currentColor" />
+              <line x1="6" y1="20" x2="14" y2="7" stroke="currentColor" stroke-width="1.75" />
+              <line x1="14" y1="7" x2="22" y2="20" stroke="currentColor" stroke-width="1.75" />
+              <line x1="6" y1="20" x2="22" y2="20" stroke="currentColor" stroke-width="1.75" />
+            </svg>
+            <span>Allonola</span>
+          </span>
+          <p>
+            To give every customer an easy, trustworthy, and personalized online shopping experience at fair prices, and to help sellers reach more buyers without needing a physical shop.
+          </p>
+        </div>
+
+        <div class="footer-col">
+          <h4>Platform</h4>
+          <ul class="footer-links">
+            <li><a href="index.html" class="footer-link">Home</a></li>
+            <li><a href="about.html" class="footer-link">About Allonola</a></li>
+            <li><a href="dashboard.html" class="footer-link">Dashboard Demo</a></li>
+            <li><a href="contact.html" class="footer-link">Contact Support</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <h4>Algorithms</h4>
+          <ul class="footer-links">
+            <li><a href="algorithms.html" class="footer-link">Overview & Comparison</a></li>
+            <li><a href="algo-linear-regression.html" class="footer-link">Linear Regression</a></li>
+            <li><a href="algo-naive-bayes.html" class="footer-link">Naive Bayes</a></li>
+            <li><a href="algo-knn.html" class="footer-link">K-Nearest Neighbors</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <h4>Machine Learning</h4>
+          <ul class="footer-links">
+            <li><a href="algo-svm.html" class="footer-link">Support Vector Machine</a></li>
+            <li><a href="algo-decision-tree.html" class="footer-link">Decision Tree</a></li>
+            <li><a href="algo-ann.html" class="footer-link">Artificial Neural Network</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <p class="disclaimer-badge">All data shown is illustrative and synthetically generated.</p>
+        <p>&copy; 2026 Allonola. Fictional company for academic use.</p>
+      </div>
+    </div>
+  </footer>
+
+  <script defer src="js/data.js"></script>
+  <script defer src="js/app.js"></script>
+  <script defer src="js/charts.js"></script>
+  <script defer src="js/table.js"></script>
+  <script defer>
+    // In-page filtering and table column sorting
+    document.addEventListener("DOMContentLoaded", function () {
+      const filterButtons = document.querySelectorAll(".filter-btn");
+      const tableRows = document.querySelectorAll("#algo-comparison-table tbody tr");
+
+      filterButtons.forEach((btn) => {
+        btn.addEventListener("click", () => {
+          filterButtons.forEach((b) => {
+            b.classList.remove("btn--primary", "active");
+            b.classList.add("btn--secondary");
+          });
+          btn.classList.remove("btn--secondary");
+          btn.classList.add("btn--primary", "active");
+
+          const filter = btn.getAttribute("data-filter");
+          tableRows.forEach((row) => {
+            const category = row.getAttribute("data-category");
+            if (filter === "all" || category === filter) {
+              row.hidden = false;
+            } else {
+              row.hidden = true;
+            }
+          });
+        });
+      });
+
+      // Sorting functionality
+      const table = document.getElementById("algo-comparison-table");
+      const headers = table.querySelectorAll(".sortable-th");
+      let sortDirections = [1, 1, 1, 1, 1];
+
+      headers.forEach((th) => {
+        th.addEventListener("click", () => {
+          const colIndex = parseInt(th.getAttribute("data-col"), 10);
+          const tbody = table.querySelector("tbody");
+          const rows = Array.from(tbody.querySelectorAll("tr"));
+          const dir = sortDirections[colIndex];
+
+          rows.sort((rowA, rowB) => {
+            const cellA = (rowA.children[colIndex].textContent || "").trim();
+            const cellB = (rowB.children[colIndex].textContent || "").trim();
+            return cellA.localeCompare(cellB) * dir;
+          });
+
+          sortDirections[colIndex] *= -1;
+          rows.forEach((r) => tbody.appendChild(r));
+        });
+      });
+    });
+  </script>
+</body>
+</html>

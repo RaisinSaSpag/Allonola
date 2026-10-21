@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Naive Bayes | Allonola</title>
+  <meta name="description" content="Naive Bayes | Allonola">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700&family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/layout.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/algorithm.css">
+</head>
+<body data-page="naive-bayes">
+  <a href="#main-content" class="skip-link">Skip to main content</a>
+
+<header class="site-header">
+  <div class="container header-inner">
+    <a href="index.html" class="site-logo" aria-label="Allonola Home">
+      <svg class="logo-icon" width="28" height="28" viewBox="0 0 28 28" fill="none" aria-hidden="true">
+        <circle cx="6" cy="20" r="3.5" fill="currentColor" />
+        <circle cx="22" cy="20" r="3.5" fill="currentColor" />
+        <circle cx="14" cy="7" r="3.5" fill="currentColor" />
+        <line x1="6" y1="20" x2="14" y2="7" stroke="currentColor" stroke-width="1.75" />
+        <line x1="14" y1="7" x2="22" y2="20" stroke="currentColor" stroke-width="1.75" />
+        <line x1="6" y1="20" x2="22" y2="20" stroke="currentColor" stroke-width="1.75" />
+      </svg>
+      <span>Allonola</span>
+    </a>
+    <nav class="nav-desktop" aria-label="Primary navigation">
+      <a href="index.html" class="nav-link">Home</a>
+      <a href="about.html" class="nav-link">About</a>
+      <div class="nav-dropdown">
+        <button type="button" class="nav-link nav-dropdown-toggle" aria-expanded="false" aria-haspopup="true">
+          <span>Algorithms</span>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="6 9 12 15 18 9"></polyline></svg>
+        </button>
+        <div class="nav-dropdown-menu" role="menu">
+          <a href="algorithms.html" class="nav-dropdown-item" role="menuitem"><span class="nav-dropdown-title">Overview &amp; Comparison</span><span class="nav-dropdown-desc">Compare all six ML approaches</span></a>
+          <a href="algo-linear-regression.html" class="nav-dropdown-item" role="menuitem"><span class="nav-dropdown-title">Linear Regression</span><span class="nav-dropdown-desc">Demand forecasting &amp; price elasticity</span></a>
+          <a href="algo-naive-bayes.html" class="nav-dropdown-item" role="menuitem"><span class="nav-dropdown-title">Naive Bayes</span><span class="nav-dropdown-desc">Sentiment &amp; fake review filtering</span></a>
+          <a href="algo-knn.html" class="nav-dropdown-item" role="menuitem"><span class="nav-dropdown-title">K-Nearest Neighbors</span><span class="nav-dropdown-desc">Collaborative recommendations</span></a>
+          <a href="algo-svm.html" class="nav-dropdown-item" role="menuitem"><span class="nav-dropdown-title">Support Vector Machine</span><span class="nav-dropdown-desc">Order fraud &amp; auto-categorization</span></a>
+          <a href="algo-decision-tree.html" class="nav-dropdown-item" role="menuitem"><span class="nav-dropdown-title">Decision Tree</span><span class="nav-dropdown-desc">Delivery risk &amp; return rules</span></a>
+          <a href="algo-ann.html" class="nav-dropdown-item" role="menuitem"><span class="nav-dropdown-title">Artificial Neural Network</span><span class="nav-dropdown-desc">Personalization &amp; shopper churn</span></a>
+        </div>
+      </div>
+      <a href="dashboard.html" class="nav-link">Dashboard demo</a>
+      <a href="contact.html" class="nav-link">Contact</a>
+    </nav>
+    <div class="header-actions">
+      <button type="button" id="theme-toggle" class="btn-icon" aria-label="Switch to light theme" title="Switch to light theme">
+        <svg class="theme-icon-sun" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+        <svg class="theme-icon-moon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="display:none;" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+      </button>
+      <button type="button" id="hamburger-btn" class="btn-icon hamburger-btn" aria-label="Open mobile menu" aria-expanded="false" aria-controls="nav-drawer">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+      </button>
+    </div>
+  </div>
+</header>
+<div id="nav-backdrop" class="nav-backdrop"></div>
+<aside id="nav-drawer" class="nav-drawer" aria-label="Mobile navigation">
+  <ul class="nav-mobile-list">
+    <li><a href="index.html" class="mobile-nav-link">Home</a></li>
+    <li><a href="about.html" class="mobile-nav-link">About</a></li>
+    <li>
+      <button type="button" id="algo-accordion-btn" class="mobile-accordion-btn" aria-expanded="false"><span>Algorithms</span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="6 9 12 15 18 9"></polyline></svg></button>
+      <ul id="algo-accordion-menu" class="mobile-sublist" hidden>
+        <li><a href="algorithms.html" class="mobile-sublink">Overview &amp; Comparison</a></li>
+        <li><a href="algo-linear-regression.html" class="mobile-sublink">Linear Regression</a></li>
+        <li><a href="algo-naive-bayes.html" class="mobile-sublink">Naive Bayes</a></li>
+        <li><a href="algo-knn.html" class="mobile-sublink">K-Nearest Neighbors</a></li>
+        <li><a href="algo-svm.html" class="mobile-sublink">Support Vector Machine</a></li>
+        <li><a href="algo-decision-tree.html" class="mobile-sublink">Decision Tree</a></li>
+        <li><a href="algo-ann.html" class="mobile-sublink">Artificial Neural Network</a></li>
+      </ul>
+    </li>
+    <li><a href="dashboard.html" class="mobile-nav-link">Dashboard demo</a></li>
+    <li><a href="contact.html" class="mobile-nav-link">Contact</a></li>
+  </ul>
+</aside>
+
+  <main id="main-content">
+
+        <section class="section">
+          <div class="container">
+            <div class="section-header reveal-on-scroll">
+              <span class="pill pill--teal">Naive Bayes</span>
+              <h1>Review moderation and sentiment filtering</h1>
+              <p class="lead">The model learns from prior review labels and estimates whether a new message is likely positive, negative, or spam.</p>
+            </div>
+            <div class="grid-2 reveal-on-scroll">
+              <article class="card"><h3>Model goal</h3><p>Flag reviews that are suspicious, spammy, or misleading while preserving legitimate product feedback for the marketplace.</p></article>
+              <article class="card"><h3>Business value</h3><p>Protects buyer trust and seller quality scores while reducing the manual moderation burden for support teams.</p></article>
+            </div>
+          </div>
+        </section>
+        <section class="section section--compact">
+          <div class="container reveal-on-scroll">
+            <div class="card">
+              <h2>Interactive demo</h2>
+              <label for="nb-text">Review text</label>
+              <textarea id="nb-text" rows="4">Amazing quality and super fast delivery, thanks team!</textarea>
+              <div class="action-row"><button class="btn btn--primary" id="nb-run" type="button">Classify review</button></div>
+              <div id="nb-output" class="output-box">Ready to classify.</div>
+            </div>
+          </div>
+        </section>
+        
+  </main>
+
+<footer class="site-footer">
+  <div class="container footer-top">
+    <div class="footer-brand">
+      <a href="index.html" class="site-logo" aria-label="Allonola Home">
+        <svg class="logo-icon" width="28" height="28" viewBox="0 0 28 28" fill="none" aria-hidden="true">
+          <circle cx="6" cy="20" r="3.5" fill="currentColor" />
+          <circle cx="22" cy="20" r="3.5" fill="currentColor" />
+          <circle cx="14" cy="7" r="3.5" fill="currentColor" />
+          <line x1="6" y1="20" x2="14" y2="7" stroke="currentColor" stroke-width="1.75" />
+          <line x1="14" y1="7" x2="22" y2="20" stroke="currentColor" stroke-width="1.75" />
+          <line x1="6" y1="20" x2="22" y2="20" stroke="currentColor" stroke-width="1.75" />
+        </svg>
+        <span>Allonola</span>
+      </a>
+      <p>Online-only marketplace that makes shopping easier and more trustworthy.</p>
+    </div>
+    <div class="footer-col">
+      <h4>Explore</h4>
+      <ul class="footer-links">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="about.html">About</a></li>
+        <li><a href="algorithms.html">Algorithms</a></li>
+        <li><a href="dashboard.html">Dashboard</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Contact</h4>
+      <ul class="footer-links">
+        <li><a href="contact.html">Contact us</a></li>
+        <li><a href="about.html">Business model</a></li>
+        <li><a href="algorithms.html">Model overview</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Important</h4>
+      <p class="text-small">All data shown is illustrative and synthetically generated.</p>
+    </div>
+  </div>
+  <div class="container footer-bottom">
+    <div>© 2026 Allonola. Fictional company for academic use.</div>
+    <div class="disclaimer-badge">Illustrative / synthetically generated</div>
+  </div>
+</footer>
+
+  <script src="js/app.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+
+        <script>
+          window.addEventListener('DOMContentLoaded', function () {
+            const text = document.getElementById('nb-text');
+            const output = document.getElementById('nb-output');
+            const button = document.getElementById('nb-run');
+            if (!text || !output || !button || !window.Allonola || !window.Allonola.ml || !window.Allonola.ml.naiveBayes) return;
+            button.addEventListener('click', function () {
+              const result = window.Allonola.ml.naiveBayes.classify(text.value || '');
+              output.textContent = 'Prediction: ' + result.predictedClass + ' | Positive: ' + result.probabilities.Positive + ' | Negative: ' + result.probabilities.Negative + ' | Spam: ' + result.probabilities.Spam;
+            });
+          });
+        </script>
+        
+</body>
+</html>

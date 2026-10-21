@@ -1,0 +1,793 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Support Vector Machine | Allonola</title>
+  <meta name="description" content="Support Vector Machine (SVM) max-margin classification for order fraud detection and automated product cataloging.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/layout.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/algorithm.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+</head>
+<body data-page="svm">
+  <a href="#main-content" class="skip-link">Skip to main content</a>
+
+  <!-- Header -->
+  <header class="site-header">
+    <div class="container header-inner">
+      <a href="index.html" class="site-logo" aria-label="Allonola Home">
+        <svg class="logo-icon" width="28" height="28" viewBox="0 0 28 28" fill="none" aria-hidden="true">
+          <circle cx="6" cy="20" r="3.5" fill="currentColor" />
+          <circle cx="22" cy="20" r="3.5" fill="currentColor" />
+          <circle cx="14" cy="7" r="3.5" fill="currentColor" />
+          <line x1="6" y1="20" x2="14" y2="7" stroke="currentColor" stroke-width="1.75" />
+          <line x1="14" y1="7" x2="22" y2="20" stroke="currentColor" stroke-width="1.75" />
+          <line x1="6" y1="20" x2="22" y2="20" stroke="currentColor" stroke-width="1.75" />
+        </svg>
+        <span>Allonola</span>
+      </a>
+
+      <nav class="nav-desktop" aria-label="Primary navigation">
+        <a href="index.html" class="nav-link">Home</a>
+        <a href="about.html" class="nav-link">About</a>
+        <div class="nav-dropdown">
+          <button type="button" class="nav-link nav-dropdown-toggle nav-link--active" aria-expanded="false" aria-haspopup="true">
+            <span>Algorithms</span>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+              <polyline points="6 9 12 15 18 9"></polyline>
+            </svg>
+          </button>
+          <div class="nav-dropdown-menu" role="menu">
+            <a href="algorithms.html" class="nav-dropdown-item" role="menuitem">
+              <span class="nav-dropdown-title">Overview & Comparison</span>
+              <span class="nav-dropdown-desc">Compare all six ML approaches</span>
+            </a>
+            <a href="algo-linear-regression.html" class="nav-dropdown-item" role="menuitem">
+              <span class="nav-dropdown-title">Linear Regression</span>
+              <span class="nav-dropdown-desc">Demand forecasting & price elasticity</span>
+            </a>
+            <a href="algo-naive-bayes.html" class="nav-dropdown-item" role="menuitem">
+              <span class="nav-dropdown-title">Naive Bayes</span>
+              <span class="nav-dropdown-desc">Sentiment & fake review filtering</span>
+            </a>
+            <a href="algo-knn.html" class="nav-dropdown-item" role="menuitem">
+              <span class="nav-dropdown-title">K-Nearest Neighbors</span>
+              <span class="nav-dropdown-desc">Collaborative recommendations</span>
+            </a>
+            <a href="algo-svm.html" class="nav-dropdown-item" role="menuitem">
+              <span class="nav-dropdown-title">Support Vector Machine</span>
+              <span class="nav-dropdown-desc">Order fraud & auto-categorization</span>
+            </a>
+            <a href="algo-decision-tree.html" class="nav-dropdown-item" role="menuitem">
+              <span class="nav-dropdown-title">Decision Tree</span>
+              <span class="nav-dropdown-desc">Delivery risk & return rules</span>
+            </a>
+            <a href="algo-ann.html" class="nav-dropdown-item" role="menuitem">
+              <span class="nav-dropdown-title">Artificial Neural Network</span>
+              <span class="nav-dropdown-desc">Personalization & shopper churn</span>
+            </a>
+          </div>
+        </div>
+        <a href="dashboard.html" class="nav-link">Dashboard demo</a>
+        <a href="contact.html" class="nav-link">Contact</a>
+      </nav>
+
+      <div class="header-actions">
+        <button type="button" id="theme-toggle" class="btn-icon" aria-label="Switch to light theme" title="Switch to light theme">
+          <svg class="theme-icon-sun" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+            <circle cx="12" cy="12" r="5"></circle>
+            <line x1="12" y1="1" x2="12" y2="3"></line>
+            <line x1="12" y1="21" x2="12" y2="23"></line>
+            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+            <line x1="1" y1="12" x2="3" y2="12"></line>
+            <line x1="21" y1="12" x2="23" y2="12"></line>
+            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+          </svg>
+          <svg class="theme-icon-moon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="display:none;" aria-hidden="true">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+          </svg>
+        </button>
+
+        <button type="button" id="hamburger-btn" class="btn-icon hamburger-btn" aria-label="Open mobile menu" aria-expanded="false" aria-controls="nav-drawer">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <line x1="3" y1="12" x2="21" y2="12"></line>
+            <line x1="3" y1="6" x2="21" y2="6"></line>
+            <line x1="3" y1="18" x2="21" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Mobile Drawer -->
+  <div id="nav-backdrop" class="nav-backdrop"></div>
+  <aside id="nav-drawer" class="nav-drawer" aria-label="Mobile navigation">
+    <div style="display: flex; justify-content: space-between; align-items: center;">
+      <span class="site-logo">
+        <svg class="logo-icon" width="24" height="24" viewBox="0 0 28 28" fill="none" aria-hidden="true">
+          <circle cx="6" cy="20" r="3.5" fill="currentColor" />
+          <circle cx="22" cy="20" r="3.5" fill="currentColor" />
+          <circle cx="14" cy="7" r="3.5" fill="currentColor" />
+          <line x1="6" y1="20" x2="14" y2="7" stroke="currentColor" stroke-width="1.75" />
+          <line x1="14" y1="7" x2="22" y2="20" stroke="currentColor" stroke-width="1.75" />
+          <line x1="6" y1="20" x2="22" y2="20" stroke="currentColor" stroke-width="1.75" />
+        </svg>
+        <span>Allonola</span>
+      </span>
+    </div>
+    <ul class="nav-mobile-list">
+      <li><a href="index.html" class="mobile-nav-link">Home</a></li>
+      <li><a href="about.html" class="mobile-nav-link">About</a></li>
+      <li>
+        <button type="button" id="algo-accordion-btn" class="mobile-accordion-btn" aria-expanded="false">
+          <span>Algorithms</span>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <polyline points="6 9 12 15 18 9"></polyline>
+          </svg>
+        </button>
+        <ul id="algo-accordion-menu" class="mobile-sublist" hidden>
+          <li><a href="algorithms.html" class="mobile-sublink">Overview & Comparison</a></li>
+          <li><a href="algo-linear-regression.html" class="mobile-sublink">Linear Regression</a></li>
+          <li><a href="algo-naive-bayes.html" class="mobile-sublink">Naive Bayes</a></li>
+          <li><a href="algo-knn.html" class="mobile-sublink">K-Nearest Neighbors</a></li>
+          <li><a href="algo-svm.html" class="mobile-sublink">Support Vector Machine</a></li>
+          <li><a href="algo-decision-tree.html" class="mobile-sublink">Decision Tree</a></li>
+          <li><a href="algo-ann.html" class="mobile-sublink">Artificial Neural Network</a></li>
+        </ul>
+      </li>
+      <li><a href="dashboard.html" class="mobile-nav-link">Dashboard demo</a></li>
+      <li><a href="contact.html" class="mobile-nav-link">Contact</a></li>
+    </ul>
+  </aside>
+
+  <!-- Breadcrumbs -->
+  <nav class="breadcrumbs-bar" aria-label="Breadcrumbs">
+    <div class="container">
+      <ol class="breadcrumbs-list">
+        <li class="breadcrumb-item"><a href="index.html">Home</a></li>
+        <li class="breadcrumb-separator" aria-hidden="true">›</li>
+        <li class="breadcrumb-item"><a href="algorithms.html">Algorithms</a></li>
+        <li class="breadcrumb-separator" aria-hidden="true">›</li>
+        <li class="breadcrumb-item breadcrumb-item--current" aria-current="page">SVM</li>
+      </ol>
+    </div>
+  </nav>
+
+  <main id="main-content" class="section">
+    <div class="container">
+      <!-- 1. Header Block -->
+      <header class="algo-header">
+        <div class="algo-header__pills">
+          <span class="pill pill--coral">Task: Classify with clear boundaries</span>
+          <span class="pill">Used in: Automatic product categories; fraud and trust dashboard</span>
+        </div>
+        <h1>Support Vector Machine (SVM)</h1>
+        <p class="algo-header__question">"Is this order suspicious, and which category does this product belong to?"</p>
+      </header>
+
+      <!-- 2. What it is -->
+      <section class="section--compact content-reading">
+        <h2>What it is</h2>
+        <p>
+          Support Vector Machine draws the clearest possible dividing line between two groups (normal order vs. suspicious order), keeping the margin as wide as possible from both groups. It provides robust decision boundaries in high-dimensional feature spaces.
+        </p>
+      </section>
+
+      <!-- 3. Why Allonola uses it -->
+      <section class="section--compact content-reading">
+        <h2>Why Allonola uses it</h2>
+        <p>
+          Because Allonola offers cash on delivery and third-party courier dispatch, fraudulent orders (such as fake buyers ordering bulk expensive electronics with freshly minted accounts) cost significant capital in wasted courier fees. SVM screens thousands of transactions in real time, routing high-risk flags to fraud analysts. This operational safeguard directly advances Operational Goal #3: keeping fraud-related losses below 0.5% of GMV. In parallel, SVM text classification automatically assigns new seller listings to correct catalog categories.
+        </p>
+      </section>
+
+      <!-- 4. How it works -->
+      <section class="section--compact content-reading">
+        <h2>How it works</h2>
+        <p>
+          The algorithm identifies an optimal separating hyperplane that maximizes the geometric margin between normal and fraudulent data points. The training examples that sit right on the edge of the margin are the <em>support vectors</em>.
+        </p>
+
+        <div class="formula-box">
+Hyperplane Decision: w · x - b = 0
+
+Maximize Margin: 2 / ||w||  subject to  y_i(w · x_i - b) ≥ 1
+
+Kernel Mapping (RBF): K(x, x') = exp(-γ ||x - x'||²)
+        </div>
+
+        <p class="text-small text-muted">
+          When raw data cannot be separated by a straight line, kernel functions (such as Radial Basis Function / RBF) project inputs into higher-dimensional feature spaces where linear separation becomes feasible. Product text descriptions are vectorized into TF-IDF numerical values, and class weighting penalties compensate for the severe rarity of fraud in real transaction streams.
+        </p>
+      </section>
+
+      <!-- 5. Data used and why -->
+      <section class="section--compact">
+        <h2>Data used and why</h2>
+        <div class="table-responsive-wrapper" tabindex="0" role="region" aria-label="SVM inputs and reasons">
+          <table class="data-table">
+            <caption>Features evaluated across fraud screening and listing categorization. Illustrative / synthetically generated.</caption>
+            <thead>
+              <tr>
+                <th scope="col">Feature</th>
+                <th scope="col">Data Format</th>
+                <th scope="col">Operational Rationale</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <th scope="row">Order amount</th>
+                <td>Philippine peso (₱)</td>
+                <td>High basket values disproportionately attract fraudulent extraction attempts.</td>
+              </tr>
+              <tr>
+                <th scope="row">Location & Payment</th>
+                <td>Metro / Province; E-wallet, Card, COD</td>
+                <td>Flags unusual payment-method-to-location mismatches (e.g., high COD to unverified addresses).</td>
+              </tr>
+              <tr>
+                <th scope="row">Account age</th>
+                <td>Days since registration</td>
+                <td>Fraudulent rings overwhelmingly operate through newly registered accounts.</td>
+              </tr>
+              <tr>
+                <th scope="row">Items per order</th>
+                <td>Integer count</td>
+                <td>Abnormal item counts deviate from standard single-buyer household baskets.</td>
+              </tr>
+              <tr>
+                <th scope="row">Product title text</th>
+                <td>TF-IDF vectorized keywords</td>
+                <td>Extracts lexical signals to map merchant listings into standardized categories.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="text-small text-muted">Outputs: binary fraud risk flag and target product category.</p>
+      </section>
+
+      <!-- 6. Sample datasets -->
+      <section class="section--compact">
+        <h2>Sample datasets</h2>
+        
+        <h3 style="font-size: 1.1rem; margin-top: 1.5rem;">Sample Dataset A: Order Fraud Screening</h3>
+        <div class="table-responsive-wrapper" tabindex="0" role="region" aria-label="Sample order fraud records">
+          <table class="data-table">
+            <caption>Sample transaction orders evaluated for fraud risk. Illustrative / synthetically generated.</caption>
+            <thead>
+              <tr>
+                <th scope="col">Order ID</th>
+                <th scope="col">Amount (₱)</th>
+                <th scope="col">Location</th>
+                <th scope="col">Payment</th>
+                <th scope="col">Account age (days)</th>
+                <th scope="col">Items</th>
+                <th scope="col">Fraud flag</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <th scope="row">O-1001</th>
+                <td class="tabular-nums">₱640</td>
+                <td>Metro</td>
+                <td>E-wallet</td>
+                <td class="tabular-nums">812</td>
+                <td class="tabular-nums">2</td>
+                <td><span class="pill pill--teal">0 (Normal)</span></td>
+              </tr>
+              <tr>
+                <th scope="row">O-1002</th>
+                <td class="tabular-nums">₱4,850</td>
+                <td>Province</td>
+                <td>COD</td>
+                <td class="tabular-nums">3</td>
+                <td class="tabular-nums">6</td>
+                <td><span class="pill pill--coral">1 (Fraud)</span></td>
+              </tr>
+              <tr>
+                <th scope="row">O-1003</th>
+                <td class="tabular-nums">₱1,220</td>
+                <td>Metro</td>
+                <td>Card</td>
+                <td class="tabular-nums">150</td>
+                <td class="tabular-nums">1</td>
+                <td><span class="pill pill--teal">0 (Normal)</span></td>
+              </tr>
+              <tr>
+                <th scope="row">O-1004</th>
+                <td class="tabular-nums">₱9,300</td>
+                <td>Province</td>
+                <td>COD</td>
+                <td class="tabular-nums">1</td>
+                <td class="tabular-nums">8</td>
+                <td><span class="pill pill--coral">1 (Fraud)</span></td>
+              </tr>
+              <tr>
+                <th scope="row">O-1005</th>
+                <td class="tabular-nums">₱380</td>
+                <td>Metro</td>
+                <td>COD</td>
+                <td class="tabular-nums">430</td>
+                <td class="tabular-nums">1</td>
+                <td><span class="pill pill--teal">0 (Normal)</span></td>
+              </tr>
+              <tr>
+                <th scope="row">O-1006</th>
+                <td class="tabular-nums">₱2,700</td>
+                <td>Metro</td>
+                <td>Card</td>
+                <td class="tabular-nums">5</td>
+                <td class="tabular-nums">4</td>
+                <td><span class="pill pill--coral">1 (Fraud)</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3 style="font-size: 1.1rem; margin-top: 2rem;">Sample Dataset B: Product Category Classifier</h3>
+        <div class="table-responsive-wrapper" tabindex="0" role="region" aria-label="Sample product category records">
+          <table class="data-table">
+            <caption>Sample merchandise catalog titles and ground truth categories. Illustrative / synthetically generated.</caption>
+            <thead>
+              <tr>
+                <th scope="col">Product title</th>
+                <th scope="col">Target Category</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <th scope="row">Stainless steel water bottle 1L</th>
+                <td><span class="pill">Home and Kitchen</span></td>
+              </tr>
+              <tr>
+                <th scope="row">Wireless earbuds with charging case</th>
+                <td><span class="pill pill--teal">Electronics</span></td>
+              </tr>
+              <tr>
+                <th scope="row">Cotton summer dress, floral print</th>
+                <td><span class="pill">Fashion</span></td>
+              </tr>
+              <tr>
+                <th scope="row">Organic brown rice 5 kg</th>
+                <td><span class="pill pill--teal">Groceries</span></td>
+              </tr>
+              <tr>
+                <th scope="row">Adjustable desk lamp with USB port</th>
+                <td><span class="pill">Home and Office</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- 7. Interactive Demo -->
+      <section class="demo-container">
+        <div class="demo-header">
+          <div>
+            <h2>Interactive demo</h2>
+            <p class="text-muted text-small">Part 1: Adjust the decision boundary threshold on 60 deterministic orders.</p>
+          </div>
+          <span class="demo-badge">Live demo: SVM fraud threshold & category matcher</span>
+        </div>
+
+        <!-- Panel 1: Fraud Scatter Plot & Thresholding -->
+        <div style="margin-bottom: 2.5rem;">
+          <div class="demo-layout">
+            <div class="demo-controls">
+              <div class="form-group">
+                <div class="slider-label-row">
+                  <label for="svm-threshold-slider" class="form-label">Decision threshold:</label>
+                  <span id="svm-threshold-val" class="tabular-nums" style="color: var(--teal); font-weight: 700;">0.50</span>
+                </div>
+                <input type="range" id="svm-threshold-slider" class="slider-input" min="0.10" max="0.95" step="0.05" value="0.50">
+                <div class="slider-label-row text-muted text-small" style="margin-top: 0.25rem;">
+                  <span>0.10 (Aggressive flagging)</span>
+                  <span>0.95 (Strict / Conservative)</span>
+                </div>
+              </div>
+
+              <!-- Live Metric Counts -->
+              <div class="grid-2">
+                <div class="metric-card" style="padding: 1rem;">
+                  <span class="metric-label" style="font-size: 0.75rem;">Flagged Orders</span>
+                  <span id="svm-stat-flagged" class="metric-value tabular-nums" style="font-size: 1.5rem;">3</span>
+                  <span class="metric-subtext">of 60 simulated orders</span>
+                </div>
+                <div class="metric-card" style="padding: 1rem;">
+                  <span class="metric-label" style="font-size: 0.75rem;">True Positives (TP)</span>
+                  <span id="svm-stat-tp" class="metric-value tabular-nums" style="font-size: 1.5rem; color: var(--teal);">3</span>
+                  <span class="metric-subtext">Confirmed fraud caught</span>
+                </div>
+                <div class="metric-card" style="padding: 1rem;">
+                  <span class="metric-label" style="font-size: 0.75rem;">False Positives (FP)</span>
+                  <span id="svm-stat-fp" class="metric-value tabular-nums" style="font-size: 1.5rem; color: var(--coral);">0</span>
+                  <span class="metric-subtext">Legitimate false alarms</span>
+                </div>
+                <div class="metric-card" style="padding: 1rem;">
+                  <span class="metric-label" style="font-size: 0.75rem;">Precision / Recall</span>
+                  <span id="svm-stat-pr" class="metric-value tabular-nums" style="font-size: 1.25rem;">1.00 / 0.75</span>
+                  <span class="metric-subtext">At active threshold</span>
+                </div>
+              </div>
+
+              <!-- Clicked Point Details Card -->
+              <div id="svm-point-details" class="card card--solid" style="padding: 1rem 1.25rem;">
+                <h3 style="font-size: 0.95rem; margin-bottom: 0.5rem;">Selected Order Details:</h3>
+                <p id="svm-point-summary" class="text-small text-muted" style="margin: 0;">
+                  Click any point on the scatter plot to inspect its amount, location, account age, items, and fraud score.
+                </p>
+              </div>
+            </div>
+
+            <!-- Scatter Plot -->
+            <div class="demo-output">
+              <figure id="svm-chart-figure" class="chart-card">
+                <div class="chart-wrapper">
+                  <canvas id="svm-scatter-canvas"></canvas>
+                </div>
+              </figure>
+            </div>
+          </div>
+        </div>
+
+        <hr class="section-divider" style="margin: 2rem 0;">
+
+        <!-- Panel 2: Product Category Predictor -->
+        <div>
+          <h3 style="font-size: 1.15rem; margin-bottom: 0.5rem;">Panel 2: Product category predictor</h3>
+          <p class="text-small text-muted" style="margin-bottom: 1.25rem;">
+            Type a product title below. A keyword-based lookup built from the five sample products serves as a simple stand-in for the SVM text classifier.
+          </p>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; align-items: start;">
+            <div class="form-group" style="margin-bottom: 0;">
+              <label for="svm-product-title-input" class="form-label">Type a product title:</label>
+              <input type="text" id="svm-product-title-input" class="form-control" placeholder="e.g., Stainless steel water bottle 1L" value="Wireless earbuds with charging case">
+              <div style="display: flex; gap: 0.5rem; flex-wrap: wrap; margin-top: 0.75rem;">
+                <button type="button" class="btn btn--subtle btn--small svm-title-btn" data-title="Stainless steel water bottle 1L">Bottle</button>
+                <button type="button" class="btn btn--subtle btn--small svm-title-btn" data-title="Cotton summer dress, floral print">Dress</button>
+                <button type="button" class="btn btn--subtle btn--small svm-title-btn" data-title="Organic brown rice 5 kg">Rice</button>
+                <button type="button" class="btn btn--subtle btn--small svm-title-btn" data-title="Adjustable desk lamp with USB port">Desk Lamp</button>
+              </div>
+            </div>
+
+            <div class="card card--solid" style="padding: 1.25rem;">
+              <span class="text-small text-muted" style="text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600;">Predicted Category:</span>
+              <div id="svm-category-output" style="font-family: var(--font-heading); font-size: 1.35rem; font-weight: 700; color: var(--teal); margin: 0.35rem 0;">
+                Electronics
+              </div>
+              <p id="svm-category-note" class="text-small text-muted" style="margin: 0;">
+                Matched keyword: "earbuds". This simple keyword stand-in demonstrates automated cataloging.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 8. Illustrative results and interpretation -->
+      <section class="section--compact">
+        <h2>Illustrative results and interpretation</h2>
+        <div class="grid-3" style="margin-bottom: 1.5rem;">
+          <div class="metric-card">
+            <span class="metric-label">Flagged Order Flag</span>
+            <span class="metric-value tabular-nums">Score 0.91</span>
+            <span class="metric-subtext">Order O-1004 flagged (score 0.91); confirmed as fraud</span>
+          </div>
+
+          <div class="metric-card">
+            <span class="metric-label">Fraud Test Set</span>
+            <span class="metric-value tabular-nums">ROC-AUC 0.94</span>
+            <span class="metric-subtext">5,000 orders (90 fraud = 1.8%): F1 = 0.72</span>
+          </div>
+
+          <div class="metric-card">
+            <span class="metric-label">Catalog Accuracy</span>
+            <span class="metric-value tabular-nums">88%</span>
+            <span class="metric-subtext">88% category accuracy on 1,000 held-out listings</span>
+          </div>
+        </div>
+
+        <div class="grid-2">
+          <div class="card card--solid">
+            <h3 style="font-size: 1.1rem; margin-bottom: 0.5rem;">Interpretation</h3>
+            <p class="text-small text-muted" style="margin: 0;">
+              Accuracy alone is misleading: a naive model that never flags any fraud would achieve 98.2% accuracy while letting all fraud through undetected. F1-score and ROC-AUC specifically evaluate performance on rare positive classes. The 32 false alarms represent a deliberate, balanced trade-off because human fraud analysts review each flagged order before action.
+            </p>
+          </div>
+
+          <div class="card card--solid">
+            <h3 style="font-size: 1.1rem; margin-bottom: 0.5rem;">Business Impact</h3>
+            <p class="text-small text-muted" style="margin: 0;">
+              Fraud analysts receive a focused queue of 100 high-risk orders rather than blindly auditing 5,000 transactions, catching approximately three in four fraudulent transactions. Operational thresholds are recalibrated monthly to align analyst bandwidth with transaction volume.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- 9. Strengths and limitations -->
+      <section class="section--compact">
+        <h2>Strengths and limitations</h2>
+        <div class="strengths-limitations-grid">
+          <div class="card">
+            <h3 style="color: var(--teal); font-size: 1.1rem; margin-bottom: 0.75rem;">Strengths</h3>
+            <ul class="bullet-list">
+              <li>Excels in high-dimensional feature spaces with many sparse variables.</li>
+              <li>Kernel trick enables effective non-linear separation without manual feature engineering.</li>
+              <li>Robust against overfitting because decision boundaries depend only on support vectors.</li>
+              <li>Class weights allow effective tuning against heavily imbalanced fraud distributions.</li>
+            </ul>
+          </div>
+
+          <div class="card">
+            <h3 style="color: var(--coral); font-size: 1.1rem; margin-bottom: 0.75rem;">Limitations</h3>
+            <ul class="bullet-list bullet-list--coral">
+              <li>Computationally slow to train on massive datasets with hundreds of thousands of rows.</li>
+              <li>Hyperparameters (regularization constant C and kernel gamma) require careful cross-validation tuning.</li>
+              <li>Does not directly produce calibrated probabilistic confidence scores without Platt scaling.</li>
+              <li>Can be sensitive to extreme noise points near the margin boundary.</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <!-- 10. Previous / Next Links -->
+      <nav class="algo-pagination" aria-label="Algorithm series pagination">
+        <a href="algo-knn.html" class="algo-pagination__btn">
+          <span class="algo-pagination__label">← Previous Algorithm</span>
+          <span class="algo-pagination__title">K-Nearest Neighbors</span>
+        </a>
+
+        <a href="algo-decision-tree.html" class="algo-pagination__btn" style="text-align: right;">
+          <span class="algo-pagination__label">Next Algorithm</span>
+          <span class="algo-pagination__title">Decision Tree →</span>
+        </a>
+      </nav>
+    </div>
+  </main>
+
+  <!-- Global Footer -->
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-top">
+        <div class="footer-brand">
+          <span class="site-logo">
+            <svg class="logo-icon" width="22" height="22" viewBox="0 0 28 28" fill="none" aria-hidden="true">
+              <circle cx="6" cy="20" r="3.5" fill="currentColor" />
+              <circle cx="22" cy="20" r="3.5" fill="currentColor" />
+              <circle cx="14" cy="7" r="3.5" fill="currentColor" />
+              <line x1="6" y1="20" x2="14" y2="7" stroke="currentColor" stroke-width="1.75" />
+              <line x1="14" y1="7" x2="22" y2="20" stroke="currentColor" stroke-width="1.75" />
+              <line x1="6" y1="20" x2="22" y2="20" stroke="currentColor" stroke-width="1.75" />
+            </svg>
+            <span>Allonola</span>
+          </span>
+          <p>
+            To give every customer an easy, trustworthy, and personalized online shopping experience at fair prices, and to help sellers reach more buyers without needing a physical shop.
+          </p>
+        </div>
+
+        <div class="footer-col">
+          <h4>Platform</h4>
+          <ul class="footer-links">
+            <li><a href="index.html" class="footer-link">Home</a></li>
+            <li><a href="about.html" class="footer-link">About Allonola</a></li>
+            <li><a href="dashboard.html" class="footer-link">Dashboard Demo</a></li>
+            <li><a href="contact.html" class="footer-link">Contact Support</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <h4>Algorithms</h4>
+          <ul class="footer-links">
+            <li><a href="algorithms.html" class="footer-link">Overview & Comparison</a></li>
+            <li><a href="algo-linear-regression.html" class="footer-link">Linear Regression</a></li>
+            <li><a href="algo-naive-bayes.html" class="footer-link">Naive Bayes</a></li>
+            <li><a href="algo-knn.html" class="footer-link">K-Nearest Neighbors</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <h4>Machine Learning</h4>
+          <ul class="footer-links">
+            <li><a href="algo-svm.html" class="footer-link">Support Vector Machine</a></li>
+            <li><a href="algo-decision-tree.html" class="footer-link">Decision Tree</a></li>
+            <li><a href="algo-ann.html" class="footer-link">Artificial Neural Network</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <p class="disclaimer-badge">All data shown is illustrative and synthetically generated.</p>
+        <p>&copy; 2026 Allonola. Fictional company for academic use.</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Script Execution Order -->
+  <script defer src="js/data.js"></script>
+  <script defer src="js/app.js"></script>
+  <script defer src="js/charts.js"></script>
+  <script defer src="js/table.js"></script>
+  <script defer src="js/ml/svm.js"></script>
+  <script defer>
+    document.addEventListener("DOMContentLoaded", function () {
+      const slider = document.getElementById("svm-threshold-slider");
+      const thresholdVal = document.getElementById("svm-threshold-val");
+      const statFlagged = document.getElementById("svm-stat-flagged");
+      const statTp = document.getElementById("svm-stat-tp");
+      const statFp = document.getElementById("svm-stat-fp");
+      const statPr = document.getElementById("svm-stat-pr");
+      const pointSummary = document.getElementById("svm-point-summary");
+
+      const titleInput = document.getElementById("svm-product-title-input");
+      const categoryOutput = document.getElementById("svm-category-output");
+      const categoryNote = document.getElementById("svm-category-note");
+      const sampleTitleBtns = document.querySelectorAll(".svm-title-btn");
+
+      const ml = window.Allonola.ml.svm;
+      const formatCurrency = window.Allonola.data.formatCurrency;
+
+      function updateScatterAndMetrics() {
+        const threshold = parseFloat(slider.value);
+        thresholdVal.textContent = threshold.toFixed(2);
+
+        const evalResult = ml.evaluateFraudThreshold(threshold);
+
+        statFlagged.textContent = evalResult.flagged;
+        statTp.textContent = evalResult.truePositives;
+        statFp.textContent = evalResult.falsePositives;
+        statPr.textContent = evalResult.precision.toFixed(2) + " / " + evalResult.recall.toFixed(2);
+
+        renderScatterPlot(evalResult);
+      }
+
+      function renderScatterPlot(evalResult) {
+        const tokens = window.Allonola.charts.getTokens();
+
+        const normalOrders = [];
+        const fraudOrders = [];
+
+        evalResult.annotatedOrders.forEach((o) => {
+          const pt = {
+            x: o.amount,
+            y: o.accountAge,
+            orderData: o,
+          };
+          if (o.fraud === 1) fraudOrders.push(pt);
+          else normalOrders.push(pt);
+        });
+
+        const config = {
+          type: "scatter",
+          data: {
+            datasets: [
+              {
+                label: "Normal Orders (Flag = 0)",
+                data: normalOrders,
+                backgroundColor: tokens.primary,
+                pointRadius: (ctx) => {
+                  const pt = ctx.raw;
+                  return pt && pt.orderData && pt.orderData.isFlagged ? 7 : 4;
+                },
+                pointBorderWidth: (ctx) => {
+                  const pt = ctx.raw;
+                  return pt && pt.orderData && pt.orderData.isFlagged ? 2 : 0;
+                },
+                pointBorderColor: "#FFFFFF",
+              },
+              {
+                label: "Fraud Orders (Flag = 1)",
+                data: fraudOrders,
+                backgroundColor: tokens.coral,
+                pointRadius: (ctx) => {
+                  const pt = ctx.raw;
+                  return pt && pt.orderData && pt.orderData.isFlagged ? 8 : 5;
+                },
+                pointBorderWidth: (ctx) => {
+                  const pt = ctx.raw;
+                  return pt && pt.orderData && pt.orderData.isFlagged ? 2 : 0;
+                },
+                pointBorderColor: "#FFFFFF",
+              },
+            ],
+          },
+          options: {
+            scales: {
+              x: {
+                title: { display: true, text: "Order Amount (₱)" },
+                ticks: { callback: (v) => formatCurrency(v) },
+              },
+              y: {
+                title: { display: true, text: "Account Age (days)" },
+              },
+            },
+            plugins: {
+              tooltip: {
+                callbacks: {
+                  label: (ctx) => {
+                    const o = ctx.raw.orderData;
+                    return `${o.orderId}: ${formatCurrency(o.amount)}, Age: ${o.accountAge}d, Score: ${o.fraudScore} (${o.isFlagged ? 'FLAGGED' : 'Pass'})`;
+                  },
+                },
+              },
+            },
+            onClick: (evt, elements) => {
+              if (elements.length > 0) {
+                const el = elements[0];
+                const pt = config.data.datasets[el.datasetIndex].data[el.index];
+                const o = pt.orderData;
+                pointSummary.innerHTML = `
+                  <strong>${o.orderId}</strong> | Amount: <span class="tabular-nums">${formatCurrency(o.amount)}</span> | Location: ${o.location} | Payment: ${o.payment} | Account age: ${o.accountAge} days | Items: ${o.items} | Fraud score: <span class="tabular-nums">${o.fraudScore}</span> | Status: <strong>${o.isFlagged ? '<span style="color:var(--coral);">FLAGGED FOR REVIEW</span>' : '<span style="color:var(--teal);">CLEARED</span>'}</strong> (Actual: ${o.fraud === 1 ? 'Fraud' : 'Normal'})
+                `;
+              }
+            },
+          },
+        };
+
+        window.Allonola.charts.createChart("svm-scatter-canvas", config, {
+          title: "Order Distribution: Amount vs. Account Age",
+          xLabel: "Order Amount (₱)",
+          yLabel: "Account Age (days)",
+          srSummary: "Scatter plot showing 60 orders plotted by amount against account age, highlighted by fraud status and decision threshold.",
+          buildFn: () => updateScatterAndMetrics(),
+        });
+
+        window.Allonola.table.attachChartTableToggle("svm-chart-figure", () => ({
+          caption: "60 deterministic orders evaluated against active threshold " + slider.value + ". Illustrative / synthetically generated.",
+          columns: [
+            { key: "id", label: "Order ID" },
+            { key: "amount", label: "Amount (₱)" },
+            { key: "age", label: "Age (days)" },
+            { key: "score", label: "Fraud Score" },
+            { key: "actual", label: "Actual Flag" },
+            { key: "flagged", label: "Decision" },
+          ],
+          rows: evalResult.annotatedOrders.map((o) => ({
+            id: o.orderId,
+            amount: formatCurrency(o.amount),
+            age: o.accountAge,
+            score: o.fraudScore,
+            actual: o.fraud === 1 ? "Fraud" : "Normal",
+            flagged: o.isFlagged ? "Flagged" : "Not flagged",
+          })),
+        }));
+      }
+
+      // Category Predictor
+      function updateCategory() {
+        const title = titleInput.value.trim();
+        const pred = ml.predictProductCategory(title);
+
+        categoryOutput.textContent = pred.category;
+        if (pred.isConfident) {
+          categoryOutput.style.color = "var(--teal)";
+          categoryNote.textContent = `Matched keyword: "${pred.matchedKeyword}". This simple rule-based lookup stands in for the high-dimensional SVM text classifier.`;
+        } else {
+          categoryOutput.style.color = "var(--coral)";
+          categoryNote.textContent = "No recognized sample keywords detected. In production, unclassifiable listings route to human merchant support.";
+        }
+      }
+
+      slider.addEventListener("input", updateScatterAndMetrics);
+      titleInput.addEventListener("input", updateCategory);
+
+      sampleTitleBtns.forEach((btn) => {
+        btn.addEventListener("click", () => {
+          titleInput.value = btn.getAttribute("data-title");
+          updateCategory();
+        });
+      });
+
+      updateScatterAndMetrics();
+      updateCategory();
+    });
+  </script>
+</body>
+</html>

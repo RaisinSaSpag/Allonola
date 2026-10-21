@@ -1,0 +1,800 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Artificial Neural Network | Allonola</title>
+  <meta name="description" content="Artificial Neural Network deep learning architecture for customer churn prediction and personalized homepage ranking.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/layout.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/algorithm.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+</head>
+<body data-page="ann">
+  <a href="#main-content" class="skip-link">Skip to main content</a>
+
+  <!-- Header -->
+  <header class="site-header">
+    <div class="container header-inner">
+      <a href="index.html" class="site-logo" aria-label="Allonola Home">
+        <svg class="logo-icon" width="28" height="28" viewBox="0 0 28 28" fill="none" aria-hidden="true">
+          <circle cx="6" cy="20" r="3.5" fill="currentColor" />
+          <circle cx="22" cy="20" r="3.5" fill="currentColor" />
+          <circle cx="14" cy="7" r="3.5" fill="currentColor" />
+          <line x1="6" y1="20" x2="14" y2="7" stroke="currentColor" stroke-width="1.75" />
+          <line x1="14" y1="7" x2="22" y2="20" stroke="currentColor" stroke-width="1.75" />
+          <line x1="6" y1="20" x2="22" y2="20" stroke="currentColor" stroke-width="1.75" />
+        </svg>
+        <span>Allonola</span>
+      </a>
+
+      <nav class="nav-desktop" aria-label="Primary navigation">
+        <a href="index.html" class="nav-link">Home</a>
+        <a href="about.html" class="nav-link">About</a>
+        <div class="nav-dropdown">
+          <button type="button" class="nav-link nav-dropdown-toggle nav-link--active" aria-expanded="false" aria-haspopup="true">
+            <span>Algorithms</span>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+              <polyline points="6 9 12 15 18 9"></polyline>
+            </svg>
+          </button>
+          <div class="nav-dropdown-menu" role="menu">
+            <a href="algorithms.html" class="nav-dropdown-item" role="menuitem">
+              <span class="nav-dropdown-title">Overview & Comparison</span>
+              <span class="nav-dropdown-desc">Compare all six ML approaches</span>
+            </a>
+            <a href="algo-linear-regression.html" class="nav-dropdown-item" role="menuitem">
+              <span class="nav-dropdown-title">Linear Regression</span>
+              <span class="nav-dropdown-desc">Demand forecasting & price elasticity</span>
+            </a>
+            <a href="algo-naive-bayes.html" class="nav-dropdown-item" role="menuitem">
+              <span class="nav-dropdown-title">Naive Bayes</span>
+              <span class="nav-dropdown-desc">Sentiment & fake review filtering</span>
+            </a>
+            <a href="algo-knn.html" class="nav-dropdown-item" role="menuitem">
+              <span class="nav-dropdown-title">K-Nearest Neighbors</span>
+              <span class="nav-dropdown-desc">Collaborative recommendations</span>
+            </a>
+            <a href="algo-svm.html" class="nav-dropdown-item" role="menuitem">
+              <span class="nav-dropdown-title">Support Vector Machine</span>
+              <span class="nav-dropdown-desc">Order fraud & auto-categorization</span>
+            </a>
+            <a href="algo-decision-tree.html" class="nav-dropdown-item" role="menuitem">
+              <span class="nav-dropdown-title">Decision Tree</span>
+              <span class="nav-dropdown-desc">Delivery risk & return rules</span>
+            </a>
+            <a href="algo-ann.html" class="nav-dropdown-item" role="menuitem">
+              <span class="nav-dropdown-title">Artificial Neural Network</span>
+              <span class="nav-dropdown-desc">Personalization & shopper churn</span>
+            </a>
+          </div>
+        </div>
+        <a href="dashboard.html" class="nav-link">Dashboard demo</a>
+        <a href="contact.html" class="nav-link">Contact</a>
+      </nav>
+
+      <div class="header-actions">
+        <button type="button" id="theme-toggle" class="btn-icon" aria-label="Switch to light theme" title="Switch to light theme">
+          <svg class="theme-icon-sun" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+            <circle cx="12" cy="12" r="5"></circle>
+            <line x1="12" y1="1" x2="12" y2="3"></line>
+            <line x1="12" y1="21" x2="12" y2="23"></line>
+            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+            <line x1="1" y1="12" x2="3" y2="12"></line>
+            <line x1="21" y1="12" x2="23" y2="12"></line>
+            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+          </svg>
+          <svg class="theme-icon-moon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="display:none;" aria-hidden="true">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+          </svg>
+        </button>
+
+        <button type="button" id="hamburger-btn" class="btn-icon hamburger-btn" aria-label="Open mobile menu" aria-expanded="false" aria-controls="nav-drawer">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <line x1="3" y1="12" x2="21" y2="12"></line>
+            <line x1="3" y1="6" x2="21" y2="6"></line>
+            <line x1="3" y1="18" x2="21" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Mobile Drawer -->
+  <div id="nav-backdrop" class="nav-backdrop"></div>
+  <aside id="nav-drawer" class="nav-drawer" aria-label="Mobile navigation">
+    <div style="display: flex; justify-content: space-between; align-items: center;">
+      <span class="site-logo">
+        <svg class="logo-icon" width="24" height="24" viewBox="0 0 28 28" fill="none" aria-hidden="true">
+          <circle cx="6" cy="20" r="3.5" fill="currentColor" />
+          <circle cx="22" cy="20" r="3.5" fill="currentColor" />
+          <circle cx="14" cy="7" r="3.5" fill="currentColor" />
+          <line x1="6" y1="20" x2="14" y2="7" stroke="currentColor" stroke-width="1.75" />
+          <line x1="14" y1="7" x2="22" y2="20" stroke="currentColor" stroke-width="1.75" />
+          <line x1="6" y1="20" x2="22" y2="20" stroke="currentColor" stroke-width="1.75" />
+        </svg>
+        <span>Allonola</span>
+      </span>
+    </div>
+    <ul class="nav-mobile-list">
+      <li><a href="index.html" class="mobile-nav-link">Home</a></li>
+      <li><a href="about.html" class="mobile-nav-link">About</a></li>
+      <li>
+        <button type="button" id="algo-accordion-btn" class="mobile-accordion-btn" aria-expanded="false">
+          <span>Algorithms</span>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <polyline points="6 9 12 15 18 9"></polyline>
+          </svg>
+        </button>
+        <ul id="algo-accordion-menu" class="mobile-sublist" hidden>
+          <li><a href="algorithms.html" class="mobile-sublink">Overview & Comparison</a></li>
+          <li><a href="algo-linear-regression.html" class="mobile-sublink">Linear Regression</a></li>
+          <li><a href="algo-naive-bayes.html" class="mobile-sublink">Naive Bayes</a></li>
+          <li><a href="algo-knn.html" class="mobile-sublink">K-Nearest Neighbors</a></li>
+          <li><a href="algo-svm.html" class="mobile-sublink">Support Vector Machine</a></li>
+          <li><a href="algo-decision-tree.html" class="mobile-sublink">Decision Tree</a></li>
+          <li><a href="algo-ann.html" class="mobile-sublink">Artificial Neural Network</a></li>
+        </ul>
+      </li>
+      <li><a href="dashboard.html" class="mobile-nav-link">Dashboard demo</a></li>
+      <li><a href="contact.html" class="mobile-nav-link">Contact</a></li>
+    </ul>
+  </aside>
+
+  <!-- Breadcrumbs -->
+  <nav class="breadcrumbs-bar" aria-label="Breadcrumbs">
+    <div class="container">
+      <ol class="breadcrumbs-list">
+        <li class="breadcrumb-item"><a href="index.html">Home</a></li>
+        <li class="breadcrumb-separator" aria-hidden="true">›</li>
+        <li class="breadcrumb-item"><a href="algorithms.html">Algorithms</a></li>
+        <li class="breadcrumb-separator" aria-hidden="true">›</li>
+        <li class="breadcrumb-item breadcrumb-item--current" aria-current="page">ANN</li>
+      </ol>
+    </div>
+  </nav>
+
+  <main id="main-content" class="section">
+    <div class="container">
+      <!-- 1. Header Block -->
+      <header class="algo-header">
+        <div class="algo-header__pills">
+          <span class="pill pill--teal">Task: Learn complex patterns</span>
+          <span class="pill">Used in: Personalized homepage; customer loss alerts; image search</span>
+        </div>
+        <h1>Artificial Neural Network (ANN)</h1>
+        <p class="algo-header__question">"What will this shopper browse, and are they at risk of leaving?"</p>
+      </header>
+
+      <!-- 2. What it is -->
+      <section class="section--compact content-reading">
+        <h2>What it is</h2>
+        <p>
+          An Artificial Neural Network is a computational program loosely inspired by the biological brain, made of connected layers of small mathematical units that learn complicated browsing habits, such as what a shopper browses before deciding to purchase.
+        </p>
+      </section>
+
+      <!-- 3. Why Allonola uses it -->
+      <section class="section--compact content-reading">
+        <h2>Why Allonola uses it</h2>
+        <p>
+          Retaining existing customers is far more cost-effective than acquiring new shoppers through advertising. When a loyal customer stops visiting or displays declining engagement, deep sequential neural networks detect subtle churn risk patterns weeks before they lapse. This capability enables our marketing team to dispatch targeted re-engagement offers, directly supporting Operational Goal #6: raising the marketplace repeat-buyer rate from 28% to 35%.
+        </p>
+      </section>
+
+      <!-- 4. How it works -->
+      <section class="section--compact content-reading">
+        <h2>How it works</h2>
+        <p>
+          Information flows from an input layer through one or more hidden layers to an output prediction. Each neuron multiplies incoming inputs by learned weights, sums them with a bias, and applies an activation function (such as ReLU). Training iteratively minimizes prediction errors using backpropagation and gradient descent.
+        </p>
+
+        <div class="formula-box">
+Neuron Activation: a^[l] = ReLU(W^[l] · a^[l-1] + b^[l])
+
+Binary Cross-Entropy Loss: L = - [ y · log(ŷ) + (1 - y) · log(1 - ŷ) ]
+
+Weight Gradient Update: W^[l] := W^[l] - α (∂L / ∂W^[l])
+        </div>
+
+        <p class="text-small text-muted">
+          Dense learned vector embeddings represent user browsing sequences and product identities in a shared semantic space. Dropout and early stopping are essential safeguards: because neural networks possess immense capacity, early stopping monitors validation loss to halt training the moment generalization ceases to improve.
+        </p>
+      </section>
+
+      <!-- 5. Data used and why -->
+      <section class="section--compact">
+        <h2>Data used and why</h2>
+        <div class="table-responsive-wrapper" tabindex="0" role="region" aria-label="ANN features and reasons">
+          <table class="data-table">
+            <caption>Features ingested by the customer retention and homepage ranking networks. Illustrative / synthetically generated.</caption>
+            <thead>
+              <tr>
+                <th scope="col">Feature Domain</th>
+                <th scope="col">Data Format</th>
+                <th scope="col">Operational Rationale</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <th scope="row">Browsing clickstream</th>
+                <td>Sequential session page views</td>
+                <td>Captures immediate interest depth and category exploration patterns.</td>
+              </tr>
+              <tr>
+                <th scope="row">Search query history</th>
+                <td>30-day token volume</td>
+                <td>Indicates current purchase intent and unmet product desires.</td>
+              </tr>
+              <tr>
+                <th scope="row">Recency & Frequency</th>
+                <td>Days since last visit & past orders</td>
+                <td>Primary statistical drivers of customer lifetime value and churn risk.</td>
+              </tr>
+              <tr>
+                <th scope="row">Demographics</th>
+                <td>Age band, region, device type</td>
+                <td>Accounts for regional purchasing habits and device checkout friction.</td>
+              </tr>
+              <tr>
+                <th scope="row">Visual features</th>
+                <td>Image embeddings (ResNet)</td>
+                <td>Powers visual similarity recommendations for fashion and home items.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="text-small text-muted">Outputs: ranked product recommendations; probability of next-day purchase or 60-day customer churn.</p>
+      </section>
+
+      <!-- 6. Sample dataset -->
+      <section class="section--compact">
+        <h2>Sample dataset</h2>
+        <div class="table-responsive-wrapper" tabindex="0" role="region" aria-label="Sample shopper retention dataset">
+          <table class="data-table">
+            <caption>Sample customer behavioral profiles evaluated for churn (no visit for 60 days). Illustrative / synthetically generated.</caption>
+            <thead>
+              <tr>
+                <th scope="col">Shopper</th>
+                <th scope="col">Pages viewed (session)</th>
+                <th scope="col">Searches (30 days)</th>
+                <th scope="col">Past purchases</th>
+                <th scope="col">Days since last visit</th>
+                <th scope="col">Age band</th>
+                <th scope="col">Bought next</th>
+                <th scope="col">Churn flag</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <th scope="row">S-01</th>
+                <td class="tabular-nums">14</td>
+                <td class="tabular-nums">6</td>
+                <td class="tabular-nums">5</td>
+                <td class="tabular-nums">2</td>
+                <td>25–34</td>
+                <td><span class="pill pill--teal">1 (Bought)</span></td>
+                <td><span class="pill pill--teal">0 (Active)</span></td>
+              </tr>
+              <tr>
+                <th scope="row">S-02</th>
+                <td class="tabular-nums">3</td>
+                <td class="tabular-nums">1</td>
+                <td class="tabular-nums">0</td>
+                <td class="tabular-nums">75</td>
+                <td>18–24</td>
+                <td><span class="pill">0</span></td>
+                <td><span class="pill pill--coral">1 (Churned)</span></td>
+              </tr>
+              <tr>
+                <th scope="row">S-03</th>
+                <td class="tabular-nums">22</td>
+                <td class="tabular-nums">9</td>
+                <td class="tabular-nums">3</td>
+                <td class="tabular-nums">6</td>
+                <td>35–44</td>
+                <td><span class="pill pill--teal">1 (Bought)</span></td>
+                <td><span class="pill pill--teal">0 (Active)</span></td>
+              </tr>
+              <tr>
+                <th scope="row">S-04</th>
+                <td class="tabular-nums">5</td>
+                <td class="tabular-nums">2</td>
+                <td class="tabular-nums">1</td>
+                <td class="tabular-nums">48</td>
+                <td>45–54</td>
+                <td><span class="pill">0</span></td>
+                <td><span class="pill pill--coral">1 (Churned)</span></td>
+              </tr>
+              <tr>
+                <th scope="row">S-05</th>
+                <td class="tabular-nums">9</td>
+                <td class="tabular-nums">4</td>
+                <td class="tabular-nums">2</td>
+                <td class="tabular-nums">12</td>
+                <td>25–34</td>
+                <td><span class="pill">0</span></td>
+                <td><span class="pill pill--teal">0 (Active)</span></td>
+              </tr>
+              <tr>
+                <th scope="row">S-06</th>
+                <td class="tabular-nums">1</td>
+                <td class="tabular-nums">0</td>
+                <td class="tabular-nums">0</td>
+                <td class="tabular-nums">90</td>
+                <td>18–24</td>
+                <td><span class="pill">0</span></td>
+                <td><span class="pill pill--coral">1 (Churned)</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- 7. Interactive Demo -->
+      <section class="demo-container">
+        <div class="demo-header">
+          <div>
+            <h2>Interactive demo</h2>
+            <p class="text-muted text-small">Part 1: Training loss curves & early stopping. Part 2: Sample shopper predictions.</p>
+          </div>
+          <span class="demo-badge">Live demo: training epoch scrubber & shopper churn</span>
+        </div>
+
+        <!-- Panel 1: Loss Curve Scrubber -->
+        <div style="margin-bottom: 2.5rem;">
+          <h3 style="font-size: 1.15rem; margin-bottom: 0.5rem;">Panel 1: Training and validation loss by epoch</h3>
+          <p class="text-small text-muted" style="margin-bottom: 1.25rem;">
+            Scrub through 30 epochs or press Play to watch loss convergence. Notice that validation loss reaches its minimum (0.34) at epoch 22 before rising, signaling early stopping.
+          </p>
+
+          <div class="demo-layout">
+            <div class="demo-controls">
+              <div class="form-group">
+                <div class="slider-label-row">
+                  <label for="ann-epoch-slider" class="form-label">Training epoch:</label>
+                  <span id="ann-epoch-val" class="tabular-nums" style="color: var(--teal); font-weight: 700;">Epoch 30</span>
+                </div>
+                <input type="range" id="ann-epoch-slider" class="slider-input" min="1" max="30" step="1" value="30">
+                <div class="slider-label-row text-muted text-small" style="margin-top: 0.25rem;">
+                  <span>Epoch 1 (Initial loss 0.69)</span>
+                  <span>Epoch 30 (Final)</span>
+                </div>
+              </div>
+
+              <div style="display: flex; gap: 0.75rem; align-items: center;">
+                <button type="button" id="ann-play-btn" class="btn btn--secondary btn--small" style="min-width: 100px;">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                    <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                  </svg>
+                  <span>Play</span>
+                </button>
+                <button type="button" id="ann-reset-btn" class="btn btn--subtle btn--small">Jump to Epoch 22</button>
+              </div>
+
+              <!-- Loss Stats Cards -->
+              <div class="grid-2" style="margin-top: 1rem;">
+                <div class="metric-card" style="padding: 1rem;">
+                  <span class="metric-label" style="font-size: 0.75rem;">Training Loss</span>
+                  <span id="ann-train-loss-stat" class="metric-value tabular-nums" style="font-size: 1.5rem; color: var(--primary);">0.310</span>
+                  <span class="metric-subtext">Monotonic decrease</span>
+                </div>
+                <div class="metric-card" style="padding: 1rem;">
+                  <span class="metric-label" style="font-size: 0.75rem;">Validation Loss</span>
+                  <span id="ann-val-loss-stat" class="metric-value tabular-nums" style="font-size: 1.5rem; color: var(--coral);">0.380</span>
+                  <span class="metric-subtext">Minimum at Epoch 22 (0.340)</span>
+                </div>
+              </div>
+
+              <div class="card card--solid" style="padding: 1rem;">
+                <p id="ann-loss-summary-text" class="text-small text-muted" style="margin: 0;">
+                  At Epoch 30: Training loss fell to 0.31. However, validation loss rose to 0.38 after bottoming out at 0.34 in Epoch 22, indicating memorization.
+                </p>
+              </div>
+            </div>
+
+            <!-- Chart -->
+            <div class="demo-output">
+              <figure id="ann-chart-figure" class="chart-card">
+                <div class="chart-wrapper">
+                  <canvas id="ann-loss-canvas"></canvas>
+                </div>
+              </figure>
+            </div>
+          </div>
+        </div>
+
+        <hr class="section-divider" style="margin: 2rem 0;">
+
+        <!-- Panel 2: Sample Shopper Churn Demo -->
+        <div>
+          <h3 style="font-size: 1.15rem; margin-bottom: 0.5rem;">Panel 2: Sample shopper prediction & personalized feed</h3>
+          <p class="text-small text-muted" style="margin-bottom: 1.25rem;">
+            Select a sample profile (S-01 to S-06) to retrieve its illustrative precomputed churn risk and ranked personalized homepage items.
+          </p>
+
+          <div class="demo-layout">
+            <div class="demo-controls">
+              <div class="form-group">
+                <label for="ann-shopper-select" class="form-label">Select shopper profile:</label>
+                <select id="ann-shopper-select" class="form-control">
+                  <option value="S-01" selected>S-01 (Active loyal shopper, visited 2 days ago)</option>
+                  <option value="S-02">S-02 (High risk, no visits for 75 days)</option>
+                  <option value="S-03">S-03 (High session volume, 35-44 age band)</option>
+                  <option value="S-04">S-04 (High risk, 48 days inactive, 45-54 age band)</option>
+                  <option value="S-05">S-05 (Moderate engagement, 25-34 age band)</option>
+                  <option value="S-06">S-06 (Critical risk, single page view 90 days ago)</option>
+                </select>
+              </div>
+
+              <button type="button" id="ann-predict-btn" class="btn btn--primary" style="width: 100%;">
+                Predict Churn Probability & Feed
+              </button>
+
+              <div class="card card--solid" style="padding: 1rem; margin-top: 1rem;">
+                <span class="text-small text-muted" style="display: block;">
+                  <strong>Note:</strong> Values are illustrative stored synthetic estimates to demonstrate model outputs.
+                </span>
+              </div>
+            </div>
+
+            <div class="demo-output">
+              <div class="demo-big-stat">
+                <div id="ann-churn-prob-display" class="demo-big-stat__number tabular-nums">12%</div>
+                <div class="demo-big-stat__label">Predicted Churn Risk (<span id="ann-churn-risk-label" style="color: var(--teal);">Low Risk</span>)</div>
+              </div>
+
+              <div class="card card--solid" style="padding: 1.25rem;">
+                <h4 style="font-size: 0.95rem; margin-bottom: 0.75rem; color: var(--teal);">Ranked Personalized Homepage Items:</h4>
+                <div id="ann-homepage-items-container" style="display: flex; flex-direction: column; gap: 0.5rem;">
+                  <!-- Populated dynamically -->
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 8. Illustrative results and interpretation -->
+      <section class="section--compact">
+        <h2>Illustrative results and interpretation</h2>
+        <div class="grid-3" style="margin-bottom: 1.5rem;">
+          <div class="metric-card">
+            <span class="metric-label">Retention Example</span>
+            <span class="metric-value tabular-nums" style="color: var(--coral);">78% Churn Risk</span>
+            <span class="metric-subtext">Shopper S-04 churn prob 0.78 (high risk), added to retention campaign</span>
+          </div>
+
+          <div class="metric-card">
+            <span class="metric-label">Test Set Quality</span>
+            <span class="metric-value tabular-nums">AUC = 0.91</span>
+            <span class="metric-subtext">Evaluated on test set of 10,000 shoppers (Accuracy 88%)</span>
+          </div>
+
+          <div class="metric-card">
+            <span class="metric-label">Early Stopping Epoch</span>
+            <span class="metric-value tabular-nums">Epoch 22</span>
+            <span class="metric-subtext">Training loss 0.69 → 0.31; val loss minimized at 0.34</span>
+          </div>
+        </div>
+
+        <div class="grid-2">
+          <div class="card card--solid">
+            <h3 style="font-size: 1.1rem; margin-bottom: 0.5rem;">Interpretation</h3>
+            <p class="text-small text-muted" style="margin: 0;">
+              An AUC of 0.91 means a random churned shopper ranks above a random active shopper 91% of the time. The widening gap after epoch 22 signals memorization of training clickstreams, which early stopping prevents in production by halting optimization.
+            </p>
+          </div>
+
+          <div class="card card--solid">
+            <h3 style="font-size: 1.1rem; margin-bottom: 0.5rem;">Business Impact</h3>
+            <p class="text-small text-muted" style="margin: 0;">
+              Retention offers are targeted precisely at the top 5% of churn-risk shoppers, measured against an untreated control group. S-01's personalized homepage led by running shoes and a phone stand produced an add-to-cart conversion the next day, supporting the corporate target of raising repeat buyers from 28% to 35%.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- 9. Strengths and limitations -->
+      <section class="section--compact">
+        <h2>Strengths and limitations</h2>
+        <div class="strengths-limitations-grid">
+          <div class="card">
+            <h3 style="color: var(--teal); font-size: 1.1rem; margin-bottom: 0.75rem;">Strengths</h3>
+            <ul class="bullet-list">
+              <li>Highest potential predictive accuracy across massive consumer behavioral datasets.</li>
+              <li>Naturally models intricate non-linear relationships and dense latent embeddings.</li>
+              <li>Supports multi-task learning (jointly predicting churn probability and item rankings).</li>
+              <li>Ingests multimodal inputs, from click timestamps to product image vectors.</li>
+            </ul>
+          </div>
+
+          <div class="card">
+            <h3 style="color: var(--coral); font-size: 1.1rem; margin-bottom: 0.75rem;">Limitations</h3>
+            <ul class="bullet-list bullet-list--coral">
+              <li>Requires extensive sample sizes and substantial GPU computing resources.</li>
+              <li>Difficult to explain to merchants why an item received a specific ranking score.</li>
+              <li>Prone to overfitting and parameter memorization without early stopping and dropout.</li>
+              <li>Significant engineering overhead to deploy low-latency inference at the edge.</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <!-- 10. Previous / Next Links -->
+      <nav class="algo-pagination" aria-label="Algorithm series pagination">
+        <a href="algo-decision-tree.html" class="algo-pagination__btn">
+          <span class="algo-pagination__label">← Previous Algorithm</span>
+          <span class="algo-pagination__title">Decision Tree</span>
+        </a>
+
+        <span class="algo-pagination__btn" style="opacity: 0.4; cursor: default; text-align: right;">
+          <span class="algo-pagination__label">End of Series</span>
+          <span class="algo-pagination__title">—</span>
+        </span>
+      </nav>
+    </div>
+  </main>
+
+  <!-- Global Footer -->
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-top">
+        <div class="footer-brand">
+          <span class="site-logo">
+            <svg class="logo-icon" width="22" height="22" viewBox="0 0 28 28" fill="none" aria-hidden="true">
+              <circle cx="6" cy="20" r="3.5" fill="currentColor" />
+              <circle cx="22" cy="20" r="3.5" fill="currentColor" />
+              <circle cx="14" cy="7" r="3.5" fill="currentColor" />
+              <line x1="6" y1="20" x2="14" y2="7" stroke="currentColor" stroke-width="1.75" />
+              <line x1="14" y1="7" x2="22" y2="20" stroke="currentColor" stroke-width="1.75" />
+              <line x1="6" y1="20" x2="22" y2="20" stroke="currentColor" stroke-width="1.75" />
+            </svg>
+            <span>Allonola</span>
+          </span>
+          <p>
+            To give every customer an easy, trustworthy, and personalized online shopping experience at fair prices, and to help sellers reach more buyers without needing a physical shop.
+          </p>
+        </div>
+
+        <div class="footer-col">
+          <h4>Platform</h4>
+          <ul class="footer-links">
+            <li><a href="index.html" class="footer-link">Home</a></li>
+            <li><a href="about.html" class="footer-link">About Allonola</a></li>
+            <li><a href="dashboard.html" class="footer-link">Dashboard Demo</a></li>
+            <li><a href="contact.html" class="footer-link">Contact Support</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <h4>Algorithms</h4>
+          <ul class="footer-links">
+            <li><a href="algorithms.html" class="footer-link">Overview & Comparison</a></li>
+            <li><a href="algo-linear-regression.html" class="footer-link">Linear Regression</a></li>
+            <li><a href="algo-naive-bayes.html" class="footer-link">Naive Bayes</a></li>
+            <li><a href="algo-knn.html" class="footer-link">K-Nearest Neighbors</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <h4>Machine Learning</h4>
+          <ul class="footer-links">
+            <li><a href="algo-svm.html" class="footer-link">Support Vector Machine</a></li>
+            <li><a href="algo-decision-tree.html" class="footer-link">Decision Tree</a></li>
+            <li><a href="algo-ann.html" class="footer-link">Artificial Neural Network</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <p class="disclaimer-badge">All data shown is illustrative and synthetically generated.</p>
+        <p>&copy; 2026 Allonola. Fictional company for academic use.</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Script Execution Order -->
+  <script defer src="js/data.js"></script>
+  <script defer src="js/app.js"></script>
+  <script defer src="js/charts.js"></script>
+  <script defer src="js/table.js"></script>
+  <script defer src="js/ml/ann.js"></script>
+  <script defer>
+    document.addEventListener("DOMContentLoaded", function () {
+      // Panel 1: Loss curves
+      const epochSlider = document.getElementById("ann-epoch-slider");
+      const epochVal = document.getElementById("ann-epoch-val");
+      const playBtn = document.getElementById("ann-play-btn");
+      const resetBtn = document.getElementById("ann-reset-btn");
+      const trainLossStat = document.getElementById("ann-train-loss-stat");
+      const valLossStat = document.getElementById("ann-val-loss-stat");
+      const lossSummaryText = document.getElementById("ann-loss-summary-text");
+
+      // Panel 2: Shopper demo
+      const shopperSelect = document.getElementById("ann-shopper-select");
+      const predictBtn = document.getElementById("ann-predict-btn");
+      const churnProbDisplay = document.getElementById("ann-churn-prob-display");
+      const churnRiskLabel = document.getElementById("ann-churn-risk-label");
+      const homepageContainer = document.getElementById("ann-homepage-items-container");
+
+      const ml = window.Allonola.ml.ann;
+      let isPlaying = false;
+      let playTimer = null;
+
+      function renderLossChart() {
+        const currentEpoch = parseInt(epochSlider.value, 10);
+        epochVal.textContent = "Epoch " + currentEpoch;
+
+        const slice = ml.getLossSlice(currentEpoch);
+
+        trainLossStat.textContent = slice.currentTrain.toFixed(3);
+        valLossStat.textContent = slice.currentVal.toFixed(3);
+
+        if (currentEpoch < 22) {
+          lossSummaryText.textContent = `At Epoch ${currentEpoch}: Both training loss (${slice.currentTrain.toFixed(3)}) and validation loss (${slice.currentVal.toFixed(3)}) are improving steadily.`;
+        } else if (currentEpoch === 22) {
+          lossSummaryText.innerHTML = `<strong>Early Stopping Point (Epoch 22):</strong> Validation loss has reached its global minimum of 0.340. In production, training halts here.`;
+        } else {
+          lossSummaryText.textContent = `At Epoch ${currentEpoch}: Training loss fell to ${slice.currentTrain.toFixed(3)}, but validation loss rose to ${slice.currentVal.toFixed(3)} (overfitting gap).`;
+        }
+
+        const tokens = window.Allonola.charts.getTokens();
+
+        const config = {
+          type: "line",
+          data: {
+            labels: slice.labels.map((e) => "Ep " + e),
+            datasets: [
+              {
+                label: "Training Loss",
+                data: slice.trainLoss,
+                borderColor: tokens.primary,
+                backgroundColor: "rgba(74, 159, 216, 0.1)",
+                borderWidth: 2,
+                pointRadius: 2,
+                tension: 0.2,
+              },
+              {
+                label: "Validation Loss",
+                data: slice.valLoss,
+                borderColor: tokens.coral,
+                backgroundColor: "rgba(242, 107, 91, 0.1)",
+                borderWidth: 2,
+                pointRadius: slice.labels.map((e) => (e === 22 ? 6 : 2)),
+                pointBackgroundColor: slice.labels.map((e) => (e === 22 ? tokens.teal : tokens.coral)),
+                tension: 0.2,
+              },
+            ],
+          },
+          options: {
+            scales: {
+              x: { title: { display: true, text: "Training Epoch" } },
+              y: {
+                title: { display: true, text: "Cross-Entropy Loss" },
+                min: 0.25,
+                max: 0.75,
+              },
+            },
+          },
+        };
+
+        window.Allonola.charts.createChart("ann-loss-canvas", config, {
+          title: "Training vs. Validation Loss by Epoch",
+          xLabel: "Epoch",
+          yLabel: "Loss",
+          srSummary: "Line chart plotting training and validation cross-entropy loss over 30 epochs with early stopping marked at epoch 22.",
+          buildFn: () => renderLossChart(),
+        });
+
+        window.Allonola.table.attachChartTableToggle("ann-chart-figure", () => ({
+          caption: "Epoch training and validation loss values up to epoch " + currentEpoch + ". Illustrative / synthetically generated.",
+          columns: [
+            { key: "epoch", label: "Epoch" },
+            { key: "train", label: "Training Loss" },
+            { key: "val", label: "Validation Loss" },
+          ],
+          rows: slice.labels.map((e, idx) => ({
+            epoch: "Epoch " + e + (e === 22 ? " (Early Stop)" : ""),
+            train: slice.trainLoss[idx].toFixed(3),
+            val: slice.valLoss[idx].toFixed(3),
+          })),
+        }));
+      }
+
+      function togglePlay() {
+        if (isPlaying) {
+          clearInterval(playTimer);
+          isPlaying = false;
+          playBtn.querySelector("span").textContent = "Play";
+        } else {
+          isPlaying = true;
+          playBtn.querySelector("span").textContent = "Pause";
+          if (parseInt(epochSlider.value, 10) >= 30) {
+            epochSlider.value = 1;
+          }
+          playTimer = setInterval(() => {
+            let next = parseInt(epochSlider.value, 10) + 1;
+            if (next > 30) {
+              clearInterval(playTimer);
+              isPlaying = false;
+              playBtn.querySelector("span").textContent = "Play";
+            } else {
+              epochSlider.value = next;
+              renderLossChart();
+            }
+          }, 350);
+        }
+      }
+
+      // Panel 2: Shopper Predictor
+      function predictShopper() {
+        const shopperId = shopperSelect.value;
+        const res = ml.predictShopperChurn(shopperId);
+
+        churnProbDisplay.textContent = Math.round(res.churnProb * 100) + "%";
+        churnRiskLabel.textContent = res.riskLevel;
+
+        if (res.churnProb >= 0.70) {
+          churnProbDisplay.style.color = "var(--coral)";
+          churnRiskLabel.style.color = "var(--coral)";
+        } else if (res.churnProb >= 0.30) {
+          churnProbDisplay.style.color = "var(--warning)";
+          churnRiskLabel.style.color = "var(--warning)";
+        } else {
+          churnProbDisplay.style.color = "var(--teal)";
+          churnRiskLabel.style.color = "var(--teal)";
+        }
+
+        if (res.homepageItems && res.homepageItems.length > 0) {
+          homepageContainer.innerHTML = res.homepageItems
+            .map(
+              (item) => `
+              <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.65rem 0.85rem; background: var(--surface); border: 1px solid var(--border); border-radius: 8px;">
+                <div>
+                  <div style="font-weight: 600; font-size: 0.95rem;">${item.rank}. ${item.title}</div>
+                  <div class="text-small text-muted">${item.reason}</div>
+                </div>
+                <span class="pill pill--teal tabular-nums">Score ${(item.score * 100).toFixed(0)}%</span>
+              </div>
+            `
+            )
+            .join("");
+        } else {
+          homepageContainer.innerHTML = `
+            <div style="padding: 0.75rem; background: var(--surface); border: 1px solid var(--border); border-radius: 8px;">
+              <span class="text-small text-muted">
+                Shopper ${shopperId} is flagged for retention campaign vouchers rather than customized new browsing recommendations due to dormancy.
+              </span>
+            </div>
+          `;
+        }
+      }
+
+      epochSlider.addEventListener("input", () => {
+        if (isPlaying) togglePlay();
+        renderLossChart();
+      });
+
+      playBtn.addEventListener("click", togglePlay);
+      resetBtn.addEventListener("click", () => {
+        if (isPlaying) togglePlay();
+        epochSlider.value = 22;
+        renderLossChart();
+      });
+
+      predictBtn.addEventListener("click", predictShopper);
+      shopperSelect.addEventListener("change", predictShopper);
+
+      renderLossChart();
+      predictShopper();
+    });
+  </script>
+</body>
+</html>

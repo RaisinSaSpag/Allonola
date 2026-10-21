@@ -1,0 +1,1018 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard Demo | Allonola</title>
+  <meta name="description" content="Simulated Seller, Platform Admin, and ML Model Performance dashboards for Allonola's marketplace.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/layout.css">
+  <link rel="stylesheet" href="css/components.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+</head>
+<body data-page="dashboard">
+  <a href="#main-content" class="skip-link">Skip to main content</a>
+
+  <!-- Header -->
+  <header class="site-header">
+    <div class="container header-inner">
+      <a href="index.html" class="site-logo" aria-label="Allonola Home">
+        <svg class="logo-icon" width="28" height="28" viewBox="0 0 28 28" fill="none" aria-hidden="true">
+          <circle cx="6" cy="20" r="3.5" fill="currentColor" />
+          <circle cx="22" cy="20" r="3.5" fill="currentColor" />
+          <circle cx="14" cy="7" r="3.5" fill="currentColor" />
+          <line x1="6" y1="20" x2="14" y2="7" stroke="currentColor" stroke-width="1.75" />
+          <line x1="14" y1="7" x2="22" y2="20" stroke="currentColor" stroke-width="1.75" />
+          <line x1="6" y1="20" x2="22" y2="20" stroke="currentColor" stroke-width="1.75" />
+        </svg>
+        <span>Allonola</span>
+      </a>
+
+      <nav class="nav-desktop" aria-label="Primary navigation">
+        <a href="index.html" class="nav-link">Home</a>
+        <a href="about.html" class="nav-link">About</a>
+        <div class="nav-dropdown">
+          <button type="button" class="nav-link nav-dropdown-toggle" aria-expanded="false" aria-haspopup="true">
+            <span>Algorithms</span>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+              <polyline points="6 9 12 15 18 9"></polyline>
+            </svg>
+          </button>
+          <div class="nav-dropdown-menu" role="menu">
+            <a href="algorithms.html" class="nav-dropdown-item" role="menuitem">
+              <span class="nav-dropdown-title">Overview & Comparison</span>
+              <span class="nav-dropdown-desc">Compare all six ML approaches</span>
+            </a>
+            <a href="algo-linear-regression.html" class="nav-dropdown-item" role="menuitem">
+              <span class="nav-dropdown-title">Linear Regression</span>
+              <span class="nav-dropdown-desc">Demand forecasting & price elasticity</span>
+            </a>
+            <a href="algo-naive-bayes.html" class="nav-dropdown-item" role="menuitem">
+              <span class="nav-dropdown-title">Naive Bayes</span>
+              <span class="nav-dropdown-desc">Sentiment & fake review filtering</span>
+            </a>
+            <a href="algo-knn.html" class="nav-dropdown-item" role="menuitem">
+              <span class="nav-dropdown-title">K-Nearest Neighbors</span>
+              <span class="nav-dropdown-desc">Collaborative recommendations</span>
+            </a>
+            <a href="algo-svm.html" class="nav-dropdown-item" role="menuitem">
+              <span class="nav-dropdown-title">Support Vector Machine</span>
+              <span class="nav-dropdown-desc">Order fraud & auto-categorization</span>
+            </a>
+            <a href="algo-decision-tree.html" class="nav-dropdown-item" role="menuitem">
+              <span class="nav-dropdown-title">Decision Tree</span>
+              <span class="nav-dropdown-desc">Delivery risk & return rules</span>
+            </a>
+            <a href="algo-ann.html" class="nav-dropdown-item" role="menuitem">
+              <span class="nav-dropdown-title">Artificial Neural Network</span>
+              <span class="nav-dropdown-desc">Personalization & shopper churn</span>
+            </a>
+          </div>
+        </div>
+        <a href="dashboard.html" class="nav-link nav-link--active">Dashboard demo</a>
+        <a href="contact.html" class="nav-link">Contact</a>
+      </nav>
+
+      <div class="header-actions">
+        <button type="button" id="theme-toggle" class="btn-icon" aria-label="Switch to light theme" title="Switch to light theme">
+          <svg class="theme-icon-sun" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+            <circle cx="12" cy="12" r="5"></circle>
+            <line x1="12" y1="1" x2="12" y2="3"></line>
+            <line x1="12" y1="21" x2="12" y2="23"></line>
+            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+            <line x1="1" y1="12" x2="3" y2="12"></line>
+            <line x1="21" y1="12" x2="23" y2="12"></line>
+            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+          </svg>
+          <svg class="theme-icon-moon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="display:none;" aria-hidden="true">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+          </svg>
+        </button>
+
+        <button type="button" id="hamburger-btn" class="btn-icon hamburger-btn" aria-label="Open mobile menu" aria-expanded="false" aria-controls="nav-drawer">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <line x1="3" y1="12" x2="21" y2="12"></line>
+            <line x1="3" y1="6" x2="21" y2="6"></line>
+            <line x1="3" y1="18" x2="21" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Mobile Drawer -->
+  <div id="nav-backdrop" class="nav-backdrop"></div>
+  <aside id="nav-drawer" class="nav-drawer" aria-label="Mobile navigation">
+    <div style="display: flex; justify-content: space-between; align-items: center;">
+      <span class="site-logo">
+        <svg class="logo-icon" width="24" height="24" viewBox="0 0 28 28" fill="none" aria-hidden="true">
+          <circle cx="6" cy="20" r="3.5" fill="currentColor" />
+          <circle cx="22" cy="20" r="3.5" fill="currentColor" />
+          <circle cx="14" cy="7" r="3.5" fill="currentColor" />
+          <line x1="6" y1="20" x2="14" y2="7" stroke="currentColor" stroke-width="1.75" />
+          <line x1="14" y1="7" x2="22" y2="20" stroke="currentColor" stroke-width="1.75" />
+          <line x1="6" y1="20" x2="22" y2="20" stroke="currentColor" stroke-width="1.75" />
+        </svg>
+        <span>Allonola</span>
+      </span>
+    </div>
+    <ul class="nav-mobile-list">
+      <li><a href="index.html" class="mobile-nav-link">Home</a></li>
+      <li><a href="about.html" class="mobile-nav-link">About</a></li>
+      <li>
+        <button type="button" id="algo-accordion-btn" class="mobile-accordion-btn" aria-expanded="false">
+          <span>Algorithms</span>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <polyline points="6 9 12 15 18 9"></polyline>
+          </svg>
+        </button>
+        <ul id="algo-accordion-menu" class="mobile-sublist" hidden>
+          <li><a href="algorithms.html" class="mobile-sublink">Overview & Comparison</a></li>
+          <li><a href="algo-linear-regression.html" class="mobile-sublink">Linear Regression</a></li>
+          <li><a href="algo-naive-bayes.html" class="mobile-sublink">Naive Bayes</a></li>
+          <li><a href="algo-knn.html" class="mobile-sublink">K-Nearest Neighbors</a></li>
+          <li><a href="algo-svm.html" class="mobile-sublink">Support Vector Machine</a></li>
+          <li><a href="algo-decision-tree.html" class="mobile-sublink">Decision Tree</a></li>
+          <li><a href="algo-ann.html" class="mobile-sublink">Artificial Neural Network</a></li>
+        </ul>
+      </li>
+      <li><a href="dashboard.html" class="mobile-nav-link">Dashboard demo</a></li>
+      <li><a href="contact.html" class="mobile-nav-link">Contact</a></li>
+    </ul>
+  </aside>
+
+  <!-- Breadcrumbs -->
+  <nav class="breadcrumbs-bar" aria-label="Breadcrumbs">
+    <div class="container">
+      <ol class="breadcrumbs-list">
+        <li class="breadcrumb-item"><a href="index.html">Home</a></li>
+        <li class="breadcrumb-separator" aria-hidden="true">›</li>
+        <li class="breadcrumb-item breadcrumb-item--current" aria-current="page">Dashboard demo</li>
+      </ol>
+    </div>
+  </nav>
+
+  <main id="main-content" class="section">
+    <div class="container">
+      <!-- Title & Time Filter Bar -->
+      <div style="display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 1rem; margin-bottom: 2rem;">
+        <div>
+          <div class="pill pill--teal" style="margin-bottom: 0.5rem;">Operations Console</div>
+          <h1>Dashboard demo</h1>
+          <p class="text-muted" style="margin: 0;">Interactive analytics for independent sellers, platform administrators, and model telemetry.</p>
+        </div>
+
+        <div style="display: flex; align-items: center; gap: 0.5rem;">
+          <span class="text-small text-muted" style="font-weight: 600;">Time range:</span>
+          <div class="filter-btn-group" style="margin: 0;" role="group" aria-label="Filter dashboard by time range">
+            <button type="button" class="btn btn--secondary btn--small time-range-btn" data-range="7d">Last 7 days</button>
+            <button type="button" class="btn btn--primary btn--small time-range-btn active" data-range="30d">Last 30 days</button>
+            <button type="button" class="btn btn--secondary btn--small time-range-btn" data-range="12m">Last 12 months</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Banner required on every tab view -->
+      <div class="alert-box alert-box--info" style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.5rem;">
+        <div style="display: flex; align-items: center; gap: 0.75rem;">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="12" y1="8" x2="12" y2="12"></line>
+            <line x1="12" y1="16" x2="12.01" y2="16"></line>
+          </svg>
+          <strong>Illustrative sample data. Not real Allonola figures.</strong>
+        </div>
+        <span class="text-small text-muted">Generated with fixed deterministic seed</span>
+      </div>
+
+      <!-- Tabs Navigation -->
+      <div class="tabs-nav" role="tablist" aria-label="Dashboard operational views">
+        <button type="button" class="tab-btn" role="tab" id="tab-seller-btn" aria-selected="true" aria-controls="panel-seller">
+          Seller View
+        </button>
+        <button type="button" class="tab-btn" role="tab" id="tab-admin-btn" aria-selected="false" aria-controls="panel-admin">
+          Admin View
+        </button>
+        <button type="button" class="tab-btn" role="tab" id="tab-ml-btn" aria-selected="false" aria-controls="panel-ml">
+          Model Performance View
+        </button>
+      </div>
+
+      <!-- TAB 1: SELLER VIEW -->
+      <section id="panel-seller" class="tab-panel" role="tabpanel" aria-labelledby="tab-seller-btn">
+        <div class="grid-2" style="margin-bottom: 2rem;">
+          <!-- Daily/Monthly Sales Line Chart -->
+          <figure id="seller-sales-figure" class="chart-card">
+            <h3 style="font-size: 1.1rem; margin-bottom: 0.25rem;">Sales Performance Over Time</h3>
+            <p class="text-small text-muted" style="margin-bottom: 1rem;">Historical gross revenue generated across the selected timeframe.</p>
+            <div class="chart-wrapper">
+              <canvas id="seller-sales-canvas"></canvas>
+            </div>
+          </figure>
+
+          <!-- Top-Selling Products Bar Chart -->
+          <figure id="seller-top-products-figure" class="chart-card">
+            <h3 style="font-size: 1.1rem; margin-bottom: 0.25rem;">Top-Selling Products (5 Samples)</h3>
+            <p class="text-small text-muted" style="margin-bottom: 1rem;">Click a product bar to filter sales views. Measured in units sold.</p>
+            <div class="chart-wrapper">
+              <canvas id="seller-top-products-canvas"></canvas>
+            </div>
+          </figure>
+        </div>
+
+        <div class="grid-2" style="margin-bottom: 2rem;">
+          <!-- Sales by Category Pie Chart -->
+          <figure id="seller-category-figure" class="chart-card">
+            <h3 style="font-size: 1.1rem; margin-bottom: 0.25rem;">Sales by Category</h3>
+            <p class="text-small text-muted" style="margin-bottom: 1rem;">Revenue distribution across store merchandising categories.</p>
+            <div class="chart-wrapper">
+              <canvas id="seller-category-canvas"></canvas>
+            </div>
+          </figure>
+
+          <!-- Demand Forecast with Confidence Band -->
+          <figure id="seller-forecast-figure" class="chart-card">
+            <h3 style="font-size: 1.1rem; margin-bottom: 0.25rem;">Demand Forecast & Confidence Band</h3>
+            <p class="text-small text-muted" style="margin-bottom: 1rem;">Linear Regression baseline forecast with ±10% upper and lower confidence intervals.</p>
+            <div class="chart-wrapper">
+              <canvas id="seller-forecast-canvas"></canvas>
+            </div>
+          </figure>
+        </div>
+
+        <!-- Stock-Level Indicators Table -->
+        <div class="card card--solid">
+          <div style="display: flex; justify-content: space-between; align-items: baseline; flex-wrap: wrap; margin-bottom: 1rem;">
+            <div>
+              <h3 style="font-size: 1.15rem; margin-bottom: 0.25rem;">Warehouse Stock-Level Indicators</h3>
+              <p class="text-small text-muted" style="margin: 0;">Inventory health indicators for independent merchant replenishment.</p>
+            </div>
+            <div style="display: flex; gap: 1rem; font-size: 0.8rem; margin-top: 0.5rem;">
+              <span class="stock-indicator"><span class="stock-dot stock-dot--green"></span> Healthy (&gt;50 units)</span>
+              <span class="stock-indicator"><span class="stock-dot stock-dot--amber"></span> Low (&lt;30 units)</span>
+              <span class="stock-indicator"><span class="stock-dot stock-dot--coral"></span> Critical (&lt;10 units)</span>
+            </div>
+          </div>
+
+          <div class="table-responsive-wrapper" tabindex="0" role="region" aria-label="Stock levels table">
+            <table class="data-table">
+              <caption>Current stock health for sample catalogue merchandise. Illustrative / synthetically generated.</caption>
+              <thead>
+                <tr>
+                  <th scope="col">Product Name</th>
+                  <th scope="col">Category</th>
+                  <th scope="col">Unit Price (₱)</th>
+                  <th scope="col">Recent Sales</th>
+                  <th scope="col">Inventory Status</th>
+                </tr>
+              </thead>
+              <tbody id="seller-stock-tbody">
+                <!-- Populated dynamically -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 2: ADMIN VIEW -->
+      <section id="panel-admin" class="tab-panel" role="tabpanel" aria-labelledby="tab-admin-btn" hidden>
+        <div class="grid-2" style="margin-bottom: 2rem;">
+          <!-- Total Orders and Revenue Line Chart -->
+          <figure id="admin-revenue-figure" class="chart-card">
+            <h3 style="font-size: 1.1rem; margin-bottom: 0.25rem;">Marketplace Orders & Revenue</h3>
+            <p class="text-small text-muted" style="margin-bottom: 1rem;">Consolidated gross platform volume across all registered sellers.</p>
+            <div class="chart-wrapper">
+              <canvas id="admin-revenue-canvas"></canvas>
+            </div>
+          </figure>
+
+          <!-- New Users & Sellers per Week Bar Chart -->
+          <figure id="admin-growth-figure" class="chart-card">
+            <h3 style="font-size: 1.1rem; margin-bottom: 0.25rem;">Platform User & Merchant Growth</h3>
+            <p class="text-small text-muted" style="margin-bottom: 1rem;">Weekly onboarding velocity for shoppers and independent store owners.</p>
+            <div class="chart-wrapper">
+              <canvas id="admin-growth-canvas"></canvas>
+            </div>
+          </figure>
+        </div>
+
+        <div class="grid-3" style="margin-bottom: 2rem;">
+          <!-- Orders by Region Bar Chart -->
+          <figure id="admin-region-figure" class="chart-card">
+            <h3 style="font-size: 1.05rem; margin-bottom: 0.25rem;">Orders by Region</h3>
+            <p class="text-small text-muted" style="margin-bottom: 1rem;">Distribution between Metro and Province fulfillment corridors.</p>
+            <div class="chart-wrapper">
+              <canvas id="admin-region-canvas"></canvas>
+            </div>
+          </figure>
+
+          <!-- On-time vs Late Delivery -->
+          <figure id="admin-delivery-figure" class="chart-card">
+            <h3 style="font-size: 1.05rem; margin-bottom: 0.25rem;">Courier On-Time Delivery Rate</h3>
+            <p class="text-small text-muted" style="margin-bottom: 1rem;">Operational target: 92% on-time dispatch (tracked via Decision Tree).</p>
+            <div class="chart-wrapper">
+              <canvas id="admin-delivery-canvas"></canvas>
+            </div>
+          </figure>
+
+          <!-- Return-Rate Chart with 6% Target Line -->
+          <figure id="admin-return-figure" class="chart-card">
+            <h3 style="font-size: 1.05rem; margin-bottom: 0.25rem;">Order Return Rate (Goal: &lt;6%)</h3>
+            <p class="text-small text-muted" style="margin-bottom: 1rem;">Red horizontal threshold represents the 6.0% return limit target.</p>
+            <div class="chart-wrapper">
+              <canvas id="admin-return-canvas"></canvas>
+            </div>
+          </figure>
+        </div>
+      </section>
+
+      <!-- TAB 3: MODEL PERFORMANCE VIEW -->
+      <section id="panel-ml" class="tab-panel" role="tabpanel" aria-labelledby="tab-ml-btn" hidden>
+        <div class="card card--solid" style="margin-bottom: 2rem;">
+          <h3 style="font-size: 1.15rem; margin-bottom: 0.5rem;">Machine Learning Feature Performance Over Time</h3>
+          <p class="text-small text-muted" style="margin-bottom: 1.25rem;">
+            Tracking accuracy, error metrics, and precision/recall across all six production algorithms. Latest quarter values reflect reported benchmark test results; quarterly history is illustrative to visualize drift monitoring.
+          </p>
+
+          <div class="grid-3" id="ml-metrics-cards-grid">
+            <!-- Populated dynamically with 6 model performance cards -->
+          </div>
+        </div>
+
+        <figure id="ml-drift-figure" class="chart-card">
+          <h3 style="font-size: 1.1rem; margin-bottom: 0.25rem;">Model Accuracy & AUC Evolution</h3>
+          <p class="text-small text-muted" style="margin-bottom: 1rem;">Historical quarterly metrics comparing SVM, Decision Tree, and ANN predictive reliability.</p>
+          <div class="chart-wrapper">
+            <canvas id="ml-drift-canvas"></canvas>
+          </div>
+        </figure>
+      </section>
+    </div>
+  </main>
+
+  <!-- Global Footer -->
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-top">
+        <div class="footer-brand">
+          <span class="site-logo">
+            <svg class="logo-icon" width="22" height="22" viewBox="0 0 28 28" fill="none" aria-hidden="true">
+              <circle cx="6" cy="20" r="3.5" fill="currentColor" />
+              <circle cx="22" cy="20" r="3.5" fill="currentColor" />
+              <circle cx="14" cy="7" r="3.5" fill="currentColor" />
+              <line x1="6" y1="20" x2="14" y2="7" stroke="currentColor" stroke-width="1.75" />
+              <line x1="14" y1="7" x2="22" y2="20" stroke="currentColor" stroke-width="1.75" />
+              <line x1="6" y1="20" x2="22" y2="20" stroke="currentColor" stroke-width="1.75" />
+            </svg>
+            <span>Allonola</span>
+          </span>
+          <p>
+            To give every customer an easy, trustworthy, and personalized online shopping experience at fair prices, and to help sellers reach more buyers without needing a physical shop.
+          </p>
+        </div>
+
+        <div class="footer-col">
+          <h4>Platform</h4>
+          <ul class="footer-links">
+            <li><a href="index.html" class="footer-link">Home</a></li>
+            <li><a href="about.html" class="footer-link">About Allonola</a></li>
+            <li><a href="dashboard.html" class="footer-link">Dashboard Demo</a></li>
+            <li><a href="contact.html" class="footer-link">Contact Support</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <h4>Algorithms</h4>
+          <ul class="footer-links">
+            <li><a href="algorithms.html" class="footer-link">Overview & Comparison</a></li>
+            <li><a href="algo-linear-regression.html" class="footer-link">Linear Regression</a></li>
+            <li><a href="algo-naive-bayes.html" class="footer-link">Naive Bayes</a></li>
+            <li><a href="algo-knn.html" class="footer-link">K-Nearest Neighbors</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <h4>Machine Learning</h4>
+          <ul class="footer-links">
+            <li><a href="algo-svm.html" class="footer-link">Support Vector Machine</a></li>
+            <li><a href="algo-decision-tree.html" class="footer-link">Decision Tree</a></li>
+            <li><a href="algo-ann.html" class="footer-link">Artificial Neural Network</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <p class="disclaimer-badge">All data shown is illustrative and synthetically generated.</p>
+        <p>&copy; 2026 Allonola. Fictional company for academic use.</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Script Execution Order -->
+  <script defer src="js/data.js"></script>
+  <script defer src="js/app.js"></script>
+  <script defer src="js/charts.js"></script>
+  <script defer src="js/table.js"></script>
+  <script defer>
+    document.addEventListener("DOMContentLoaded", function () {
+      const tabBtns = document.querySelectorAll(".tab-btn");
+      const tabPanels = document.querySelectorAll(".tab-panel");
+      const timeBtns = document.querySelectorAll(".time-range-btn");
+
+      let currentTimeRange = "30d";
+      let activeTabId = "panel-seller";
+      let filteredProduct = null;
+
+      const formatCurrency = window.Allonola.data.formatCurrency;
+
+      // Tab Switching
+      tabBtns.forEach((btn) => {
+        btn.addEventListener("click", () => {
+          const targetId = btn.getAttribute("aria-controls");
+          activeTabId = targetId;
+
+          tabBtns.forEach((b) => b.setAttribute("aria-selected", "false"));
+          btn.setAttribute("aria-selected", "true");
+
+          tabPanels.forEach((p) => {
+            if (p.id === targetId) p.hidden = false;
+            else p.hidden = true;
+          });
+
+          renderDashboard();
+        });
+      });
+
+      // Time Range Filter
+      timeBtns.forEach((btn) => {
+        btn.addEventListener("click", () => {
+          timeBtns.forEach((b) => {
+            b.classList.remove("btn--primary", "active");
+            b.classList.add("btn--secondary");
+          });
+          btn.classList.remove("btn--secondary");
+          btn.classList.add("btn--primary", "active");
+
+          currentTimeRange = btn.getAttribute("data-range");
+          renderDashboard();
+        });
+      });
+
+      function renderDashboard() {
+        const data = window.Allonola.data.getDashboardData(currentTimeRange);
+        const tokens = window.Allonola.charts.getTokens();
+
+        if (activeTabId === "panel-seller") {
+          renderSellerView(data, tokens);
+        } else if (activeTabId === "panel-admin") {
+          renderAdminView(data, tokens);
+        } else if (activeTabId === "panel-ml") {
+          renderMLView(data, tokens);
+        }
+      }
+
+      // 1. Seller View Charts
+      function renderSellerView(data, tokens) {
+        // Sales line
+        const salesConfig = {
+          type: "line",
+          data: {
+            labels: data.labels,
+            datasets: [
+              {
+                label: "Gross Sales (₱)",
+                data: data.seller.salesLine,
+                borderColor: tokens.teal,
+                backgroundColor: "rgba(46, 196, 182, 0.12)",
+                fill: true,
+                tension: 0.3,
+              },
+            ],
+          },
+          options: {
+            scales: {
+              y: {
+                ticks: { callback: (v) => formatCurrency(v) },
+                title: { display: true, text: "Revenue (₱)" },
+              },
+            },
+          },
+        };
+        window.Allonola.charts.createChart("seller-sales-canvas", salesConfig, {
+          title: "Sales Revenue Over Time",
+          xLabel: "Timeline",
+          yLabel: "Sales (₱)",
+          srSummary: "Line chart showing gross revenue over the chosen timeframe.",
+          buildFn: () => renderDashboard(),
+        });
+        window.Allonola.table.attachChartTableToggle("seller-sales-figure", () => ({
+          caption: "Gross sales series for " + currentTimeRange + ". Illustrative / synthetically generated.",
+          columns: [
+            { key: "period", label: "Period" },
+            { key: "sales", label: "Sales (₱)" },
+          ],
+          rows: data.labels.map((lbl, idx) => ({
+            period: lbl,
+            sales: formatCurrency(data.seller.salesLine[idx]),
+          })),
+        }));
+
+        // Top Products bar chart
+        const prods = data.seller.topProducts;
+        const topProdsConfig = {
+          type: "bar",
+          data: {
+            labels: prods.map((p) => p.name.length > 20 ? p.name.slice(0, 18) + "..." : p.name),
+            datasets: [
+              {
+                label: "Units Sold",
+                data: prods.map((p) => p.units),
+                backgroundColor: prods.map((p) => (filteredProduct && p.name.includes(filteredProduct) ? tokens.coral : tokens.primary)),
+                borderRadius: 6,
+              },
+            ],
+          },
+          options: {
+            onClick: (evt, elements) => {
+              if (elements.length > 0) {
+                const idx = elements[0].index;
+                const clicked = prods[idx].name;
+                filteredProduct = filteredProduct === clicked ? null : clicked;
+                renderDashboard();
+              }
+            },
+          },
+        };
+        window.Allonola.charts.createChart("seller-top-products-canvas", topProdsConfig, {
+          title: "Top-Selling Products (Click bar to toggle highlight)",
+          xLabel: "Product",
+          yLabel: "Units Sold",
+          srSummary: "Bar chart displaying units sold for the top five products.",
+          buildFn: () => renderDashboard(),
+        });
+        window.Allonola.table.attachChartTableToggle("seller-top-products-figure", () => ({
+          caption: "Top five selling products for " + currentTimeRange + ". Illustrative / synthetically generated.",
+          columns: [
+            { key: "name", label: "Product" },
+            { key: "category", label: "Category" },
+            { key: "units", label: "Units Sold" },
+          ],
+          rows: prods.map((p) => ({
+            name: p.name,
+            category: p.category,
+            units: p.units,
+          })),
+        }));
+
+        // Category Share Pie Chart
+        const catShare = data.seller.categoryShare;
+        const catConfig = {
+          type: "doughnut",
+          data: {
+            labels: catShare.map((c) => c.category),
+            datasets: [
+              {
+                data: catShare.map((c) => c.percent),
+                backgroundColor: [tokens.teal, tokens.primary, tokens.coral, "#F59E0B", "#8B5CF6"],
+                borderColor: tokens.surfaceSolid,
+                borderWidth: 2,
+              },
+            ],
+          },
+        };
+        window.Allonola.charts.createChart("seller-category-canvas", catConfig, {
+          title: "Revenue by Merchandise Category",
+          srSummary: "Doughnut chart of sales percentage by product category.",
+          buildFn: () => renderDashboard(),
+        });
+        window.Allonola.table.attachChartTableToggle("seller-category-figure", () => ({
+          caption: "Merchandise category share percentages. Illustrative / synthetically generated.",
+          columns: [
+            { key: "category", label: "Category" },
+            { key: "percent", label: "Share (%)" },
+          ],
+          rows: catShare.map((c) => ({
+            category: c.category,
+            percent: c.percent + "%",
+          })),
+        }));
+
+        // Demand Forecast with Confidence Band
+        const fc = data.seller.forecast;
+        const forecastConfig = {
+          type: "line",
+          data: {
+            labels: data.labels,
+            datasets: [
+              {
+                label: "Upper Confidence Band (+10%)",
+                data: fc.upperBand,
+                borderColor: "rgba(46, 196, 182, 0.4)",
+                borderDash: [5, 5],
+                fill: false,
+                tension: 0.3,
+                pointRadius: 0,
+              },
+              {
+                label: "Linear Regression Forecast",
+                data: fc.forecastLine,
+                borderColor: tokens.teal,
+                borderWidth: 2,
+                fill: false,
+                tension: 0.3,
+                pointRadius: 3,
+              },
+              {
+                label: "Lower Confidence Band (-10%)",
+                data: fc.lowerBand,
+                borderColor: "rgba(46, 196, 182, 0.4)",
+                borderDash: [5, 5],
+                fill: "-1",
+                backgroundColor: "rgba(46, 196, 182, 0.08)",
+                tension: 0.3,
+                pointRadius: 0,
+              },
+            ],
+          },
+          options: {
+            scales: {
+              y: {
+                ticks: { callback: (v) => formatCurrency(v) },
+              },
+            },
+          },
+        };
+        window.Allonola.charts.createChart("seller-forecast-canvas", forecastConfig, {
+          title: "Revenue Forecast & Upper/Lower Bands",
+          xLabel: "Timeline",
+          yLabel: "Projected ₱",
+          srSummary: "Line chart displaying baseline linear regression forecast with upper and lower confidence intervals.",
+          buildFn: () => renderDashboard(),
+        });
+        window.Allonola.table.attachChartTableToggle("seller-forecast-figure", () => ({
+          caption: "Sales forecast confidence intervals. Illustrative / synthetically generated.",
+          columns: [
+            { key: "period", label: "Period" },
+            { key: "lower", label: "Lower (-10%)" },
+            { key: "forecast", label: "Forecast" },
+            { key: "upper", label: "Upper (+10%)" },
+          ],
+          rows: data.labels.map((lbl, idx) => ({
+            period: lbl,
+            lower: formatCurrency(fc.lowerBand[idx]),
+            forecast: formatCurrency(fc.forecastLine[idx]),
+            upper: formatCurrency(fc.upperBand[idx]),
+          })),
+        }));
+
+        // Stock Levels Tbody
+        const tbody = document.getElementById("seller-stock-tbody");
+        if (tbody) {
+          tbody.innerHTML = prods
+            .map((p) => {
+              const dotClass = p.stock === "green" ? "stock-dot--green" : p.stock === "amber" ? "stock-dot--amber" : "stock-dot--coral";
+              const label = p.stock === "green" ? "Healthy (In stock)" : p.stock === "amber" ? "Low Stock (Reorder)" : "Critical Stockout";
+              return `
+              <tr>
+                <th scope="row">${p.name}</th>
+                <td>${p.category}</td>
+                <td class="tabular-nums">${formatCurrency(p.price)}</td>
+                <td class="tabular-nums">${p.units} units</td>
+                <td>
+                  <span class="stock-indicator">
+                    <span class="stock-dot ${dotClass}"></span>
+                    <span>${label}</span>
+                  </span>
+                </td>
+              </tr>
+            `;
+            })
+            .join("");
+        }
+      }
+
+      // 2. Admin View Charts
+      function renderAdminView(data, tokens) {
+        // Orders & Revenue
+        const revConfig = {
+          type: "line",
+          data: {
+            labels: data.labels,
+            datasets: [
+              {
+                label: "Orders Count",
+                data: data.admin.totalOrders,
+                borderColor: tokens.primary,
+                yAxisID: "yOrders",
+                tension: 0.2,
+              },
+              {
+                label: "Revenue (₱)",
+                data: data.admin.revenue,
+                borderColor: tokens.teal,
+                yAxisID: "yRev",
+                tension: 0.2,
+              },
+            ],
+          },
+          options: {
+            scales: {
+              yOrders: {
+                type: "linear",
+                position: "left",
+                title: { display: true, text: "Orders" },
+              },
+              yRev: {
+                type: "linear",
+                position: "right",
+                title: { display: true, text: "Revenue (₱)" },
+                ticks: { callback: (v) => formatCurrency(v) },
+                grid: { drawOnChartArea: false },
+              },
+            },
+          },
+        };
+        window.Allonola.charts.createChart("admin-revenue-canvas", revConfig, {
+          title: "Marketplace Total Orders vs. Revenue",
+          xLabel: "Timeline",
+          srSummary: "Dual-axis line chart plotting total order volume and aggregate gross marketplace revenue.",
+          buildFn: () => renderDashboard(),
+        });
+        window.Allonola.table.attachChartTableToggle("admin-revenue-figure", () => ({
+          caption: "Marketplace orders and gross revenue by period. Illustrative / synthetically generated.",
+          columns: [
+            { key: "period", label: "Period" },
+            { key: "orders", label: "Orders" },
+            { key: "rev", label: "Revenue (₱)" },
+          ],
+          rows: data.labels.map((lbl, idx) => ({
+            period: lbl,
+            orders: data.admin.totalOrders[idx],
+            rev: formatCurrency(data.admin.revenue[idx]),
+          })),
+        }));
+
+        // Growth bar chart
+        const growthConfig = {
+          type: "bar",
+          data: {
+            labels: data.labels,
+            datasets: [
+              {
+                label: "New Buyers",
+                data: data.admin.newUsers,
+                backgroundColor: tokens.primary,
+                borderRadius: 4,
+              },
+              {
+                label: "New Sellers",
+                data: data.admin.newSellers,
+                backgroundColor: tokens.teal,
+                borderRadius: 4,
+              },
+            ],
+          },
+        };
+        window.Allonola.charts.createChart("admin-growth-canvas", growthConfig, {
+          title: "New Users and Sellers Enrolled",
+          xLabel: "Period",
+          yLabel: "Registrations",
+          srSummary: "Bar chart displaying new registered buyers and sellers over time.",
+          buildFn: () => renderDashboard(),
+        });
+        window.Allonola.table.attachChartTableToggle("admin-growth-figure", () => ({
+          caption: "New platform registration growth. Illustrative / synthetically generated.",
+          columns: [
+            { key: "period", label: "Period" },
+            { key: "buyers", label: "New Buyers" },
+            { key: "sellers", label: "New Sellers" },
+          ],
+          rows: data.labels.map((lbl, idx) => ({
+            period: lbl,
+            buyers: data.admin.newUsers[idx],
+            sellers: data.admin.newSellers[idx],
+          })),
+        }));
+
+        // Orders by Region (Metro vs Province)
+        const reg = data.admin.ordersByRegion;
+        const regConfig = {
+          type: "bar",
+          data: {
+            labels: reg.map((r) => r.region),
+            datasets: [
+              {
+                label: "Orders by Region",
+                data: reg.map((r) => r.orders),
+                backgroundColor: [tokens.teal, tokens.primary],
+                borderRadius: 6,
+              },
+            ],
+          },
+          options: {
+            plugins: { legend: { display: false } },
+          },
+        };
+        window.Allonola.charts.createChart("admin-region-canvas", regConfig, {
+          title: "Regional Dispatch Breakdown",
+          xLabel: "Region",
+          yLabel: "Total Orders",
+          srSummary: "Bar chart showing total order volume split between Metro and Province locations.",
+          buildFn: () => renderDashboard(),
+        });
+        window.Allonola.table.attachChartTableToggle("admin-region-figure", () => ({
+          caption: "Regional order distribution. Illustrative / synthetically generated.",
+          columns: [
+            { key: "region", label: "Region" },
+            { key: "orders", label: "Orders" },
+          ],
+          rows: reg.map((r) => ({ region: r.region, orders: r.orders })),
+        }));
+
+        // Delivery Reliability
+        const deliv = data.admin.deliveryReliability;
+        const delivConfig = {
+          type: "doughnut",
+          data: {
+            labels: ["On-time Delivery", "Delayed Transit"],
+            datasets: [
+              {
+                data: [deliv.onTime, deliv.delayed],
+                backgroundColor: [tokens.teal, tokens.coral],
+                borderColor: tokens.surfaceSolid,
+                borderWidth: 2,
+              },
+            ],
+          },
+        };
+        window.Allonola.charts.createChart("admin-delivery-canvas", delivConfig, {
+          title: "On-Time Delivery Rate (Target: 92%)",
+          srSummary: "Doughnut chart comparing on-time shipments (92.4%) against delayed courier parcels.",
+          buildFn: () => renderDashboard(),
+        });
+        window.Allonola.table.attachChartTableToggle("admin-delivery-figure", () => ({
+          caption: "Courier on-time delivery proportions. Illustrative / synthetically generated.",
+          columns: [
+            { key: "metric", label: "Status" },
+            { key: "rate", label: "Percentage (%)" },
+          ],
+          rows: [
+            { metric: "On-time Delivery", rate: deliv.onTime + "%" },
+            { metric: "Delayed Transit", rate: deliv.delayed + "%" },
+          ],
+        }));
+
+        // Return-rate chart with 6% target line
+        const retConfig = {
+          type: "line",
+          data: {
+            labels: data.labels,
+            datasets: [
+              {
+                label: "Return Rate (%)",
+                data: data.admin.returnRate,
+                borderColor: tokens.primary,
+                backgroundColor: "rgba(74, 159, 216, 0.1)",
+                fill: true,
+                tension: 0.2,
+              },
+              {
+                label: "Target Ceiling (6.0%)",
+                data: data.labels.map(() => data.admin.targetReturnRate),
+                borderColor: tokens.coral,
+                borderDash: [6, 4],
+                pointRadius: 0,
+                fill: false,
+              },
+            ],
+          },
+          options: {
+            scales: {
+              y: {
+                min: 0,
+                max: 10,
+                ticks: { callback: (v) => v + "%" },
+                title: { display: true, text: "Return Percentage" },
+              },
+            },
+          },
+        };
+        window.Allonola.charts.createChart("admin-return-canvas", retConfig, {
+          title: "Order Return Rate vs. 6% Operational Limit",
+          xLabel: "Timeline",
+          yLabel: "Return Rate (%)",
+          srSummary: "Line chart plotting order return percentage against the corporate 6% ceiling threshold.",
+          buildFn: () => renderDashboard(),
+        });
+        window.Allonola.table.attachChartTableToggle("admin-return-figure", () => ({
+          caption: "Return rate measurements versus 6.0% maximum operational target. Illustrative / synthetically generated.",
+          columns: [
+            { key: "period", label: "Period" },
+            { key: "rate", label: "Return Rate (%)" },
+            { key: "target", label: "Target Ceiling" },
+          ],
+          rows: data.labels.map((lbl, idx) => ({
+            period: lbl,
+            rate: data.admin.returnRate[idx] + "%",
+            target: "6.0%",
+          })),
+        }));
+      }
+
+      // 3. Model Performance View
+      function renderMLView(data, tokens) {
+        const grid = document.getElementById("ml-metrics-cards-grid");
+        if (grid) {
+          grid.innerHTML = data.modelPerformance
+            .map((item) => {
+              const latest = item.history[item.history.length - 1];
+              return `
+              <div class="card" style="padding: 1.25rem;">
+                <span class="pill pill--teal" style="font-size: 0.75rem; margin-bottom: 0.5rem;">${item.name}</span>
+                <div style="font-size: 0.85rem; color: var(--text-muted);">${item.metricName}</div>
+                <div class="tabular-nums" style="font-family: var(--font-heading); font-size: 1.75rem; font-weight: 700; color: var(--text); margin: 0.25rem 0;">
+                  ${latest.primary} <span style="font-size: 1rem; color: var(--teal); font-weight: 600;">/ ${latest.secondary}</span>
+                </div>
+                <span class="text-small text-muted">Latest Quarter: Evaluated on test split</span>
+              </div>
+            `;
+            })
+            .join("");
+        }
+
+        // ML Drift Evolution Chart
+        const periods = ["Q1", "Q2", "Q3", "Latest"];
+        const svmItem = data.modelPerformance.find((m) => m.name.includes("SVM"));
+        const dtItem = data.modelPerformance.find((m) => m.name.includes("Decision Tree"));
+        const annItem = data.modelPerformance.find((m) => m.name.includes("ANN"));
+
+        const driftConfig = {
+          type: "line",
+          data: {
+            labels: periods,
+            datasets: [
+              {
+                label: "SVM (ROC-AUC)",
+                data: svmItem.history.map((h) => h.primary),
+                borderColor: tokens.coral,
+                tension: 0.2,
+              },
+              {
+                label: "Decision Tree (Accuracy)",
+                data: dtItem.history.map((h) => h.primary),
+                borderColor: tokens.primary,
+                tension: 0.2,
+              },
+              {
+                label: "ANN (AUC)",
+                data: annItem.history.map((h) => h.primary),
+                borderColor: tokens.teal,
+                tension: 0.2,
+              },
+            ],
+          },
+          options: {
+            scales: {
+              y: {
+                min: 0.75,
+                max: 1.0,
+                title: { display: true, text: "Metric Value" },
+              },
+            },
+          },
+        };
+
+        window.Allonola.charts.createChart("ml-drift-canvas", driftConfig, {
+          title: "Quarterly Predictive Quality Evolution",
+          xLabel: "Quarter",
+          yLabel: "Quality Metric",
+          srSummary: "Line chart plotting accuracy and AUC drift across quarterly evaluations for SVM, Decision Tree, and ANN models.",
+          buildFn: () => renderDashboard(),
+        });
+        window.Allonola.table.attachChartTableToggle("ml-drift-figure", () => ({
+          caption: "Quarterly model drift metrics. Illustrative / synthetically generated.",
+          columns: [
+            { key: "quarter", label: "Quarter" },
+            { key: "svm", label: "SVM ROC-AUC" },
+            { key: "dt", label: "Decision Tree Accuracy" },
+            { key: "ann", label: "ANN AUC" },
+          ],
+          rows: periods.map((q, idx) => ({
+            quarter: q,
+            svm: svmItem.history[idx].primary,
+            dt: dtItem.history[idx].primary,
+            ann: annItem.history[idx].primary,
+          })),
+        }));
+      }
+
+      renderDashboard();
+    });
+  </script>
+</body>
+</html>
