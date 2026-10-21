@@ -47,7 +47,7 @@
   --text-muted: #4F6272;
   --primary: #1F4E79;
   --teal: #0F6E6E;
-  --coral: #F26B5B;
+  --coral: #B23F2C; /* darkened from #F26B5B for WCAG AA contrast on light backgrounds */
   --success: #0F6E6E;
   --warning: #D97706;
   --shadow: 0 4px 18px rgba(31, 78, 121, 0.08);

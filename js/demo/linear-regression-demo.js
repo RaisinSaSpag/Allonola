@@ -39,8 +39,17 @@
     priceSlider.max = Math.round(b.basePrice * 1.3);
     priceSlider.value = b.basePrice;
     promoBox.checked = b.baselinePromotion;
+    // Observed prices come from the sample dataset, so the note reflects real sample rows.
+    const observed = window.Allonola.data.linearRegression.sampleDataset
+      .filter(function (row) { return row.product === productSel.value; })
+      .map(function (row) { return row.price; });
+    const observedText = observed.length
+      ? "Observed sample prices: " + formatPeso(Math.min.apply(null, observed)) + " to " +
+        formatPeso(Math.max.apply(null, observed)) + "."
+      : "No observed sample prices for this product.";
     rangeNote.textContent =
-      "Slider range is ±30% around the baseline price of " + formatPeso(b.basePrice) + ".";
+      "Slider range is ±30% around the baseline price of " + formatPeso(b.basePrice) + ". " +
+      observedText + " Prices outside the observed range are extrapolations.";
   }
 
   function drawChart(curve) {

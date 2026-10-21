@@ -397,7 +397,7 @@
       hitRateAt5: 0.71,
       hitRateInterpretation: "71% of shoppers bought at least one recommended item from their top-5 suggestions",
       interpretation:
-        "A hit rate of 71% proves the model is genuinely useful for the vast majority of shoppers. A Precision@5 of 0.34 demonstrates that many exploratory suggestions miss, which is typical and expected in sparse retail matrices with broad inventory.",
+        "A hit rate of 71% suggests the model is useful for most shoppers in this illustrative test. A Precision@5 of 0.34 shows that many exploratory suggestions miss, which is typical and expected in sparse retail matrices with broad inventory.",
       businessImpact:
         "Seven in ten shoppers discover and purchase at least one relevant complementary item from their recommendations, driving discovery for cross-category sellers. Allonola plans to combine KNN neighborhood matching with category-based ranking to avoid repeating already-owned accessories.",
     },

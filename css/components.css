@@ -456,3 +456,37 @@
 .tab-panel[hidden] {
   display: none;
 }
+
+/* Scrollable wrapper for wide tables (added by js/app.js) */
+.table-scroll {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.table-scroll:focus-visible {
+  outline: 2px solid var(--teal);
+  outline-offset: 2px;
+}
+
+/* Let grid and flex children shrink below their content width on small screens */
+.card,
+.chart-card,
+.demo-container,
+.demo-controls,
+.demo-layout > * {
+  min-width: 0;
+}
+
+/* Keep chart canvases inside their wrapper even before Chart.js sizes them */
+.chart-wrapper {
+  position: relative;
+  width: 100%;
+  max-width: 100%;
+}
+
+.chart-wrapper canvas {
+  display: block;
+  max-width: 100%;
+}

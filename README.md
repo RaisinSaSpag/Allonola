@@ -109,7 +109,7 @@ allonola/
 ## ⚙️ Architectural Decisions (Where the Brief was Silent)
 
 1. **Local File System Compatibility (`file://`) vs. ES Modules**:
-   Browsers strictly block ES Module `import` statements and local JSON `fetch()` calls under the `file://` protocol due to Cross-Origin Resource Sharing (CORS) security policies. To ensure the site works flawlessly when `index.html` is opened directly from a local drive without running a local web server, all scripts load via classic `<script defer>` tags in their required dependency sequence, sharing a clean global namespace `window.Allonola = { data, ml, ui, charts, table }`.
+   Browsers strictly block ES Module `import` statements and local JSON `fetch()` calls under the `file://` protocol due to Cross-Origin Resource Sharing (CORS) security policies. To ensure the site works reliably when `index.html` is opened directly from a local drive without running a local web server, all scripts load via classic `<script defer>` tags in their required dependency sequence, sharing a clean global namespace `window.Allonola = { data, ml, ui, charts, table }`.
 2. **Chart.js CDN Version**:
    Used Chart.js 4.4.1 UMD distribution loaded from `https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js`.
 3. **Deterministic Random Generation**:

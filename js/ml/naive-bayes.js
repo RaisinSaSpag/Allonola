@@ -15,12 +15,20 @@
    * @param {string} text
    * @returns {string[]}
    */
+  // Common English words that carry no sentiment or spam signal.
+  const STOP_WORDS = new Set([
+    "a", "an", "the", "and", "or", "but", "of", "to", "in", "on", "at", "for", "from",
+    "with", "by", "is", "it", "its", "this", "that", "these", "those", "was", "were",
+    "be", "been", "am", "are", "as", "so", "if", "i", "me", "my", "we", "our", "you",
+    "your", "they", "them", "he", "she", "his", "her", "do", "did", "not", "no",
+  ]);
+
   function tokenize(text) {
     if (!text || typeof text !== "string") return [];
     return text
       .toLowerCase()
       .split(/[^a-z]+/)
-      .filter((t) => t.length > 0);
+      .filter((t) => t.length > 0 && !STOP_WORDS.has(t));
   }
 
   // Model training state initialized from sample reviews

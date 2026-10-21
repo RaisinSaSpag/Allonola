@@ -192,12 +192,28 @@
     }
   }
 
+  // Wrap wide tables in a scrollable container so they scroll inside the card, not the page
+  function initTableScroll() {
+    document.querySelectorAll("table").forEach((table) => {
+      const parent = table.parentElement;
+      if (!parent || parent.classList.contains("table-scroll")) return;
+      const wrap = document.createElement("div");
+      wrap.className = "table-scroll";
+      wrap.setAttribute("role", "region");
+      wrap.setAttribute("tabindex", "0");
+      wrap.setAttribute("aria-label", "Scrollable table");
+      parent.insertBefore(wrap, table);
+      wrap.appendChild(table);
+    });
+  }
+
   // Global Page Lifecycle Dispatcher
   document.addEventListener("DOMContentLoaded", () => {
     initTheme();
     initNavigation();
     initScrollAnimation();
     initSkipLink();
+    initTableScroll();
   });
 
   window.Allonola.ui = {

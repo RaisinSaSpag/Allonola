@@ -219,10 +219,11 @@
   gap: 1.5rem;
   overflow-y: auto;
   box-shadow: var(--shadow);
-  transition: right 300ms ease;
+  display: none; /* removed from layout when closed so it cannot create sideways scrolling */
 }
 
 .nav-drawer--open {
+  display: flex;
   right: 0;
 }
 
