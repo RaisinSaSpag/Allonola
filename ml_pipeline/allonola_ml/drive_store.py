@@ -55,7 +55,14 @@ def build_service(mode: str = "service_account"):
             else:
                 if not Path(OAUTH_CLIENT_FILE).exists():
                     raise FileNotFoundError(f"OAuth client file not found: {OAUTH_CLIENT_FILE}")
-                creds = InstalledAppFlow.from_client_secrets_file(OAUTH_CLIENT_FILE, SCOPES).run_local_server(port=0)
+                creds = InstalledAppFlow.from_client_secrets_file(
+    OAUTH_CLIENT_FILE, SCOPES
+).run_local_server(
+    host="localhost",
+    bind_addr="0.0.0.0",
+    port=47469,
+    open_browser=False,
+)
             Path(OAUTH_TOKEN_FILE).write_text(creds.to_json())
     else:
         raise ValueError(f"Unknown auth mode: {mode}")
