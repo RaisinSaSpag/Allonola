@@ -1,0 +1,5 @@
+# Google OAuth credentials and tokens
+ml_pipeline/client_secret_*.json
+ml_pipeline/credentials.json
+ml_pipeline/token.json
+.env
