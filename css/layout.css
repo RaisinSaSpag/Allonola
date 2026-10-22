@@ -13,8 +13,24 @@
   padding-right: 1.5rem;
 }
 
+/* The block spans the container (so cards/tables below line up with it);
+   only running text keeps the comfortable reading measure. */
 .content-reading {
+  max-width: none;
+}
+
+.content-reading > p,
+.content-reading > ul,
+.content-reading > ol,
+.content-reading .lead {
   max-width: var(--content-reading-width);
+}
+
+.container.content-reading--narrow,
+.content-reading--narrow {
+  max-width: var(--content-reading-width);
+  margin-left: auto;
+  margin-right: auto;
 }
 
 /* Header */
@@ -69,6 +85,8 @@
   display: flex;
   align-items: center;
   gap: 1.75rem;
+  margin-left: auto;   /* sit next to the action buttons instead of floating mid-header */
+  margin-right: 1.5rem;
 }
 
 .nav-link {
@@ -320,7 +338,7 @@
 }
 
 .breadcrumb-separator {
-  color: var(--border);
+  color: var(--text-muted);
 }
 
 .breadcrumb-item--current {
@@ -407,6 +425,11 @@
   padding: 2.5rem 0;
 }
 
+/* Hero block that is directly followed by another section (avoids a double gap) */
+.section--tight-bottom {
+  padding-bottom: 1rem;
+}
+
 .section-header {
   margin-bottom: 2.5rem;
 }
@@ -441,13 +464,14 @@
 
 .footer-top {
   display: grid;
-  grid-template-columns: 2fr 1fr 1fr 1fr;
+  grid-template-columns: 2fr 1fr 1fr;
   gap: 2.5rem;
   margin-bottom: 3rem;
 }
 
 .footer-brand p {
   margin-top: 0.75rem;
+  max-width: 38ch;
   color: var(--text-muted);
   font-size: 0.95rem;
 }
@@ -466,6 +490,7 @@
   gap: 0.5rem;
 }
 
+.footer-links a,
 .footer-link {
   color: var(--text-muted);
   text-decoration: none;
@@ -473,6 +498,7 @@
   transition: color var(--transition-speed) ease;
 }
 
+.footer-links a:hover,
 .footer-link:hover {
   color: var(--primary);
 }
@@ -482,9 +508,15 @@
   border-top: 1px solid var(--border);
   display: flex;
   flex-direction: column;
+  align-items: center;
   gap: 0.5rem;
   font-size: 0.85rem;
   text-align: center;
+}
+
+.footer-bottom p {
+  max-width: none;
+  margin: 0;
 }
 
 .disclaimer-badge {
@@ -527,4 +559,10 @@
   .section {
     padding: 2.5rem 0;
   }
+}
+
+/* Eyebrow pill above a page/section heading */
+.section-header > .pill,
+.algo-header > .pill {
+  margin-bottom: 0.75rem;
 }

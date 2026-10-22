@@ -54,7 +54,7 @@
 .demo-header {
   display: flex;
   justify-content: space-between;
-  align-items: baseline;
+  align-items: center;
   flex-wrap: wrap;
   gap: 0.75rem;
   margin-bottom: 1.5rem;
@@ -72,10 +72,30 @@
   border: 1px solid rgba(46, 196, 182, 0.25);
 }
 
+.demo-container > p {
+  margin-bottom: 1.5rem;
+}
+
 .demo-layout {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   gap: 2rem;
+  align-items: start;
+}
+
+/* Every direct column of a demo stacks its blocks with an even gap */
+.demo-layout > * {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.demo-layout .form-group {
+  margin-bottom: 0;
+}
+
+.demo-layout .chart-card {
+  margin: 0;
 }
 
 @media (max-width: 860px) {

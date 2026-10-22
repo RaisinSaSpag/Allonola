@@ -119,6 +119,13 @@ p {
   max-width: var(--content-reading-width);
 }
 
+/* Centered blocks: keep the reading measure but centre the box itself,
+   otherwise centred text sits off-centre inside a left-anchored 70ch box. */
+.text-center { text-align: center; }
+.text-center p,
+.text-center .lead,
+.mx-auto { margin-left: auto; margin-right: auto; }
+
 p.lead {
   font-size: 1.15rem;
   color: var(--text);

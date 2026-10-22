@@ -85,9 +85,14 @@ allonola/
 │       └── naive-bayes-demo.js
 ├── assets/
 │   └── icons/                  # Inline SVGs utilized directly in HTML templates
-└── test/
-    └── checks.html             # Automated unit tests and console assertion harness
+├── test/
+│   └── checks.html             # Automated unit tests and console assertion harness
+└── ml_pipeline/                # Python: real model training (60/20/20), Google Drive storage, JSON API
+    └── README.md               # Setup and usage (separate from the static site)
 ```
+
+> The website itself is still static (no build step). The Python pipeline in `ml_pipeline/` is optional
+> and runs separately; see `ml_pipeline/README.md`. The in-browser demos remain illustrative.
 
 ---
 

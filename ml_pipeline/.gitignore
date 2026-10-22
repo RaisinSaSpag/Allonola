@@ -1,0 +1,8 @@
+# Never commit credentials or generated artifacts
+credentials.json
+token.json
+service_account.json
+*.pem
+artifacts/
+__pycache__/
+*.pyc

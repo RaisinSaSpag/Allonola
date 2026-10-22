@@ -1,0 +1,135 @@
+# Allonola ML pipeline (Python)
+
+Trains the six models behind the website, evaluates them properly, stores them in
+**Google Drive**, and serves them to the site through a small JSON API.
+
+| Model | Website page | Task | Split | Selected on |
+|---|---|---|---|---|
+| `linear_regression` | Demand forecasting | regression | chronological | RMSE |
+| `naive_bayes` | Review sentiment / spam | 3-class text | stratified | macro-F1 |
+| `knn` | Recommendations | 4-class | stratified | macro-F1 |
+| `svm` | Order fraud | binary, 8 % positives | stratified | F1 |
+| `decision_tree` | Late delivery | binary, 30 % positives | stratified | F1 (simplest within 0.01) |
+| `ann` | Shopper churn | binary, 25 % positives | stratified | ROC-AUC |
+
+## About "20-20-60"
+
+The standard recipe is **60 % train / 20 % validation / 20 % test**, which is what
+this pipeline uses by default (`--split 60 20 20`). If you meant something else,
+pass different percentages, e.g. `--split 70 15 15`.
+
+## Training protocol (what `train.py` does for every model)
+
+1. **Split once**: 60/20/20. Stratified for classification so class ratios match in every
+   part; **chronological** for demand data (past trains, future tests, no leakage).
+2. **Tune** hyper-parameters: fit on *train*, score on *validation*.
+3. **Cross-validate** the winner on train+validation (5-fold; `TimeSeriesSplit` for demand).
+4. **Refit** the winner on train+validation (`--no-refit` to disable).
+5. **Test once**: the untouched 20 % gives the number you report.
+
+Preprocessing (scalers, TF-IDF, one-hot) lives *inside* each sklearn `Pipeline`, so it is fitted on
+training rows only. A unit test proves that corrupting the test labels changes nothing about model
+selection.
+
+## Quick start
+
+```bash
+cd ml_pipeline
+python -m venv .venv && source .venv/bin/activate      # Windows: .venv\Scripts\activate
+pip install -r requirements.txt
+
+python -m allonola_ml.train --models all               # trains + saves to ./artifacts/<run_id>/
+python -m unittest discover -s tests -t .              # 13 tests
+```
+
+Each model folder contains `model.joblib`, `metadata.json` (split sizes, every trial, CV scores,
+train/validation/test metrics, feature schema, SHA-256), `data/{train,val,test}.csv`, and where
+meaningful `explanation.json` (price elasticity, top spam words) or `rules.txt` (decision-tree rules).
+
+## Results on the bundled synthetic data (test set, seed 42)
+
+| Model | Test result | Note |
+|---|---|---|
+| Linear regression | RMSE 14.9 units, R² 0.905 | elasticity is in `explanation.json` |
+| Naive Bayes | accuracy 0.887, macro-F1 0.887 | 6 % of labels deliberately wrong |
+| KNN | accuracy 0.405 (chance 0.25) | next purchase is inherently noisy |
+| SVM | precision 0.27, recall 0.63, F1 0.38, AUC 0.83 | fraud is rare; accuracy is not the right yardstick |
+| Decision tree | accuracy 0.72, F1 0.48 | depth 3, readable rules |
+| ANN | accuracy 0.82, AUC 0.81 (CV AUC 0.81) | |
+
+**These numbers describe the synthetic data generators, not real shoppers.** The data is
+produced by rules written in `datasets.py`, so a score only shows the pipeline works and how hard
+the generator is. Replace each `make_*` function with a real export (same column names) and re-run.
+
+## Google Drive storage
+
+Drive layout:
+
+```
+<your folder>/latest.json                      # {"run_id": "..."}
+<your folder>/runs/<run_id>/manifest.json
+<your folder>/runs/<run_id>/<model>/model.joblib, metadata.json, data/*.csv
+```
+
+### Option A: service account (servers, scheduled training)
+1. Google Cloud Console → create a project → enable **Google Drive API**.
+2. IAM → Service accounts → create one → Keys → add key → JSON. Save it as `ml_pipeline/service_account.json`.
+3. In Drive, create a folder (e.g. `Allonola-ML`) and **Share** it with the service account's e-mail
+   (looks like `name@project.iam.gserviceaccount.com`) as **Editor**.
+4. Copy the folder ID (the last part of the folder URL).
+
+```bash
+export ALLONOLA_DRIVE_FOLDER_ID=<folder id>
+python -m allonola_ml.train --models all --drive
+```
+
+### Option B: your own Google account (laptop)
+Create an OAuth client of type *Desktop app*, save it as `credentials.json`, then:
+
+```bash
+python -m allonola_ml.train --models all --drive --drive-auth oauth   # browser opens once
+```
+
+Re-running updates files in place instead of creating duplicates. **Never commit
+`service_account.json`, `credentials.json` or `token.json`** (already in `.gitignore`).
+
+## Serving the models to the website
+
+```bash
+python -m allonola_ml.api                      # uses ./artifacts
+python -m allonola_ml.api --drive              # pulls the latest run from Drive first
+```
+
+| Endpoint | Purpose |
+|---|---|
+| `GET /health` | status + which run is loaded |
+| `GET /models` | list + test metrics |
+| `GET /models/<name>` | full metadata |
+| `POST /predict/<name>` | `{"rows":[{...}]}` or a single `{...}` |
+
+From the website's JavaScript:
+
+```js
+const res = await fetch("http://127.0.0.1:5000/predict/naive_bayes", {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({ text: "click this link for a free gift card" }),
+});
+const { results } = await res.json();   // [{prediction:"spam", probabilities:{...}}]
+```
+
+Required fields per model are in `GET /models/<name>` → `schema.features`.
+In production set `ALLONOLA_CORS_ORIGIN` to your site's origin (default `*` is for local development)
+and run behind a real WSGI server (e.g. `gunicorn "allonola_ml.api:create_app(...)"`); a static
+host such as GitHub Pages cannot run this API.
+
+## Security notes
+* `.joblib` files are pickles: only load files you created. The loader refuses any file whose
+  SHA-256 differs from `metadata.json`, but anyone who can edit both files on Drive can bypass that,
+  so keep the Drive folder private.
+* The API validates input and caps request size/rows; add authentication before exposing it publicly.
+
+## Google Colab alternative
+In Colab, `from google.colab import drive; drive.mount('/content/drive')` and run
+`python -m allonola_ml.train --out /content/drive/MyDrive/Allonola-ML/runs` to write straight to your
+Drive without any API setup.

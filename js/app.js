@@ -196,7 +196,9 @@
   function initTableScroll() {
     document.querySelectorAll("table").forEach((table) => {
       const parent = table.parentElement;
-      if (!parent || parent.classList.contains("table-scroll")) return;
+      if (!parent) return;
+      // Already inside a scrolling wrapper (table-scroll, or the page's own table-responsive-wrapper)
+      if (parent.classList.contains("table-scroll") || parent.classList.contains("table-responsive-wrapper")) return;
       const wrap = document.createElement("div");
       wrap.className = "table-scroll";
       wrap.setAttribute("role", "region");

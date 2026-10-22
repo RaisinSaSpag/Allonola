@@ -81,9 +81,22 @@
   </ul>
 </aside>
 
+  <!-- Breadcrumbs -->
+  <nav class="breadcrumbs-bar" aria-label="Breadcrumbs">
+    <div class="container">
+      <ol class="breadcrumbs-list">
+        <li class="breadcrumb-item"><a href="index.html">Home</a></li>
+        <li class="breadcrumb-separator" aria-hidden="true">›</li>
+        <li class="breadcrumb-item"><a href="algorithms.html">Algorithms</a></li>
+        <li class="breadcrumb-separator" aria-hidden="true">›</li>
+        <li class="breadcrumb-item breadcrumb-item--current" aria-current="page">KNN</li>
+      </ol>
+    </div>
+  </nav>
+
   <main id="main-content">
 
-        <section class="section">
+        <section class="section section--tight-bottom">
           <div class="container">
             <div class="section-header reveal-on-scroll">
               <span class="pill pill--teal">KNN</span>
@@ -126,49 +139,57 @@
         
   </main>
 
-<footer class="site-footer">
-  <div class="container footer-top">
-    <div class="footer-brand">
-      <a href="index.html" class="site-logo" aria-label="Allonola Home">
-        <svg class="logo-icon" width="28" height="28" viewBox="0 0 28 28" fill="none" aria-hidden="true">
-          <circle cx="6" cy="20" r="3.5" fill="currentColor" />
-          <circle cx="22" cy="20" r="3.5" fill="currentColor" />
-          <circle cx="14" cy="7" r="3.5" fill="currentColor" />
-          <line x1="6" y1="20" x2="14" y2="7" stroke="currentColor" stroke-width="1.75" />
-          <line x1="14" y1="7" x2="22" y2="20" stroke="currentColor" stroke-width="1.75" />
-          <line x1="6" y1="20" x2="22" y2="20" stroke="currentColor" stroke-width="1.75" />
-        </svg>
-        <span>Allonola</span>
-      </a>
-      <p>Online-only marketplace that makes shopping easier and more trustworthy.</p>
+<!-- Global Footer -->
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-top">
+        <div class="footer-brand">
+          <span class="site-logo">
+            <svg class="logo-icon" width="22" height="22" viewBox="0 0 28 28" fill="none" aria-hidden="true">
+              <circle cx="6" cy="20" r="3.5" fill="currentColor" />
+              <circle cx="22" cy="20" r="3.5" fill="currentColor" />
+              <circle cx="14" cy="7" r="3.5" fill="currentColor" />
+              <line x1="6" y1="20" x2="14" y2="7" stroke="currentColor" stroke-width="1.75" />
+              <line x1="14" y1="7" x2="22" y2="20" stroke="currentColor" stroke-width="1.75" />
+              <line x1="6" y1="20" x2="22" y2="20" stroke="currentColor" stroke-width="1.75" />
+            </svg>
+            <span>Allonola</span>
+          </span>
+          <p>
+            To give every customer an easy, trustworthy, and personalized online shopping experience at fair prices, and to help sellers reach more buyers without needing a physical shop.
+          </p>
+        </div>
+
+        <div class="footer-col">
+          <h4>Platform</h4>
+          <ul class="footer-links">
+            <li><a href="index.html" class="footer-link">Home</a></li>
+            <li><a href="about.html" class="footer-link">About Allonola</a></li>
+            <li><a href="dashboard.html" class="footer-link">Dashboard Demo</a></li>
+            <li><a href="contact.html" class="footer-link">Contact Support</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <h4>Algorithms</h4>
+          <ul class="footer-links">
+            <li><a href="algorithms.html" class="footer-link">Overview &amp; Comparison</a></li>
+            <li><a href="algo-linear-regression.html" class="footer-link">Linear Regression</a></li>
+            <li><a href="algo-naive-bayes.html" class="footer-link">Naive Bayes</a></li>
+            <li><a href="algo-knn.html" class="footer-link">K-Nearest Neighbors</a></li>
+            <li><a href="algo-svm.html" class="footer-link">Support Vector Machine</a></li>
+            <li><a href="algo-decision-tree.html" class="footer-link">Decision Tree</a></li>
+            <li><a href="algo-ann.html" class="footer-link">Artificial Neural Network</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <p class="disclaimer-badge">All data shown is illustrative and synthetically generated.</p>
+        <p>&copy; 2026 Allonola. Fictional company for academic use.</p>
+      </div>
     </div>
-    <div class="footer-col">
-      <h4>Explore</h4>
-      <ul class="footer-links">
-        <li><a href="index.html">Home</a></li>
-        <li><a href="about.html">About</a></li>
-        <li><a href="algorithms.html">Algorithms</a></li>
-        <li><a href="dashboard.html">Dashboard</a></li>
-      </ul>
-    </div>
-    <div class="footer-col">
-      <h4>Contact</h4>
-      <ul class="footer-links">
-        <li><a href="contact.html">Contact us</a></li>
-        <li><a href="about.html">Business model</a></li>
-        <li><a href="algorithms.html">Model overview</a></li>
-      </ul>
-    </div>
-    <div class="footer-col">
-      <h4>Important</h4>
-      <p class="text-small">All data shown is illustrative and synthetically generated.</p>
-    </div>
-  </div>
-  <div class="container footer-bottom">
-    <div>© 2026 Allonola. Fictional company for academic use.</div>
-    <div class="disclaimer-badge">Illustrative / synthetically generated</div>
-  </div>
-</footer>
+  </footer>
 
   <script defer src="js/chart.umd.min.js"></script>
   <script defer src="js/data.js"></script>
