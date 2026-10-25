@@ -736,10 +736,10 @@ Weight Gradient Update: W^[l] := W^[l] - α (∂L / ∂W^[l])
         churnProbDisplay.textContent = Math.round(res.churnProb * 100) + "%";
         churnRiskLabel.textContent = res.riskLevel;
 
-        if (res.churnProb >= 0.70) {
+        if (res.churnProb >= 0.66) {
           churnProbDisplay.style.color = "var(--coral)";
           churnRiskLabel.style.color = "var(--coral)";
-        } else if (res.churnProb >= 0.30) {
+        } else if (res.churnProb >= 0.33) {
           churnProbDisplay.style.color = "var(--warning)";
           churnRiskLabel.style.color = "var(--warning)";
         } else {

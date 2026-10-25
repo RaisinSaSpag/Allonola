@@ -746,3 +746,4 @@
     formatCurrency,
   };
 })();
+

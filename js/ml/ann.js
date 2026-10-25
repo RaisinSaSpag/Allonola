@@ -41,8 +41,7 @@
     if (!row || !stored) {
       return {
         shopper: shopperId,
-        churnProb: 0.5,
-        riskLevel: "Unknown profile",
+        churnProb: null, riskLevel: "Error: Shopper ID not found",
         homepageItems: [],
         isIllustrative: true,
       };
@@ -66,3 +65,4 @@
     predictShopperChurn,
   };
 })();
+
