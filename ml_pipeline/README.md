@@ -133,3 +133,31 @@ host such as GitHub Pages cannot run this API.
 In Colab, `from google.colab import drive; drive.mount('/content/drive')` and run
 `python -m allonola_ml.train --out /content/drive/MyDrive/Allonola-ML/runs` to write straight to your
 Drive without any API setup.
+
+## Running the trained models in the browser (JavaScript)
+
+The website must not use hand-written formulas. After training, export the learned
+parameters and check that the JavaScript reproduces Python's predictions:
+
+```bash
+python -m allonola_ml.train --models all                       # 1. train -> artifacts/<run_id>/
+python -m allonola_ml.export_js artifacts/<run_id>             # 2. write js/ml/model-params.js
+node tests/js_parity.js                                        # 3. JS vs Python, row by row
+```
+
+* `allonola_ml/export_js.py` writes the weights, scaler, support vectors, tree nodes,
+  TF-IDF vocabulary and neural-network layers. It also writes `tests/parity_fixture.json`:
+  200 real held-out test rows plus Python's predictions for them.
+* `js/ml/inference.js` re-implements each model's prediction step. It is a classic
+  script, so it works from `file://` like the rest of the site.
+* `tests/js_parity.js` loads the same two files the browser loads and compares every row.
+  Labels and decision values must match exactly. Probabilities must match within 1e-6,
+  except the SVM, which is allowed 5e-3 (see below).
+
+Latest result (run 20261025T080816Z): all six models pass. Labels match on 1,200 of 1,200
+rows, decision values agree to 1e-13, and probabilities agree to 2.5e-3 for the SVM and
+2e-15 for the other models.
+
+Known gap: `SVC(probability=True)` is deprecated in scikit-learn 1.9. Its `predict_proba` is a
+Platt sigmoid that differs very slightly from the stored (A, B) on this model. The SVM's
+labels and decision values are still exact, and those are what the fraud threshold uses.

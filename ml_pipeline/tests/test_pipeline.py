@@ -1,3 +1,4 @@
+import importlib.util
 import json
 import re
 import tempfile
@@ -179,6 +180,10 @@ class FakeDrive:
         return self._Exec(run)
 
 
+HAS_GOOGLE = importlib.util.find_spec("googleapiclient") is not None
+
+
+@unittest.skipUnless(HAS_GOOGLE, "needs google-api-python-client (pip install -r requirements.txt)")
 class DriveTests(unittest.TestCase):
     def _run_dir(self, tmp, run_id="20260101T000000Z", payload=b"v1"):
         d = Path(tmp) / run_id
