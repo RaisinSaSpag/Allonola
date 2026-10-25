@@ -499,7 +499,7 @@ These are the figures reported on the site and in `data.js`. Full tables are in 
 
 | Model | Headline metric | Value | Other |
 |---|---|---|---|
-| Linear regression | R² | 0.83 | RMSE 10.4 units |
+| Linear regression | R² | 0.83 | RMSE 13.8 units |
 | Naive Bayes | Accuracy | 88.7% | See `ml_pipeline/README.md` for macro-F1 |
 | SVM | F1 (fraud) | 0.35 | ROC-AUC 0.78; 35 of 66 frauds caught among 800 test orders, 133 flagged |
 | Decision tree | Accuracy | 65.8% | F1 0.54; late recall 0.61; 600 test orders: 276 TN, 130 FP, 75 FN, 119 TP |

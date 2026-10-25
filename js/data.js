@@ -283,7 +283,7 @@
       name: "ANN",
       taskType: "Learn complex patterns",
       filterCategory: "classify",
-      strength: "Highest potential accuracy",
+      strength: "Learns complex patterns",
       limitation: "Needs lots of data, harder to explain",
       businessQuestion: "What will this shopper browse, and are they at risk of leaving?",
       usedIn: "Personalized homepage; customer loss alerts; image search",
