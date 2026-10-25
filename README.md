@@ -16,13 +16,13 @@ Allonola is a complete, multi-page static website for a fictional online retail 
 
 ## 🚀 How to Open and Run the Website
 
-This website is built with vanilla HTML5, CSS3, and modern vanilla JavaScript (ES2020) with no build step, no Node.js runtime, no backend server, and no database. The only external dependencies are Chart.js (CDN) and Google Fonts.
+This website is built with vanilla HTML5, CSS3, and modern vanilla JavaScript (ES2020) with no build step, no Node.js runtime, no backend server, and no database. **Chart.js and Google Fonts are hosted locally**, meaning the site is 100% offline-capable and requires no internet connection to run.
 
 ### 1. Opening Directly from the Local File System (`file://`)
 You can open the website offline directly in any modern browser:
 1. Open the folder that contains `index.html`.
 2. Double-click `index.html` (or right-click → Open with Chrome / Edge / Firefox / Safari).
-3. All data is bundled directly in `js/data.js`, so the site does not need a server or local `fetch()` requests. The one exception is Chart.js, which is loaded from a CDN: the charts need an internet connection the first time the site is opened, and the browser's cache keeps them available afterwards.
+3. All data, scripts, styles, and fonts are bundled locally, so the site needs no internet connection.
 
 ### 2. Hosting on GitHub Pages
 To publish this repository on GitHub Pages:
@@ -61,68 +61,37 @@ allonola/
 ├── algo-ann.html               # Algorithm 6: Shopper churn & personalized homepage feed
 ├── dashboard.html              # Interactive Dashboard (Seller view, Admin view, Model performance view)
 ├── contact.html                # Contact (Accessible form validation, FAQ, online-only notice)
-├── README.md                   # Project documentation & deployment guide
+├── DOCUMENTATION.md            # Comprehensive technical & architectural documentation
+├── README.md                   # Project overview & deployment guide
 ├── css/
 │   ├── base.css                # Design tokens, dark/light themes, reset, typography, accessibility
 │   ├── layout.css              # Header, navigation drawer, breadcrumbs, grid system, footer
 │   ├── components.css          # Glass cards, buttons, badges, tables, forms, tabs, alerts
-│   └── algorithm.css           # 10-part algorithm page template, formula boxes, interactive demo controls
+│   ├── algorithm.css           # 10-part algorithm page template, formula boxes, interactive demo controls
+│   └── fonts.css               # @font-face rules for local fonts
 ├── js/
 │   ├── data.js                 # Single source of truth: facts, datasets, baselines, seeded generators
 │   ├── app.js                  # Header, theme controller, navigation, scroll-in reveal, skip links
 │   ├── charts.js               # Chart.js helper with CSS tokens, theme rebuilds, accessibility summaries
 │   ├── table.js                # Accessible HTML table renderer with "View as table" chart toggles
+│   ├── chart.umd.min.js        # Chart.js 4.4.1 bundled locally for offline support
 │   └── ml/
-│       ├── linear-regression.js # Pure math for demand forecasting & price elasticity
-│       ├── naive-bayes.js       # Multinomial Naive Bayes text classifier with Laplace smoothing
-│       ├── knn.js               # Cosine vector similarity & collaborative neighborhood recommender
-│       ├── svm.js               # Max-margin fraud thresholding & keyword category lookup
-│       ├── decision-tree.js     # Hierarchical rule evaluation & delivery risk path generator
-│       └── ann.js               # Training loss epoch slices & shopper churn lookup
+│       ├── model-params.js     # GENERATED: Trained weights from the Python ML pipeline
+│       ├── inference.js        # JavaScript engine that runs the trained model weights
+│       ├── linear-regression.js# Pure math for demand forecasting & price elasticity
+│       ├── naive-bayes.js      # Multinomial Naive Bayes text classifier with Laplace smoothing
+│       ├── knn.js              # Cosine vector similarity & collaborative neighborhood recommender
+│       ├── svm.js              # Max-margin fraud thresholding & keyword category lookup
+│       ├── decision-tree.js    # Hierarchical rule evaluation & delivery risk path generator
+│       └── ann.js              # Training loss epoch slices & shopper churn lookup
 │   └── demo/                   # Page controllers that connect the ML modules to the interactive demos
 │       ├── linear-regression-demo.js
 │       ├── knn-demo.js
 │       └── naive-bayes-demo.js
 ├── assets/
+│   ├── fonts/                  # Montserrat and Open Sans (woff2)
 │   └── icons/                  # Inline SVGs utilized directly in HTML templates
 ├── test/
 │   └── checks.html             # Automated unit tests and console assertion harness
 └── ml_pipeline/                # Python: real model training (60/20/20), Google Drive storage, JSON API
     └── README.md               # Setup and usage (separate from the static site)
-```
-
-> The website itself is still static (no build step). The Python pipeline in `ml_pipeline/` is optional
-> and runs separately; see `ml_pipeline/README.md`. The in-browser demos remain illustrative.
-
----
-
-## 🎨 Design System & Accessibility
-
-- **Theme Mode**: Dark theme by default (`#0B1A2A`) with a light theme toggle (`#F5F8FB`). User preference is saved in `localStorage` inside a `try/catch` wrapper and respects system `prefers-color-scheme` on first visit.
-- **Color Contrast**: Compliant with WCAG AA guidelines (minimum 4.5:1 contrast for body text across both dark and light modes).
-- **Typography**: Google Fonts [Montserrat](https://fonts.google.com/specimen/Montserrat) (weights 600, 700) for headings and [Open Sans](https://fonts.google.com/specimen/Open+Sans) (weights 400, 600) for readable body text.
-- **Motion Accessibility**: All hero looping gradients and scroll animations automatically disable when `prefers-reduced-motion: reduce` is enabled.
-- **Assistive Technology**:
-  - Semantic HTML5 landmark structure (`<header>`, `<nav>`, `<main>`, `<section>`, `<article>`, `<aside>`, `<footer>`).
-  - Visible skip-to-content link as the very first focusable element.
-  - Visible focus outlines (`2px outline in --teal`).
-  - Screen reader text summaries (`.sr-only`) and interactive **"View as table"** toggles on every single Chart.js visualization.
-  - Accessible form validation with `aria-required`, `aria-describedby` error associations, and an error summary alert box (`role="alert"`).
-
----
-
-## ⚙️ Architectural Decisions (Where the Brief was Silent)
-
-1. **Local File System Compatibility (`file://`) vs. ES Modules**:
-   Browsers strictly block ES Module `import` statements and local JSON `fetch()` calls under the `file://` protocol due to Cross-Origin Resource Sharing (CORS) security policies. To ensure the site works reliably when `index.html` is opened directly from a local drive without running a local web server, all scripts load via classic `<script defer>` tags in their required dependency sequence, sharing a clean global namespace `window.Allonola = { data, ml, ui, charts, table }`.
-2. **Chart.js CDN Version**:
-   Used Chart.js 4.4.1 UMD distribution loaded from `https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js`.
-3. **Deterministic Random Generation**:
-   Implemented a Linear Congruential Generator (LCG) in `js/data.js` so that simulated time-series numbers generate consistently across page reloads. The 60 SVM demo orders are now scored by the trained SVM (`js/ml/model-params.js`), not generated in the browser.
-4. **Currency Formatting**:
-   Standardized on the Philippine peso symbol (`₱`) with comma thousands separators formatted through a centralized helper function `formatCurrency(val)` in `js/data.js`.
-
----
-
-## 📄 License & Academic Citation
-© 2026 Allonola. Created for academic and educational evaluation. Fictional platform.
