@@ -38,10 +38,10 @@ To verify the accuracy of the underlying algorithms:
 2. The page executes automated assertion checks on all pure ML functions:
    - **Naive Bayes**: Classifies `"Click this link for a free gift card"` as **Spam**.
    - **K-Nearest Neighbors (KNN)**: Verifies that target user `U1` with `k = 3` identifies nearest neighbors `U2`, `U4`, and `U6`, recommending **Earbuds** first with predicted score `~4.3`.
-   - **Decision Tree**: Evaluates sample order `R-04` (`Perishable`, seller rating `3.4`, `Courier C`, `31 km`, return history `1`) to output **LIKELY LATE** with **82% confidence**.
-   - **Linear Regression**: Confirms that unit forecasts return valid whole numbers `≥ 0` across extreme prices and promotion toggles.
-   - **SVM**: Evaluates deterministic fraud boundary thresholding on 60 orders.
-   - **ANN**: Confirms monotonic training loss convergence and early stopping minimum at epoch 22.
+   - **Decision Tree**: Evaluates a sample order (`Perishable`, seller rating `3.4`, `Courier C`, `31 km`, return history `1`) with the trained tree to output **LIKELY LATE** with **86% confidence**, after 4 rules.
+   - **Linear Regression**: Confirms that forecasts are whole numbers `≥ 0`, fall when price rises, and rise with a promotion.
+   - **SVM**: Applies a fraud threshold of 0.20 to the trained SVM's scores for the 60 demo orders.
+   - **ANN**: Confirms the trained network scores the six sample shoppers consistently with their churn flags, and that the illustrative loss curve has its early-stopping minimum at epoch 22.
 3. Open browser developer tools (`F12` → Console) for detailed diagnostic logs.
 
 ---
@@ -118,7 +118,7 @@ allonola/
 2. **Chart.js CDN Version**:
    Used Chart.js 4.4.1 UMD distribution loaded from `https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js`.
 3. **Deterministic Random Generation**:
-   Implemented a Linear Congruential Generator (LCG) in `js/data.js` so that simulated time-series numbers and the 60 SVM scatter plot orders generate consistently across page reloads without variance.
+   Implemented a Linear Congruential Generator (LCG) in `js/data.js` so that simulated time-series numbers generate consistently across page reloads. The 60 SVM demo orders are now scored by the trained SVM (`js/ml/model-params.js`), not generated in the browser.
 4. **Currency Formatting**:
    Standardized on the Philippine peso symbol (`₱`) with comma thousands separators formatted through a centralized helper function `formatCurrency(val)` in `js/data.js`.
 

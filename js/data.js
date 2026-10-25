@@ -307,6 +307,7 @@
     baselines: {
       "Ceramic mug": {
         product: "Ceramic mug",
+        category: "Home and Kitchen",
         baselineRow: { week: "W42", price: 219, promotion: "Yes", unitsSold: 91, season: "Rainy" },
         basePrice: 219,
         baseUnitsSold: 91,
@@ -314,6 +315,7 @@
       },
       "Running shoes (P-220)": {
         product: "Running shoes (P-220)",
+        category: "Fashion",
         baselineRow: { week: "W44", price: 1790, promotion: "No", unitsSold: 110, season: "Holiday" },
         basePrice: 1790,
         baseUnitsSold: 110,
@@ -321,6 +323,7 @@
       },
       "Phone stand": {
         product: "Phone stand",
+        category: "Home and Office",
         baselineRow: { week: "W45", price: 399, promotion: "Yes", unitsSold: 71, season: "Holiday" },
         basePrice: 399,
         baseUnitsSold: 71,
@@ -334,15 +337,16 @@
       { feature: "Promotion", unit: "Yes / No", reason: "Measures lift driven by banner discounts and marketplace campaigns" },
     ],
     reportedResults: {
-      example: "Running shoes (P-220), week 44: predicted 118 units; 110 sold (over-forecast by 8).",
-      testSet: "240 product-weeks",
-      rmse: 9.8,
-      mae: 7.4,
-      r2: 0.81,
+      example:
+        "Phone stand on a weekday with a promotion: the trained model forecasts about 86 units at the baseline price of ₱399. Use the controls above to see how the forecast responds to price.",
+      testSet: "480 held-out product-days (last 20% of dates)",
+      rmse: 13.8,
+      mae: 10.4,
+      r2: 0.83,
       interpretation:
-        "RMSE is larger than MAE because a few large misses weigh more heavily in the squared penalty of RMSE. An R² of 0.81 indicates the model captures 81% of variance driven by price, baseline sales, and seasonality; remaining variance reflects external factors not in the model, such as competitor price cuts or flash stock clearances.",
+        "RMSE is larger than MAE because a few large misses weigh more heavily in the squared penalty of RMSE. An R² of 0.83 means the model explains about 83% of the variation in units sold, using price, promotion, weekend timing and product. The remaining variation reflects factors not in the model, such as competitor prices or stock clearances.",
       businessImpact:
-        "Forecasts remain within about 7 units of actual demand on average. Pilot merchant sellers estimate a 15% reduction in overstock holding costs, demonstrating steady progress toward the corporate target of keeping MAPE under 20% for top 200 sellers.",
+        "On average, forecasts are within about 10 units of actual demand on the test set. This is a synthetic-data result: the value of these forecasts for a real seller depends on real sales data.",
     },
   };
 
@@ -360,17 +364,17 @@
     ],
     reportedResults: {
       examples: [
-        { text: "Click this link for a free gift card", expectedClass: "Spam", probability: 0.93 },
-        { text: "Battery lasts all day, great value", expectedClass: "Positive", probability: 0.88 },
+        { text: "Click this link for a free gift card", expectedClass: "Spam", probability: 0.9998 },
+        { text: "Battery lasts all day, great value", expectedClass: "Positive", probability: 0.674 },
       ],
-      testSetSize: "1,000 reviews",
-      accuracy: "91.6%",
-      spamPrecision: 0.88,
-      spamRecall: 0.84,
+      testSetSize: "600 held-out synthetic reviews",
+      accuracy: "88.7%",
+      spamPrecision: 0.93,
+      spamRecall: 0.89,
       interpretation:
         "Recall matters most for marketplace trust because a missed spam or deceptive review directly reaches and misleads buyers. Precision matters for merchant and reviewer fairness, as a genuine customer review wrongly suppressed creates friction and damages seller reputation.",
       businessImpact:
-        "Approximately 84 out of every 100 fraudulent spam reviews are caught automatically before publication. About 1 in 8 flagged reviews is genuine; borderline predictions near the probability threshold are automatically routed to human moderators.",
+        "On the synthetic test set, the model catches about 89% of spam reviews, and 93% of the reviews it flags as spam really are spam. Real moderation quality depends on real review data.",
     },
   };
 
@@ -403,7 +407,7 @@
     },
   };
 
-  // 4. SVM Datasets, 60 Deterministic Orders, and Categories
+  // 4. SVM Datasets and Categories (orders are scored by the trained SVM)
   const svm = {
     sampleDatasetA: [
       { orderId: "O-1001", amount: 640, location: "Metro", payment: "E-wallet", accountAge: 812, items: 2, fraud: 0 },
@@ -421,78 +425,19 @@
       { title: "Adjustable desk lamp with USB port", category: "Home and Office" },
     ],
     reportedResults: {
-      orderExample: "Order O-1004 flagged with fraud score 0.91, sent to analyst queue with reasons; confirmed as fraud.",
-      testSet: "5,000 orders (90 confirmed fraud = 1.8%)",
-      f1Score: 0.72,
-      rocAuc: 0.94,
-      thresholdSummary: "At chosen threshold: 100 flagged, 68 confirmed (precision 0.68); 68 of 90 fraud cases caught (recall 0.76).",
-      categoryAccuracy: "88% on 1,000 held-out listings",
+      orderExample: "Order O-1053 (₱753, COD, account 217 days old) has the highest fraud score among the 60 demo orders (0.41); it is a confirmed fraud case.",
+      testSet: "800 held-out synthetic orders (66 confirmed fraud = 8.3%)",
+      f1Score: 0.35,
+      rocAuc: 0.78,
+      thresholdSummary: "At the model's default cut-off (probability 0.50): 133 of 800 test orders flagged, 35 of 66 frauds caught (precision 0.26, recall 0.53).",
+      categoryAccuracy: "Not measured. The product category matcher is a keyword lookup, not one of the trained models.",
       interpretation:
-        "Accuracy alone is misleading (a naive model that never flags fraud would achieve 98.2% accuracy while letting all fraud through). F1-score and ROC-AUC evaluate performance on rare positive classes. The 32 false alarms represent an intentional trade-off because human analysts can review 100 flagged cases swiftly.",
+        "Accuracy alone is misleading: a model that never flags fraud would score about 92% accuracy on this test set while catching no fraud. F1-score and ROC-AUC evaluate performance on the rare fraud class. The 98 false alarms at the default cut-off are a deliberate trade-off, because analysts can review flagged orders before dispatch.",
       businessImpact:
-        "Fraud analysts review a targeted queue of 100 orders rather than auditing 5,000 transactions blindly, catching three out of four fraudulent orders before dispatch. Thresholds are calibrated monthly to balance analyst capacity against fraud risk.",
+        "At the default cut-off, analysts review 133 flagged orders out of 800 and catch 35 of 66 frauds (53%). Lowering the threshold catches more fraud at the cost of more reviews; the cut-off is a business choice.",
     },
   };
 
-  // Generate 60 deterministic orders for SVM scatter plot with a fixed seed
-  // Approximate fraud rate ~1 in 50 (around 2 or 3 fraud cases in 60 orders)
-  (function generateDeterministicSVMOrders() {
-    const rng = createSeededRandom(42);
-    const locations = ["Metro", "Province"];
-    const payments = ["E-wallet", "Card", "COD"];
-    const orders = [];
-
-    // Include the 6 exact sample orders first
-    orders.push(
-      { orderId: "O-1001", amount: 640, location: "Metro", payment: "E-wallet", accountAge: 812, items: 2, fraud: 0, fraudScore: 0.08 },
-      { orderId: "O-1002", amount: 4850, location: "Province", payment: "COD", accountAge: 3, items: 6, fraud: 1, fraudScore: 0.88 },
-      { orderId: "O-1003", amount: 1220, location: "Metro", payment: "Card", accountAge: 150, items: 1, fraud: 0, fraudScore: 0.15 },
-      { orderId: "O-1004", amount: 9300, location: "Province", payment: "COD", accountAge: 1, items: 8, fraud: 1, fraudScore: 0.91 },
-      { orderId: "O-1005", amount: 380, location: "Metro", payment: "COD", accountAge: 430, items: 1, fraud: 0, fraudScore: 0.05 },
-      { orderId: "O-1006", amount: 2700, location: "Metro", payment: "Card", accountAge: 5, items: 4, fraud: 1, fraudScore: 0.84 }
-    );
-
-    // Generate remaining 54 deterministic orders (O-1007 to O-1060)
-    for (let i = 7; i <= 60; i++) {
-      const orderId = "O-" + (1000 + i);
-      const isProvince = rng() > 0.55;
-      const location = isProvince ? "Province" : "Metro";
-      const payment = payments[Math.floor(rng() * payments.length)];
-      
-      // Let order 38 be an additional subtle fraud point
-      const isFraud = i === 38;
-      let amount, accountAge, items, fraudScore;
-
-      if (isFraud) {
-        amount = 5400 + Math.floor(rng() * 3000);
-        accountAge = 2 + Math.floor(rng() * 6);
-        items = 5 + Math.floor(rng() * 4);
-        fraudScore = +(0.78 + rng() * 0.12).toFixed(2);
-      } else {
-        // Normal orders: older accounts, lower to moderate amounts, low fraud score
-        accountAge = 20 + Math.floor(rng() * 900);
-        amount = 250 + Math.floor(rng() * 3200);
-        items = 1 + Math.floor(rng() * 4);
-        // Fraud score correlates with high amount, young account, COD
-        const amountRisk = Math.min(1, amount / 6000);
-        const ageRisk = Math.max(0, 1 - accountAge / 300);
-        fraudScore = +(Math.max(0.02, Math.min(0.48, (amountRisk * 0.25 + ageRisk * 0.2 + rng() * 0.15)))).toFixed(2);
-      }
-
-      orders.push({
-        orderId,
-        amount,
-        location,
-        payment,
-        accountAge,
-        items,
-        fraud: isFraud ? 1 : 0,
-        fraudScore,
-      });
-    }
-
-    svm.deterministicOrders = orders;
-  })();
 
   // 5. Decision Tree Datasets, Tree Rules, and Confusion Matrix
   const decisionTree = {
@@ -507,48 +452,26 @@
     ],
     reportedResults: {
       orderExample:
-        "Order R-04 followed 'rating below 3.5 → distance above 25 km → perishable' to the leaf 'likely late' with 82% confidence; it arrived 1 day late.",
-      testSet: "1,200 orders",
-      accuracy: "85.8%",
+        "Each order's audit trail on the Decision Tree page lists the rules it passed, from the root down to its leaf.",
+      testSet: "600 held-out synthetic orders",
+      accuracy: "65.8%",
       confusionMatrix: {
-        totalOrders: 1200,
-        actualOnTime: 960,
-        actualLate: 240,
-        predictedOnTimeActualOnTime: 850, // True Negatives
-        predictedLateActualOnTime: 110,   // False Positives
-        predictedOnTimeActualLate: 60,    // False Negatives
-        predictedLateActualLate: 180,     // True Positives
+        totalOrders: 600,
+        actualOnTime: 406,
+        actualLate: 194,
+        predictedOnTimeActualOnTime: 276, // True Negatives
+        predictedLateActualOnTime: 130,   // False Positives
+        predictedOnTimeActualLate: 75,    // False Negatives
+        predictedLateActualLate: 119,     // True Positives
       },
-      latePrecision: 0.62,
-      latePrecisionNote: "180 of 290 warnings correct",
-      lateRecall: 0.75,
-      lateRecallNote: "180 of 240 late orders caught",
+      latePrecision: 0.48,
+      latePrecisionNote: "119 of 249 late warnings correct",
+      lateRecall: 0.61,
+      lateRecallNote: "119 of 194 late orders caught",
       interpretation:
-        "The decision tree is deliberately tuned to favor recall over precision: a missed late delivery directly frustrates a buyer waiting for essentials, whereas an unnecessary early warning simply triggers proactive seller follow-up. 180 of 240 delayed shipments are intercepted before customer complaints occur.",
+        "The tree is shallow (depth 4) so that staff can read every rule. Its late precision (0.48) and recall (0.61) show that about half of its warnings are false alarms and it misses about four in ten late orders. The trade-off between warnings and misses is set by the training choices in the pipeline.",
       businessImpact:
-        "Operations specialists audit 290 flagged high-risk orders rather than all 1,200 dispatches, catching 75% of delays early. The explainable branch rules empower constructive root-cause conversations with specific courier hubs and lower-rated sellers.",
-    },
-    // Teaching rules and display confidence values (illustrative)
-    rulesDefinition: {
-      rootCondition: "Seller rating below 3.5?",
-      branchYesRating: {
-        condition: "Distance above 25 km?",
-        branchYesDistance: {
-          condition: "Product type is Perishable or Fragile?",
-          outcomeYes: { label: "LIKELY LATE", confidence: "82%", confidenceNum: 0.82 },
-          outcomeNo: { label: "LIKELY ON TIME", confidence: "60%", confidenceNum: 0.60 },
-        },
-        branchNoDistance: {
-          condition: "Courier C?",
-          outcomeYes: { label: "LIKELY LATE", confidence: "55%", confidenceNum: 0.55 },
-          outcomeNo: { label: "LIKELY ON TIME", confidence: "70%", confidenceNum: 0.70 },
-        },
-      },
-      branchNoRating: {
-        condition: "Return history 2 or more?",
-        outcomeYes: { label: "LIKELY LATE", confidence: "58%", confidenceNum: 0.58 },
-        outcomeNo: { label: "LIKELY ON TIME", confidence: "90%", confidenceNum: 0.90 },
-      },
+        "Operations staff would review 249 flagged orders out of 600 and catch 119 of 194 delays (61%) before dispatch. The rule trails help root-cause conversations with couriers and sellers.",
     },
   };
 
@@ -563,19 +486,15 @@
       { shopper: "S-06", pagesViewed: 1, searches: 0, pastPurchases: 0, daysSinceLastVisit: 90, ageBand: "18–24", boughtNext: 0, churn: 1 },
     ],
     reportedResults: {
-      shopperHighlights: [
-        "Shopper S-04 churn probability 0.78 (high risk), added to retention campaign.",
-        "Shopper S-01 homepage led by running shoes and a phone stand, related to recent searches; S-01 bought one of the top three items next day.",
-      ],
-      testSet: "10,000 shoppers",
-      accuracy: "88%",
-      auc: 0.91,
+      testSet: "600 held-out synthetic shoppers (25% churned)",
+      accuracy: "82.5%",
+      auc: 0.82,
       lossCurveNote:
-        "Training loss fell from 0.69 (epoch 1) to 0.31 (epoch 30); validation loss stopped improving near epoch 22 (0.34) and rose, so training stopped early.",
+        "Illustrative: the training-loss curve on the page is a teaching example, not the exported model's loss history.",
       interpretation:
-        "An AUC of 0.91 means a randomly chosen churned shopper receives a higher predicted risk score than a randomly chosen active shopper 91% of the time. The widening gap between training loss and validation loss past epoch 22 signals parameter memorization, which early stopping halts in production.",
+        "An AUC of 0.82 means a randomly chosen churned shopper receives a higher predicted risk score than a randomly chosen active shopper about 82% of the time. Accuracy is high partly because most shoppers do not churn; at the default cut-off the network finds 46% of churners (precision 0.75).",
       businessImpact:
-        "Retention discount vouchers and re-engagement emails are targeted strictly at the top 5% of churn-risk shoppers, measured against an untreated holdout control group. This initiative directly supports raising the repeat-buyer rate from 28% to the 35% operational target.",
+        "On the synthetic test set, the network ranks churners well enough to target retention offers at the highest-risk shoppers. Any real campaign would need an A/B test against a control group.",
     },
     // 30 epochs: training loss monotonic 0.69 to 0.31; validation loss min 0.34 at epoch 22, rising to ~0.38 at epoch 30
     lossHistory: [
@@ -613,8 +532,6 @@
     storedShoppers: {
       "S-01": {
         shopper: "S-01",
-        churnProb: 0.12,
-        riskLevel: "Low risk (Active loyal)",
         homepageItems: [
           { rank: 1, title: "Running shoes (P-220)", score: 0.94, reason: "Matches high sports apparel query sequence" },
           { rank: 2, title: "Phone stand", score: 0.89, reason: "Frequently paired complementary desktop accessory" },
@@ -623,32 +540,22 @@
       },
       "S-02": {
         shopper: "S-02",
-        churnProb: 0.85,
-        riskLevel: "High risk (Inactive 75 days)",
         homepageItems: [],
       },
       "S-03": {
         shopper: "S-03",
-        churnProb: 0.08,
-        riskLevel: "Very low risk (Frequent visitor)",
         homepageItems: [],
       },
       "S-04": {
         shopper: "S-04",
-        churnProb: 0.78,
-        riskLevel: "High risk (Enrolled in retention campaign)",
         homepageItems: [],
       },
       "S-05": {
         shopper: "S-05",
-        churnProb: 0.31,
-        riskLevel: "Moderate engagement",
         homepageItems: [],
       },
       "S-06": {
         shopper: "S-06",
-        churnProb: 0.92,
-        riskLevel: "Critical churn risk (Inactive 90 days)",
         homepageItems: [],
       },
     },
@@ -762,7 +669,7 @@
             { period: "Q1", primary: 0.77, secondary: 8.6 },
             { period: "Q2", primary: 0.79, secondary: 8.1 },
             { period: "Q3", primary: 0.80, secondary: 7.7 },
-            { period: "Latest", primary: 0.81, secondary: 7.4 }, // Matches reported
+            { period: "Latest", primary: 0.83, secondary: 10.4 }, // Test set (retrained pipeline)
           ],
         },
         {
@@ -772,7 +679,7 @@
             { period: "Q1", primary: 0.83, secondary: 0.79 },
             { period: "Q2", primary: 0.85, secondary: 0.81 },
             { period: "Q3", primary: 0.87, secondary: 0.83 },
-            { period: "Latest", primary: 0.88, secondary: 0.84 }, // Matches reported
+            { period: "Latest", primary: 0.90, secondary: 0.88 }, // Test set (retrained pipeline)
           ],
         },
         {
@@ -792,7 +699,7 @@
             { period: "Q1", primary: 0.90, secondary: 0.67 },
             { period: "Q2", primary: 0.92, secondary: 0.69 },
             { period: "Q3", primary: 0.93, secondary: 0.71 },
-            { period: "Latest", primary: 0.94, secondary: 0.72 }, // Matches reported
+            { period: "Latest", primary: 0.78, secondary: 0.35 }, // Test set (retrained pipeline)
           ],
         },
         {
@@ -802,7 +709,7 @@
             { period: "Q1", primary: 0.82, secondary: 0.69 },
             { period: "Q2", primary: 0.83, secondary: 0.71 },
             { period: "Q3", primary: 0.84, secondary: 0.73 },
-            { period: "Latest", primary: 0.858, secondary: 0.75 }, // Matches reported
+            { period: "Latest", primary: 0.66, secondary: 0.61 }, // Test set (retrained pipeline)
           ],
         },
         {
@@ -812,7 +719,7 @@
             { period: "Q1", primary: 0.86, secondary: 0.83 },
             { period: "Q2", primary: 0.88, secondary: 0.85 },
             { period: "Q3", primary: 0.90, secondary: 0.87 },
-            { period: "Latest", primary: 0.91, secondary: 0.88 }, // Matches reported
+            { period: "Latest", primary: 0.82, secondary: 0.825 }, // Test set (retrained pipeline)
           ],
         },
       ],

@@ -1,7 +1,7 @@
 /**
  * js/ml/svm.js
- * Support Vector Machine evaluation helpers: decision thresholding,
- * classification performance metrics, and keyword-based category matching.
+ * Support Vector Machine helpers: applies a fraud-probability threshold to the trained SVM's scores,
+ * and a keyword-based product category matcher (rule-based; not part of the trained models).
  * Pure functions with no DOM access; suitable for automated testing.
  */
 "use strict";
@@ -11,10 +11,10 @@
   window.Allonola.ml = window.Allonola.ml || {};
 
   /**
-   * Evaluates the 60 deterministic orders against a fraud score threshold.
+   * Evaluates the 60 demo orders against a fraud probability threshold (trained SVM scores).
    *
    * @param {number} threshold - Decision boundary (0.10 to 0.95)
-   * @param {Array} [orders] - Optional custom order array; defaults to stored 60 orders
+   * @param {Array} [orders] - Optional custom order array; defaults to the 60 demo orders
    * @returns {{
    *   threshold: number,
    *   total: number,
@@ -30,7 +30,8 @@
    * }}
    */
   function evaluateFraudThreshold(threshold, orders) {
-    const list = orders || window.Allonola.data.svm.deterministicOrders || [];
+    // Default: the 60 demo orders, each scored by the trained SVM (js/ml/inference.js).
+    const list = orders || window.Allonola.inference.svmDemoOrders();
     let tp = 0;
     let fp = 0;
     let fn = 0;

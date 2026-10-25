@@ -1,7 +1,7 @@
 /**
  * js/ml/naive-bayes.js
- * Multinomial Naive Bayes text classifier trained on illustrative review corpus.
- * Uses Laplace smoothing (alpha = 1) and log probabilities to avoid underflow.
+ * Review sentiment / spam classifier for the Naive Bayes page.
+ * Runs the trained model via js/ml/inference.js (parameters from js/ml/model-params.js).
  * Pure functions with no DOM access; suitable for automated testing.
  */
 "use strict";
@@ -10,180 +10,50 @@
   window.Allonola = window.Allonola || {};
   window.Allonola.ml = window.Allonola.ml || {};
 
-  /**
-   * Tokenizes input text: lowercase, splits on non-letters, keeps all tokens.
-   * @param {string} text
-   * @returns {string[]}
-   */
-  // Common English words that carry no sentiment or spam signal.
-  const STOP_WORDS = new Set([
-    "a", "an", "the", "and", "or", "but", "of", "to", "in", "on", "at", "for", "from",
-    "with", "by", "is", "it", "its", "this", "that", "these", "those", "was", "were",
-    "be", "been", "am", "are", "as", "so", "if", "i", "me", "my", "we", "our", "you",
-    "your", "they", "them", "he", "she", "his", "her", "do", "did", "not", "no",
-  ]);
-
+  // Same tokenisation as the trained model: lowercase ASCII words of 2+ characters.
   function tokenize(text) {
     if (!text || typeof text !== "string") return [];
-    return text
-      .toLowerCase()
-      .split(/[^a-z]+/)
-      .filter((t) => t.length > 0 && !STOP_WORDS.has(t));
+    return text.toLowerCase().match(/[a-z0-9_]{2,}/g) || [];
   }
 
-  // Model training state initialized from sample reviews
-  let modelState = null;
-
-  function trainModel() {
-    const samples = window.Allonola.data.naiveBayes.sampleDataset;
-    const classes = ["Positive", "Negative", "Spam"];
-    const classDocCounts = { Positive: 0, Negative: 0, Spam: 0 };
-    const classWordCounts = { Positive: {}, Negative: {}, Spam: {} };
-    const classTotalWords = { Positive: 0, Negative: 0, Spam: 0 };
-    const vocabulary = new Set();
-
-    samples.forEach(({ text, label }) => {
-      if (!classes.includes(label)) return;
-      classDocCounts[label]++;
-      const tokens = tokenize(text);
-      tokens.forEach((token) => {
-        vocabulary.add(token);
-        classWordCounts[label][token] = (classWordCounts[label][token] || 0) + 1;
-        classTotalWords[label]++;
-      });
-    });
-
-    const totalDocs = samples.length;
-    const vocabSize = vocabulary.size;
-
-    modelState = {
-      classes,
-      totalDocs,
-      vocabSize,
-      classDocCounts,
-      classWordCounts,
-      classTotalWords,
-      vocabulary,
-    };
-
-    return modelState;
-  }
+  const LABEL = { negative: "Negative", positive: "Positive", spam: "Spam" };
 
   /**
-   * Classifies a review string into Positive, Negative, or Spam.
+   * Classifies a review as Positive, Negative or Spam using the trained model.
    *
    * @param {string} text
    * @returns {{
-   *   predictedClass: string,
+   *   predictedClass: string,                       // "Positive" | "Negative" | "Spam" | "Neutral"
    *   probabilities: { Positive: number, Negative: number, Spam: number },
-   *   logScores: { Positive: number, Negative: number, Spam: number },
    *   topWords: Array<{ word: string, weight: number, class: string }>,
    *   tokens: string[]
    * }}
    */
   function classify(text) {
-    if (!modelState) trainModel();
-
     const tokens = tokenize(text);
-    const { classes, totalDocs, vocabSize, classDocCounts, classWordCounts, classTotalWords } = modelState;
-
-    if (tokens.length === 0) {
-      return {
-        predictedClass: "Neutral",
-        probabilities: { Positive: 0.333, Negative: 0.333, Spam: 0.334 },
-        logScores: { Positive: 0, Negative: 0, Spam: 0 },
-        topWords: [],
-        tokens: [],
-      };
-    }
-
-    const logScores = {};
-    const wordContributions = {}; // token -> { Positive, Negative, Spam }
-
-    classes.forEach((c) => {
-      // Prior probability: P(c) = docCount(c) / totalDocs
-      let score = Math.log(classDocCounts[c] / totalDocs);
-
-      tokens.forEach((token) => {
-        const count = classWordCounts[c][token] || 0;
-        // Laplace smoothed conditional probability: (count + 1) / (totalWordsInClass + |V|)
-        const pWordGivenClass = (count + 1) / (classTotalWords[c] + vocabSize);
-        const logP = Math.log(pWordGivenClass);
-        score += logP;
-
-        if (!wordContributions[token]) wordContributions[token] = {};
-        wordContributions[token][c] = logP;
-      });
-
-      logScores[c] = score;
-    });
-
-    // Softmax normalization to derive valid probabilities that sum to 1
-    const maxLog = Math.max(logScores.Positive, logScores.Negative, logScores.Spam);
-    const expScores = {
-      Positive: Math.exp(logScores.Positive - maxLog),
-      Negative: Math.exp(logScores.Negative - maxLog),
-      Spam: Math.exp(logScores.Spam - maxLog),
+    const neutral = {
+      predictedClass: "Neutral",
+      probabilities: { Positive: 0.333, Negative: 0.333, Spam: 0.334 },
+      topWords: [],
+      tokens,
     };
-    const sumExp = expScores.Positive + expScores.Negative + expScores.Spam;
+    if (tokens.length === 0) return neutral;
 
-    const probabilities = {
-      Positive: +(expScores.Positive / sumExp).toFixed(4),
-      Negative: +(expScores.Negative / sumExp).toFixed(4),
-      Spam: +(expScores.Spam / sumExp).toFixed(4),
-    };
+    const r = window.Allonola.inference.predictReview(text);
+    if (r.topWords.length === 0) return neutral; // no words the model knows
 
-    // Determine predicted class
-    let predictedClass = "Positive";
-    let highestProb = -1;
-    classes.forEach((c) => {
-      if (probabilities[c] > highestProb) {
-        highestProb = probabilities[c];
-        predictedClass = c;
-      }
-    });
-
-    // Identify top words that favored the predicted class over alternative classes
-    const scoredWords = [];
-    tokens.forEach((token) => {
-      const classLog = wordContributions[token][predictedClass];
-      // Compare against average log score of other classes
-      let otherSum = 0;
-      let otherCount = 0;
-      classes.forEach((other) => {
-        if (other !== predictedClass) {
-          otherSum += wordContributions[token][other];
-          otherCount++;
-        }
-      });
-      const advantage = classLog - otherSum / otherCount;
-      scoredWords.push({ word: token, weight: +advantage.toFixed(3), class: predictedClass });
-    });
-
-    // Sort by descending impact and deduplicate
-    const uniqueTopWords = [];
-    const seen = new Set();
-    scoredWords
-      .sort((a, b) => b.weight - a.weight)
-      .forEach((item) => {
-        if (!seen.has(item.word)) {
-          seen.add(item.word);
-          uniqueTopWords.push(item);
-        }
-      });
-
+    const predicted = LABEL[r.label];
     return {
-      predictedClass,
-      probabilities,
-      logScores,
-      topWords: uniqueTopWords.slice(0, 5),
+      predictedClass: predicted,
+      probabilities: {
+        Positive: +r.proba.positive.toFixed(4),
+        Negative: +r.proba.negative.toFixed(4),
+        Spam: +r.proba.spam.toFixed(4),
+      },
+      topWords: r.topWords.map((w) => ({ word: w.word, weight: +w.weight.toFixed(3), class: predicted })),
       tokens,
     };
   }
 
-  window.Allonola.ml.naiveBayes = {
-    tokenize,
-    trainModel,
-    classify,
-  };
+  window.Allonola.ml.naiveBayes = { tokenize, classify };
 })();

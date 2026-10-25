@@ -1,7 +1,8 @@
 /**
  * js/ml/ann.js
- * Artificial Neural Network helper functions for training epoch histories,
- * early stopping analysis, and customer churn prediction queries.
+ * Shopper churn for the Neural Network page.
+ * Churn comes from the trained network (js/ml/inference.js). The loss curve is illustrative:
+ * the exported model does not include per-epoch validation loss.
  * Pure functions with no DOM access; suitable for automated testing.
  */
 "use strict";
@@ -11,17 +12,8 @@
   window.Allonola.ml = window.Allonola.ml || {};
 
   /**
-   * Retrieves epoch slices up to the specified epoch index.
-   *
-   * @param {number} maxEpoch - Between 1 and 30
-   * @returns {{
-   *   labels: number[],
-   *   trainLoss: number[],
-   *   valLoss: number[],
-   *   currentTrain: number,
-   *   currentVal: number,
-   *   earlyStoppingEpoch: number
-   * }}
+   * Illustrative training-loss slice up to the given epoch (1 to 30).
+   * Not produced by the trained model; see the page note.
    */
   function getLossSlice(maxEpoch = 30) {
     const history = window.Allonola.data.ann.lossHistory || [];
@@ -39,22 +31,14 @@
   }
 
   /**
-   * Looks up stored churn prediction metrics and personalized homepage recommendations for a shopper.
-   *
-   * @param {string} shopperId - "S-01" to "S-06"
-   * @returns {{
-   *   shopper: string,
-   *   churnProb: number,
-   *   riskLevel: string,
-   *   homepageItems: Array<{ rank: number, title: string, score: number, reason: string }>,
-   *   isIllustrative: boolean
-   * }}
+   * Churn probability and homepage items for a demo shopper ("S-01" to "S-06").
+   * churnProb is the trained network's output for that shopper's features.
    */
   function predictShopperChurn(shopperId) {
-    const shoppers = window.Allonola.data.ann.storedShoppers || {};
-    const record = shoppers[shopperId];
-
-    if (!record) {
+    const inf = window.Allonola.inference;
+    const row = inf.demoShopperRow(shopperId);
+    const stored = (window.Allonola.data.ann.storedShoppers || {})[shopperId];
+    if (!row || !stored) {
       return {
         shopper: shopperId,
         churnProb: 0.5,
@@ -64,9 +48,16 @@
       };
     }
 
+    const churnProb = inf.predictChurn(row).proba["1"];
+    const riskLevel =
+      churnProb < 0.33 ? "Low churn risk" : churnProb < 0.66 ? "Moderate churn risk" : "High churn risk";
     return {
-      ...record,
-      isIllustrative: true,
+      shopper: shopperId,
+      churnProb,
+      riskLevel,
+      homepageItems: stored.homepageItems || [],
+      features: row,
+      isIllustrative: false,
     };
   }
 

@@ -27,31 +27,36 @@ def _calibrate(z: np.ndarray, rate: float) -> np.ndarray:
     return _sigmoid(z + (lo + hi) / 2)
 
 
-# 1. Linear regression: demand forecasting ----------------------------------
+# 1. Linear regression: demand forecasting for the three products on the site.
+# base_price / base_units match js/data.js (linearRegression.baselines).
+DEMAND_PRODUCTS = [
+    # name,                  category,            base_price, base_units
+    ("Ceramic mug",          "Home and Kitchen",  219,        91),
+    ("Running shoes (P-220)", "Fashion",          1790,       110),
+    ("Phone stand",          "Home and Office",   399,        71),
+]
+
+
 def make_demand(n: int = 2400, seed: int = 42) -> pd.DataFrame:
     rng = np.random.default_rng(seed)
-    n_products = 24
+    n_products = len(DEMAND_PRODUCTS)
     n_days = max(n // n_products, 1)
-    cat = rng.choice(CATEGORIES, n_products)
-    base_price = np.round(rng.uniform(150, 2500, n_products))
-    base_units = rng.uniform(40, 160, n_products)
-
     rows = []
     start = pd.Timestamp("2025-01-01")
     for d in range(n_days):
         date = start + pd.Timedelta(days=d)
         weekend = int(date.dayofweek >= 5)
-        for p in range(n_products):
-            price = base_price[p] * rng.uniform(0.75, 1.25)
+        for name, cat, base_price, base_units in DEMAND_PRODUCTS:
+            price = base_price * rng.uniform(0.75, 1.25)
             promo = int(rng.random() < 0.25)
             units = (
-                base_units[p]
-                * (price / base_price[p]) ** -1.3
+                base_units
+                * (price / base_price) ** -1.3
                 * (1 + 0.22 * promo)
                 * (1.10 if weekend else 1.0)
                 * rng.lognormal(0, 0.12)
             )
-            rows.append((date, f"P-{p:03d}", cat[p], price, base_price[p], promo, date.dayofweek, weekend, int(round(units))))
+            rows.append((date, name, cat, round(price, 2), base_price, promo, date.dayofweek, weekend, int(round(units))))
     return pd.DataFrame(
         rows,
         columns=["date", "product", "category", "price", "base_price", "promo", "day_of_week", "is_weekend", "units_sold"],
@@ -104,13 +109,18 @@ def make_shoppers(n: int = 2000, seed: int = 42) -> pd.DataFrame:
     )
 
 
-# 4. SVM: order fraud ---------------------------------------------------------
+# 4. SVM: order fraud. Payment and location use the site's labels.
+PAYMENTS = ["COD", "Card", "E-wallet"]
+LOCATIONS = ["Metro", "Province"]
+
+
 def make_orders(n: int = 4000, seed: int = 42) -> pd.DataFrame:
     rng = np.random.default_rng(seed)
     amount = rng.lognormal(7.0, 0.8, n).round(2)
     age = (rng.exponential(300, n) + 1).round()
     items = rng.poisson(1.8, n) + 1
-    cod = rng.binomial(1, 0.35, n)
+    payment = rng.choice(PAYMENTS, n, p=[0.35, 0.45, 0.20])
+    location = rng.choice(LOCATIONS, n, p=[0.6, 0.4])
     mismatch = rng.binomial(1, 0.12, n)
     last24 = rng.poisson(0.6, n)
     new_dev = rng.binomial(1, 0.20, n)
@@ -118,7 +128,8 @@ def make_orders(n: int = 4000, seed: int = 42) -> pd.DataFrame:
         0.55 * np.log1p(amount / 1000)
         - 0.012 * np.minimum(age, 365) / 10
         + 0.25 * items
-        + 0.9 * cod
+        + 0.9 * (payment == "COD")
+        + 0.4 * (location == "Province")
         + 1.6 * mismatch
         + 0.7 * last24
         + 1.1 * new_dev
@@ -129,7 +140,8 @@ def make_orders(n: int = 4000, seed: int = 42) -> pd.DataFrame:
             "order_amount": amount,
             "account_age_days": age,
             "items_per_order": items,
-            "is_cod": cod,
+            "payment": payment,
+            "location": location,
             "address_mismatch": mismatch,
             "orders_last_24h": last24,
             "new_device": new_dev,
@@ -138,19 +150,24 @@ def make_orders(n: int = 4000, seed: int = 42) -> pd.DataFrame:
     )
 
 
-# 5. Decision tree: late delivery --------------------------------------------
+# 5. Decision tree: late delivery. Categories and couriers use the site's labels.
+DELIVERY_CATEGORIES = ["Standard", "Fragile", "Perishable"]
+DELIVERY_COURIERS = ["Courier A", "Courier B", "Courier C"]
+
+
 def make_deliveries(n: int = 3000, seed: int = 42) -> pd.DataFrame:
     rng = np.random.default_rng(seed)
-    cat = rng.choice(["Perishable", "Electronics", "Fashion", "Home"], n, p=[0.2, 0.3, 0.3, 0.2])
+    cat = rng.choice(DELIVERY_CATEGORIES, n, p=[0.5, 0.2, 0.3])
     rating = rng.uniform(2.5, 5.0, n).round(1)
-    courier = rng.choice(["A", "B", "C"], n)
+    courier = rng.choice(DELIVERY_COURIERS, n)
     dist = rng.lognormal(2.6, 0.7, n).round(1)
     returns = rng.poisson(0.5, n)
     z = (
         1.2 * (cat == "Perishable")
+        + 0.9 * (cat == "Fragile")
         + 0.04 * dist
         - 0.7 * (rating - 4)
-        + 0.9 * (courier == "C")
+        + 0.9 * (courier == "Courier C")
         + 0.3 * returns
     )
     late = rng.binomial(1, _calibrate(z, 0.30))
@@ -166,33 +183,39 @@ def make_deliveries(n: int = 3000, seed: int = 42) -> pd.DataFrame:
     )
 
 
-# 6. ANN: shopper churn -------------------------------------------------------
+# 6. ANN: shopper churn. Features follow the website's "Data used" table
+#    (clickstream, search, past purchases, recency). Age band is shown on the page
+#    but is not a model input.
+AGE_BANDS = ["18–24", "25–34", "35–44", "45–54"]
+
+
 def make_churn(n: int = 3000, seed: int = 42) -> pd.DataFrame:
     rng = np.random.default_rng(seed)
-    recency = rng.exponential(25, n).round()
-    sessions = rng.poisson(8, n)
-    orders = rng.poisson(3, n)
-    basket = rng.lognormal(6.5, 0.5, n).round(2)
-    tickets = rng.poisson(0.5, n)
-    discount = rng.uniform(0, 1, n).round(2)
-    z = (
-        0.05 * recency
-        - 0.15 * sessions
-        - 0.30 * orders
-        + 0.40 * tickets
-        - 0.80 * discount
-        + 0.0002 * (2000 - np.minimum(basket, 4000))
-        + 0.3 * np.sin(recency / 7) * (orders == 0)  # mild non-linearity
-    )
+    pages = rng.poisson(10, n)                  # pages viewed in the last session
+    searches = rng.poisson(3, n)                # searches in the last 30 days
+    purchases = rng.poisson(2.5, n)             # past purchases
+    days = rng.exponential(25, n).round()       # days since last visit
+    z = 0.05 * days - 0.12 * pages - 0.20 * searches - 0.35 * purchases
     churn = rng.binomial(1, _calibrate(z, 0.25))
     return pd.DataFrame(
         {
-            "recency_days": recency,
-            "sessions_30d": sessions,
-            "orders_90d": orders,
-            "avg_basket": basket,
-            "support_tickets": tickets,
-            "discount_usage": discount,
+            "pages_viewed_session": pages,
+            "searches_30d": searches,
+            "past_purchases": purchases,
+            "days_since_last_visit": days,
+            "age_band": rng.choice(AGE_BANDS, n),
             "churned": churn,
         }
     )
+
+
+# The six sample profiles on the ANN page (same values as the table there).
+# Scored by the trained network; they are hand-written examples, not test-set rows.
+DEMO_PROFILES = {
+    "S-01": {"pages_viewed_session": 14, "searches_30d": 6, "past_purchases": 5, "days_since_last_visit": 2,  "churned": 0},
+    "S-02": {"pages_viewed_session": 3,  "searches_30d": 1, "past_purchases": 0, "days_since_last_visit": 75, "churned": 1},
+    "S-03": {"pages_viewed_session": 22, "searches_30d": 9, "past_purchases": 3, "days_since_last_visit": 6,  "churned": 0},
+    "S-04": {"pages_viewed_session": 5,  "searches_30d": 2, "past_purchases": 1, "days_since_last_visit": 48, "churned": 1},
+    "S-05": {"pages_viewed_session": 9,  "searches_30d": 4, "past_purchases": 2, "days_since_last_visit": 12, "churned": 0},
+    "S-06": {"pages_viewed_session": 1,  "searches_30d": 0, "past_purchases": 0, "days_since_last_visit": 90, "churned": 1},
+}

@@ -110,10 +110,23 @@ def build_knn(n_neighbors: int = 5, weights: str = "uniform"):
 
 
 # ---- 4. svm ---------------------------------------------------------------------
+SVM_CATEGORICAL = ["payment", "location"]
+SVM_NUMERIC = [
+    "order_amount", "account_age_days", "items_per_order",
+    "address_mismatch", "orders_last_24h", "new_device",
+]
+
+
 def build_svm(C: float = 1.0, gamma="scale"):
+    prep = ColumnTransformer(
+        [
+            ("cat", _onehot(), SVM_CATEGORICAL),
+            ("num", StandardScaler(), SVM_NUMERIC),
+        ]
+    )
     return Pipeline(
         [
-            ("scale", StandardScaler()),
+            ("prep", prep),
             ("clf", SVC(kernel="rbf", C=C, gamma=gamma, class_weight="balanced", probability=True, random_state=SEED)),
         ]
     )
@@ -214,10 +227,7 @@ SPECS: dict[str, ModelSpec] = {
             title="Order fraud detection (SVM)",
             task="classification",
             make_data=ds.make_orders,
-            features=[
-                "order_amount", "account_age_days", "items_per_order", "is_cod",
-                "address_mismatch", "orders_last_24h", "new_device",
-            ],
+            features=SVM_CATEGORICAL + SVM_NUMERIC,
             target="is_fraud",
             scoring="f1",   # fraud is rare (accuracy misleads); F1 judges the served predict() output, not just the ranking
             grid={"C": [0.01, 0.03, 0.1, 0.5, 1.0, 5.0, 10.0], "gamma": ["scale", 0.005, 0.02, 0.1]},
@@ -242,8 +252,7 @@ SPECS: dict[str, ModelSpec] = {
             task="classification",
             make_data=ds.make_churn,
             features=[
-                "recency_days", "sessions_30d", "orders_90d", "avg_basket",
-                "support_tickets", "discount_usage",
+                "pages_viewed_session", "searches_30d", "past_purchases", "days_since_last_visit",
             ],
             target="churned",
             scoring="roc_auc",

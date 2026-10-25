@@ -211,7 +211,7 @@ Weight Gradient Update: W^[l] := W^[l] - α (∂L / ∂W^[l])
         <h2>Data used and why</h2>
         <div class="table-responsive-wrapper" tabindex="0" role="region" aria-label="ANN features and reasons">
           <table class="data-table">
-            <caption>Features ingested by the customer retention and homepage ranking networks. Illustrative / synthetically generated.</caption>
+            <caption>Features used by the trained churn network are the clickstream (pages viewed, searches), past purchases and recency rows. Demographics and image features are not inputs to this model. Synthetic data.</caption>
             <thead>
               <tr>
                 <th scope="col">Feature Domain</th>
@@ -248,7 +248,7 @@ Weight Gradient Update: W^[l] := W^[l] - α (∂L / ∂W^[l])
             </tbody>
           </table>
         </div>
-        <p class="text-small text-muted">Outputs: ranked product recommendations; probability of next-day purchase or 60-day customer churn.</p>
+        <p class="text-small text-muted">Output used on this page: churn probability from the trained network. Homepage recommendations are illustrative.</p>
       </section>
 
       <!-- 6. Sample dataset -->
@@ -256,7 +256,7 @@ Weight Gradient Update: W^[l] := W^[l] - α (∂L / ∂W^[l])
         <h2>Sample dataset</h2>
         <div class="table-responsive-wrapper" tabindex="0" role="region" aria-label="Sample shopper retention dataset">
           <table class="data-table">
-            <caption>Sample customer behavioral profiles evaluated for churn (no visit for 60 days). Illustrative / synthetically generated.</caption>
+            <caption>Six sample profiles (S-01 to S-06) scored by the trained network. Age band and "bought next" are shown for context and are not model inputs. Synthetic data.</caption>
             <thead>
               <tr>
                 <th scope="col">Shopper</th>
@@ -348,6 +348,7 @@ Weight Gradient Update: W^[l] := W^[l] - α (∂L / ∂W^[l])
         <!-- Panel 1: Loss Curve Scrubber -->
         <div style="margin-bottom: 2.5rem;">
           <h3 style="font-size: 1.15rem; margin-bottom: 0.5rem;">Panel 1: Training and validation loss by epoch</h3>
+          <p class="text-small text-muted" style="margin-bottom: 0.75rem;"><strong>Illustrative:</strong> this loss curve is a teaching example. The exported model does not include per-epoch loss history.</p>
           <p class="text-small text-muted" style="margin-bottom: 1.25rem;">
             Scrub through 30 epochs or press Play to watch loss convergence. Notice that validation loss reaches its minimum (0.34) at epoch 22 before rising, signaling early stopping.
           </p>
@@ -414,7 +415,7 @@ Weight Gradient Update: W^[l] := W^[l] - α (∂L / ∂W^[l])
         <div>
           <h3 style="font-size: 1.15rem; margin-bottom: 0.5rem;">Panel 2: Sample shopper prediction & personalized feed</h3>
           <p class="text-small text-muted" style="margin-bottom: 1.25rem;">
-            Select a sample profile (S-01 to S-06) to retrieve its illustrative precomputed churn risk and ranked personalized homepage items.
+            Select a sample profile (S-01 to S-06). The churn risk is computed by the trained network from its features; the homepage items are illustrative.
           </p>
 
           <div class="demo-layout">
@@ -437,7 +438,7 @@ Weight Gradient Update: W^[l] := W^[l] - α (∂L / ∂W^[l])
 
               <div class="card card--solid" style="padding: 1rem; margin-top: 1rem;">
                 <span class="text-small text-muted" style="display: block;">
-                  <strong>Note:</strong> Values are illustrative stored synthetic estimates to demonstrate model outputs.
+                  <strong>Note:</strong> Churn risk is computed by the trained network. Homepage items are illustrative.
                 </span>
               </div>
             </div>
@@ -461,22 +462,22 @@ Weight Gradient Update: W^[l] := W^[l] - α (∂L / ∂W^[l])
 
       <!-- 8. Illustrative results and interpretation -->
       <section class="section--compact">
-        <h2>Illustrative results and interpretation</h2>
+        <h2>Test-set results and interpretation</h2>
         <div class="grid-3" style="margin-bottom: 1.5rem;">
           <div class="metric-card">
-            <span class="metric-label">Retention Example</span>
-            <span class="metric-value tabular-nums" style="color: var(--coral);">78% Churn Risk</span>
-            <span class="metric-subtext">Shopper S-04 churn prob 0.78 (high risk), added to retention campaign</span>
+            <span class="metric-label">Churn base rate</span>
+            <span class="metric-value tabular-nums">25%</span>
+            <span class="metric-subtext">151 of 600 held-out shoppers churned</span>
           </div>
 
           <div class="metric-card">
             <span class="metric-label">Test Set Quality</span>
-            <span class="metric-value tabular-nums">AUC = 0.91</span>
-            <span class="metric-subtext">Evaluated on test set of 10,000 shoppers (Accuracy 88%)</span>
+            <span class="metric-value tabular-nums">AUC = 0.82</span>
+            <span class="metric-subtext">600 held-out shoppers: accuracy 82.5%, recall 46% at the default cut-off</span>
           </div>
 
           <div class="metric-card">
-            <span class="metric-label">Early Stopping Epoch</span>
+            <span class="metric-label">Early Stopping Epoch (illustrative)</span>
             <span class="metric-value tabular-nums">Epoch 22</span>
             <span class="metric-subtext">Training loss 0.69 → 0.31; val loss minimized at 0.34</span>
           </div>
@@ -486,14 +487,14 @@ Weight Gradient Update: W^[l] := W^[l] - α (∂L / ∂W^[l])
           <div class="card card--solid">
             <h3 style="font-size: 1.1rem; margin-bottom: 0.5rem;">Interpretation</h3>
             <p class="text-small text-muted" style="margin: 0;">
-              An AUC of 0.91 means a random churned shopper ranks above a random active shopper 91% of the time. The widening gap after epoch 22 signals memorization of training clickstreams, which early stopping prevents in production by halting optimization.
+              An AUC of 0.82 means a randomly chosen churned shopper receives a higher predicted risk score than a randomly chosen active shopper about 82% of the time. Accuracy is high partly because most shoppers do not churn; at the default cut-off the network finds 46% of churners, with 75% precision.
             </p>
           </div>
 
           <div class="card card--solid">
             <h3 style="font-size: 1.1rem; margin-bottom: 0.5rem;">Business Impact</h3>
             <p class="text-small text-muted" style="margin: 0;">
-              Retention offers are targeted precisely at the top 5% of churn-risk shoppers, measured against an untreated control group. S-01's personalized homepage led by running shoes and a phone stand produced an add-to-cart conversion the next day, supporting the corporate target of raising repeat buyers from 28% to 35%.
+              On the synthetic test set, the network ranks churners well enough to prioritise retention offers. Any real campaign would need an A/B test against a control group before the offers are judged a success.
             </p>
           </div>
         </div>
@@ -597,6 +598,8 @@ Weight Gradient Update: W^[l] := W^[l] - α (∂L / ∂W^[l])
   <script defer src="js/app.js"></script>
   <script defer src="js/charts.js"></script>
   <script defer src="js/table.js"></script>
+  <script defer src="js/ml/model-params.js"></script>
+  <script defer src="js/ml/inference.js"></script>
   <script defer src="js/ml/ann.js"></script>
   <script defer>
     document.addEventListener("DOMContentLoaded", function () {

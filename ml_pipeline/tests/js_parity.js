@@ -4,10 +4,11 @@
  *
  *   node ml_pipeline/tests/js_parity.js
  *
- * Loads the SAME two classic scripts the browser loads (js/ml/model-params.js and
- * js/ml/inference.js) into a sandbox, runs every row in parity_fixture.json through
- * the JavaScript engine, and compares with what scikit-learn predicted for those rows.
- * Exit code 0 = every label matches and every probability is within 1e-6.
+ * Loads the SAME classic scripts the browser loads (js/ml/model-params.js and js/ml/inference.js)
+ * into a sandbox, runs every held-out row in parity_fixture.json through the JavaScript engine,
+ * and compares with what scikit-learn predicted for those rows. It also checks the demo data
+ * the pages display (the 60 SVM orders and the 6 churn shoppers).
+ * Exit code 0 = every check passed.
  */
 "use strict";
 
@@ -31,11 +32,10 @@ for (const file of ["model-params.js", "inference.js"]) {
 const inf = sandbox.Allonola.inference;
 const fixture = JSON.parse(fs.readFileSync(fixturePath, "utf8"));
 
-// model name -> function(row) returning {label, proba} or {value}
+// Each engine maps a fixture row to the JS prediction.
 const engines = {
   linear_regression: (row) => ({ value: inf.predictUnits(row) }),
   naive_bayes: (row) => inf.predictReview(row.text),
-  knn: (row) => inf.predictKnn(row),
   svm: (row) => inf.predictFraud(row),
   decision_tree: (row) => inf.predictLate(row),
   ann: (row) => inf.predictChurn(row),
@@ -48,30 +48,21 @@ for (const [name, engine] of Object.entries(engines)) {
   const { rows, python } = fixture[name];
   let labelMismatch = 0;
   let maxProbDiff = 0;
-  let maxValueDiff = 0;
   let maxDecisionDiff = 0;
-  let relValueDiff = 0;
+  let maxRelValueDiff = 0;
 
   rows.forEach((row, i) => {
     const js = engine(row);
     if ("value" in python) {
       const diff = Math.abs(js.value - python.value[i]);
-      maxValueDiff = Math.max(maxValueDiff, diff);
-      relValueDiff = Math.max(relValueDiff, diff / Math.max(1, Math.abs(python.value[i])));
+      maxRelValueDiff = Math.max(maxRelValueDiff, diff / Math.max(1, Math.abs(python.value[i])));
       return;
     }
     if (String(js.label) !== String(python.label[i])) labelMismatch++;
     if (python.decision) maxDecisionDiff = Math.max(maxDecisionDiff, Math.abs(js.decision - python.decision[i]));
-    if (python.proba) {
-      // python.proba[i] is ordered like the model's classes_
-      const pyProba = python.proba[i];
-      const classes = Object.keys(js.proba);
-      classes.forEach((c, k) => {
-        // sklearn class order is the order the exporter wrote, which matches js.proba keys
-        const diff = Math.abs(js.proba[c] - pyProba[k]);
-        maxProbDiff = Math.max(maxProbDiff, diff);
-      });
-    }
+    Object.keys(js.proba).forEach((c, k) => {
+      maxProbDiff = Math.max(maxProbDiff, Math.abs(js.proba[c] - python.proba[i][k]));
+    });
   });
 
   const probTol = PROBA_TOL[name] ?? TOL;
@@ -79,23 +70,39 @@ for (const [name, engine] of Object.entries(engines)) {
     labelMismatch === 0 &&
     maxDecisionDiff <= TOL &&
     maxProbDiff <= probTol &&
-    (!("value" in python) || relValueDiff <= TOL);
+    maxRelValueDiff <= TOL;
   if (!ok) failures++;
   report.push({
-    model: name,
+    check: name,
     rows: rows.length,
     labelMismatches: labelMismatch,
-    maxDecisionDiff: maxDecisionDiff,
-    maxProbDiff: maxProbDiff,
-    maxAbsValueDiff: maxValueDiff,
-    maxRelValueDiff: relValueDiff,
+    maxDecisionDiff,
+    maxProbDiff,
+    maxRelValueDiff,
     result: ok ? "PASS" : "FAIL",
   });
 }
 
+// Demo data shown on the SVM and ANN pages must score exactly as Python scored it.
+const demo = fixture._demo;
+{
+  const orders = inf.svmDemoOrders();
+  const diff = Math.max(...orders.map((o, i) => Math.abs(o.fraudProbability - demo.svmOrders[i].pythonScore)));
+  const ok = orders.length === 60 && diff <= PROBA_TOL.svm;
+  if (!ok) failures++;
+  report.push({ check: "svm demo orders (60)", rows: orders.length, maxProbDiff: diff, result: ok ? "PASS" : "FAIL" });
+}
+{
+  const ids = Object.keys(demo.shoppers);
+  const diff = Math.max(...ids.map((id) => Math.abs(inf.predictChurn(inf.demoShopperRow(id)).proba["1"] - demo.shoppers[id].pythonChurnProb)));
+  const ok = ids.length === 6 && diff <= TOL;
+  if (!ok) failures++;
+  report.push({ check: "ann demo shoppers (6)", rows: ids.length, maxProbDiff: diff, result: ok ? "PASS" : "FAIL" });
+}
+
 console.table(report);
 if (failures) {
-  console.error(`${failures} model(s) disagree with Python.`);
+  console.error(`${failures} check(s) failed.`);
   process.exit(1);
 }
-console.log("All six JavaScript models reproduce the Python predictions.");
+console.log("All JavaScript checks reproduce the Python predictions.");

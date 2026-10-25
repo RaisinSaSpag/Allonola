@@ -67,6 +67,8 @@
 
   <!-- Load data and pure ML logic -->
   <script src="../js/data.js"></script>
+  <script src="../js/ml/model-params.js"></script>
+  <script src="../js/ml/inference.js"></script>
   <script src="../js/ml/linear-regression.js"></script>
   <script src="../js/ml/naive-bayes.js"></script>
   <script src="../js/ml/knn.js"></script>
@@ -129,59 +131,66 @@
         assert("KNN: Top Item for U1 (k = 3)", false, "Successful execution", "Exception: " + e.message);
       }
 
-      // 3. Decision Tree Check
+      // 3. Decision Tree Check (trained tree, sample order from the Decision Tree page)
       try {
-        const orderR04 = {
+        const orderSample = {
           productType: "Perishable",
           sellerRating: 3.4,
           courier: "Courier C",
           distanceKm: 31,
           returnHistory: 1
         };
-        const dtResult = window.Allonola.ml.decisionTree.predictDeliveryRisk(orderR04);
+        const dtResult = window.Allonola.ml.decisionTree.predictDeliveryRisk(orderSample);
         const isLikelyLate = dtResult.prediction === "LIKELY LATE";
-        const is82Percent = dtResult.confidence === "82%";
+        const is86Percent = dtResult.confidence === "86%";
+        const fourRules = dtResult.pathSteps.length === 4;
 
         assert(
-          "Decision Tree: Order R-04 Delivery Risk",
-          isLikelyLate && is82Percent,
-          "LIKELY LATE with 82% confidence",
-          dtResult.prediction + " with " + dtResult.confidence + " confidence",
+          "Decision Tree: Sample Order Delivery Risk",
+          isLikelyLate && is86Percent && fourRules,
+          "LIKELY LATE with 86% confidence, after 4 rules",
+          dtResult.prediction + " with " + dtResult.confidence + " confidence, after " + dtResult.pathSteps.length + " rules",
           dtResult.explanation
         );
       } catch (e) {
-        assert("Decision Tree: Order R-04 Delivery Risk", false, "Successful execution", "Exception: " + e.message);
+        assert("Decision Tree: Sample Order Delivery Risk", false, "Successful execution", "Exception: " + e.message);
       }
 
-      // 4. Linear Regression Check
+      // 4. Linear Regression Check (trained model)
       try {
-        const p1 = window.Allonola.ml.linearRegression.predictUnits("Running shoes (P-220)", 1790, false);
-        const p2 = window.Allonola.ml.linearRegression.predictUnits("Ceramic mug", 219, true);
-        const p3 = window.Allonola.ml.linearRegression.predictUnits("Phone stand", 399, true);
-        const p4High = window.Allonola.ml.linearRegression.predictUnits("Running shoes (P-220)", 50000, false); // Edge case
+        const LR = window.Allonola.ml.linearRegression;
+        const p1 = LR.predictUnits("Running shoes (P-220)", 1790, false);   // base price, no promotion
+        const p2 = LR.predictUnits("Ceramic mug", 219, true);
+        const p3 = LR.predictUnits("Phone stand", 399, true);
+        const p4High = LR.predictUnits("Running shoes (P-220)", 50000, false); // Edge case
+        const pHigherPrice = LR.predictUnits("Running shoes (P-220)", 1969, false); // +10% price
+        const promoOn = LR.predictUnits("Phone stand", 399, true);
+        const promoOff = LR.predictUnits("Phone stand", 399, false);
 
-        const isWholeNumber = Number.isInteger(p1) && Number.isInteger(p2) && Number.isInteger(p3) && Number.isInteger(p4High);
+        const isWholeNumber = [p1, p2, p3, p4High].every(Number.isInteger);
         const isNonNegative = p1 >= 0 && p2 >= 0 && p3 >= 0 && p4High >= 0;
-        const baselineP1Correct = p1 === 110;
+        const nearBaseline = Math.abs(p1 - 110) <= 5;       // base units for P-220 are 110
+        const demandFallsWithPrice = pHigherPrice < p1;     // negative price elasticity
+        const promoLifts = promoOn > promoOff;
 
         assert(
-          "Linear Regression: Whole Number Non-Negative Output",
-          isWholeNumber && isNonNegative && baselineP1Correct,
-          "Whole integer >= 0 (Baseline W44 Running shoes = 110)",
-          "P-220: " + p1 + ", Mug: " + p2 + ", Stand: " + p3 + ", Extreme Price: " + p4High
+          "Linear Regression: Whole, Non-Negative, Direction-Correct Forecasts",
+          isWholeNumber && isNonNegative && nearBaseline && demandFallsWithPrice && promoLifts,
+          "Whole integers >= 0; P-220 near 110 units at base price; demand falls as price rises; promotion lifts demand",
+          "P-220: " + p1 + ", P-220 at +10%: " + pHigherPrice + ", Mug: " + p2 + ", Stand promo on/off: " + promoOn + "/" + promoOff + ", Extreme: " + p4High
         );
       } catch (e) {
-        assert("Linear Regression: Whole Number Non-Negative Output", false, "Successful execution", "Exception: " + e.message);
+        assert("Linear Regression: Whole, Non-Negative, Direction-Correct Forecasts", false, "Successful execution", "Exception: " + e.message);
       }
 
-      // 5. SVM Threshold Evaluation Check
+      // 5. SVM Threshold Evaluation Check (trained SVM scores on the 60 demo orders)
       try {
-        const svmResult = window.Allonola.ml.svm.evaluateFraudThreshold(0.50);
-        const isConsistent = svmResult.total === 60 && svmResult.truePositives > 0 && svmResult.precision > 0;
+        const svmResult = window.Allonola.ml.svm.evaluateFraudThreshold(0.20);
+        const isConsistent = svmResult.total === 60 && svmResult.truePositives > 0 && svmResult.flagged > 0 && svmResult.precision > 0;
         assert(
-          "SVM: Fraud Threshold Evaluation (60 Orders)",
+          "SVM: Fraud Threshold Evaluation (60 Orders, threshold 0.20)",
           isConsistent,
-          "60 orders evaluated; TP > 0, valid precision and recall",
+          "60 orders evaluated; at least one fraud caught at threshold 0.20",
           "Total: " + svmResult.total + ", Flagged: " + svmResult.flagged + ", TP: " + svmResult.truePositives + ", Prec: " + svmResult.precision + ", Rec: " + svmResult.recall
         );
       } catch (e) {
@@ -201,6 +210,26 @@
         );
       } catch (e) {
         assert("ANN: Loss Curves Consistency", false, "Successful execution", "Exception: " + e.message);
+      }
+
+      // 7. ANN Shopper Churn Check (trained network on the six sample profiles)
+      try {
+        const ANN = window.Allonola.ml.ann;
+        const churn = {};
+        ["S-01", "S-02", "S-03", "S-04", "S-05", "S-06"].forEach((id) => {
+          churn[id] = ANN.predictShopperChurn(id).churnProb;
+        });
+        // The sample table marks S-02, S-04 and S-06 as churned and the others as active.
+        const ranksMatchTable = ["S-02", "S-04", "S-06"].every((id) => churn[id] >= 0.5) &&
+          ["S-01", "S-03", "S-05"].every((id) => churn[id] < 0.5);
+        assert(
+          "ANN: Shopper Churn Matches Sample Table (S-01 to S-06)",
+          ranksMatchTable,
+          "Churned shoppers S-02, S-04, S-06 at or above 0.50; active shoppers below 0.50",
+          Object.keys(churn).map((id) => id + " " + churn[id].toFixed(2)).join(", ")
+        );
+      } catch (e) {
+        assert("ANN: Shopper Churn Matches Sample Table", false, "Successful execution", "Exception: " + e.message);
       }
 
       console.groupEnd();

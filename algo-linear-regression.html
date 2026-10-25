@@ -114,9 +114,9 @@
             <div class="card demo-container">
               <div class="demo-header">
                 <h2>Interactive demo</h2>
-                <span class="demo-badge">Illustrative</span>
+                <span class="demo-badge">Trained model</span>
               </div>
-              <p class="text-small text-muted">A simplified illustration of the price and promotion effects in the model. It is not a trained model, and all forecast values are illustrative.</p>
+              <p class="text-small text-muted">Forecasts come from the trained linear regression. Choose a product, change its price and toggle the promotion. Forecasts are for a weekday; the data is synthetic.</p>
               <div class="demo-layout">
                 <div class="demo-controls">
                   <div class="form-group">
@@ -144,7 +144,7 @@
                   <div id="lr-output" class="demo-output" aria-live="polite"></div>
                   <figure class="chart-card">
                     <div class="chart-wrapper" style="height:320px"><canvas id="lr-chart" role="img" aria-label="Line chart of predicted units sold across the price range"></canvas></div>
-                    <figcaption class="chart-figcaption">Illustrative. Predicted units sold against price, with the current promotion setting.</figcaption>
+                    <figcaption class="chart-figcaption">Predicted units sold from the trained model, against price, with the current promotion setting.</figcaption>
                   </figure>
                 </div>
               </div>
@@ -211,6 +211,8 @@
   <script defer src="js/app.js"></script>
   <script defer src="js/charts.js"></script>
   <script defer src="js/table.js"></script>
+  <script defer src="js/ml/model-params.js"></script>
+  <script defer src="js/ml/inference.js"></script>
   <script defer src="js/ml/linear-regression.js"></script>
   <script defer src="js/demo/linear-regression-demo.js"></script>
 </body>

@@ -1,12 +1,11 @@
 /**
  * js/ml/inference.js
- * Runs the six TRAINED models (exported by ml_pipeline/allonola_ml/export_js.py)
- * in plain JavaScript. Each function re-implements the prediction step of the
- * matching scikit-learn estimator; ml_pipeline/tests/js_parity.js checks that the
- * outputs match Python's to ~1e-6 on real held-out rows.
+ * Runs the trained models (exported by ml_pipeline/allonola_ml/export_js.py) in plain JavaScript.
+ * Each function re-implements the prediction step of the matching scikit-learn estimator.
+ * ml_pipeline/tests/js_parity.js checks that the outputs match Python's on held-out rows.
  *
- * Needs js/ml/model-params.js to be loaded first. Classic script, no imports,
- * so it also works from file://.
+ * Load order: js/ml/model-params.js, then this file. Classic script, works from file://.
+ * (KNN is not here: the website's KNN demo is the item-based recommender in knn.js.)
  */
 "use strict";
 
@@ -28,18 +27,15 @@
     return row[col];
   }
 
-  // Turns a row object into the numeric vector the model was trained on,
-  // using the column specs written by the exporter (same order as sklearn).
+  // Row object -> numeric vector, in the column order sklearn used.
+  // Spec entries: onehot {col, value}; raw {col, mean?, scale?} (standardised when mean/scale exist).
   function featureVector(spec, row) {
     return spec.map((f) => {
       const v = rawValue(row, f.col);
       if (f.kind === "onehot") return v === f.value ? 1 : 0;
-      return Number(v);
+      const x = Number(v);
+      return f.mean === undefined ? x : (x - f.mean) / f.scale;
     });
-  }
-
-  function standardise(x, mean, scale) {
-    return x.map((v, i) => (v - mean[i]) / scale[i]);
   }
 
   function sigmoid(z) {
@@ -54,15 +50,16 @@
 
   // ---- 1. Linear regression (demand forecasting) -------------------------------
   // sklearn: TransformedTargetRegressor(log1p / expm1) around Ridge.
+  // row: { product, category, price, base_price, promo (0/1), is_weekend (0/1) }
   function predictUnits(row) {
     const m = params("linear_regression");
     const x = featureVector(m.features, row);
     let z = m.intercept;
     for (let i = 0; i < x.length; i++) z += m.coef[i] * x[i];
-    return Math.expm1(z); // continuous forecast; the demo rounds and clamps
+    return Math.expm1(z); // continuous; the page rounds and clamps
   }
 
-  /** Price elasticity = coefficient on log(price / base_price), as stored by the trainer. */
+  /** Price elasticity = coefficient on log(price / base_price). */
   function priceElasticity() {
     const m = params("linear_regression");
     const idx = m.features.findIndex((f) => f.col === "log_price_ratio");
@@ -71,7 +68,7 @@
 
   // ---- 2. Naive Bayes (review sentiment / spam) --------------------------------
   // sklearn: TfidfVectorizer(ngram_range, min_df=2) -> MultinomialNB.
-  // Tokeniser: default TfidfVectorizer pattern \b\w\w+\b on lowercased text (ASCII letters/digits/_).
+  // Tokeniser matches the default pattern \b\w\w+\b on lowercased ASCII text.
   function nbTokens(text, ngramRange) {
     const words = text.toLowerCase().match(/[a-z0-9_]{2,}/g) || [];
     const out = [];
@@ -81,6 +78,9 @@
     return out;
   }
 
+  // Returns { label, proba: {class: p}, topWords: [{word, weight}] }.
+  // topWords: vocabulary terms in this review that favour the predicted class most,
+  // weight = tf-idf value x (log-prob for predicted class - mean log-prob for the others).
   function predictReview(text) {
     const m = params("naive_bayes");
     const vocabIndex = {};
@@ -91,7 +91,6 @@
       const j = vocabIndex[term];
       if (j !== undefined) x[j] += 1;
     });
-    // tf * idf, then L2 normalisation (TfidfVectorizer defaults)
     let norm = 0;
     for (let j = 0; j < x.length; j++) {
       x[j] *= m.idf[j];
@@ -100,7 +99,6 @@
     norm = Math.sqrt(norm);
     if (norm > 0) for (let j = 0; j < x.length; j++) x[j] /= norm;
 
-    // joint log likelihood per class, then softmax for probabilities
     const jll = m.classes.map((_, c) => {
       let s = m.class_log_prior[c];
       for (let j = 0; j < x.length; j++) s += x[j] * m.feature_log_prob[c][j];
@@ -111,44 +109,25 @@
     const total = exps.reduce((a, b) => a + b, 0);
     const proba = {};
     m.classes.forEach((c, i) => (proba[c] = exps[i] / total));
-    return { label: m.classes[argmax(jll)], proba };
-  }
 
-  // ---- 3. KNN (next-category recommender) --------------------------------------
-  // sklearn: StandardScaler -> KNeighborsClassifier (brute force Euclidean).
-  function predictKnn(row) {
-    const m = params("knn");
-    const x = standardise(featureVector(m.features, row), m.scaler_mean, m.scaler_scale);
-
-    const nearest = m.X.map((xi, i) => {
-      let s = 0;
-      for (let j = 0; j < x.length; j++) s += (xi[j] - x[j]) ** 2;
-      return { d: Math.sqrt(s), y: m.y[i] };
-    });
-    nearest.sort((a, b) => a.d - b.d);
-    const neigh = nearest.slice(0, m.n_neighbors);
-
-    // sklearn: uniform -> each neighbour weighs 1; distance -> 1/d, and exact matches take all the weight
-    let weights = neigh.map((n) => 1);
-    if (m.weights === "distance") {
-      const zero = neigh.map((n) => n.d === 0);
-      weights = zero.some(Boolean)
-        ? zero.map((z) => (z ? 1 : 0))
-        : neigh.map((n) => 1 / n.d);
+    const pred = argmax(jll);
+    const others = m.classes.map((_, c) => c).filter((c) => c !== pred);
+    const topWords = [];
+    for (let j = 0; j < x.length; j++) {
+      if (x[j] === 0) continue;
+      const meanOther = others.reduce((s, c) => s + m.feature_log_prob[c][j], 0) / others.length;
+      topWords.push({ word: m.vocabulary[j], weight: x[j] * (m.feature_log_prob[pred][j] - meanOther) });
     }
-    const votes = m.classes.map(() => 0);
-    neigh.forEach((n, i) => (votes[n.y] += weights[i]));
-    const totalW = votes.reduce((a, b) => a + b, 0);
-    const proba = {};
-    m.classes.forEach((c, i) => (proba[c] = totalW > 0 ? votes[i] / totalW : 0));
-    return { label: m.classes[argmax(votes)], proba };
+    topWords.sort((a, b) => b.weight - a.weight);
+
+    return { label: m.classes[pred], proba, topWords: topWords.slice(0, 5) };
   }
 
-  // ---- 4. SVM (order fraud) ----------------------------------------------------
-  // sklearn: StandardScaler -> SVC(kernel="rbf", probability=True); binary.
+  // ---- 3. SVM (order fraud) -----------------------------------------------------
+  // sklearn: ColumnTransformer(one-hot payment & location, scaled numeric) -> SVC(rbf, probability=True).
   function predictFraud(row) {
     const m = params("svm");
-    const x = standardise(featureVector(m.features, row), m.scaler_mean, m.scaler_scale);
+    const x = featureVector(m.features, row);
 
     let f = m.intercept;
     for (let i = 0; i < m.support_vectors.length; i++) {
@@ -157,32 +136,15 @@
       for (let j = 0; j < x.length; j++) s += (sv[j] - x[j]) ** 2;
       f += m.dual_coef[i] * Math.exp(-m.gamma * s);
     }
-    // predict() uses the sign of the decision function; predict_proba uses Platt scaling.
-    // Sign convention checked against sklearn: P(class 1) = 1 / (1 + exp(A*f - B)).
+    // label = sign of the decision value (what sklearn's predict() uses).
+    // probability = Platt sigmoid, sign convention checked against sklearn: 1 / (1 + exp(A*f - B)).
     const pPositive = 1 / (1 + Math.exp(m.platt_a * f - m.platt_b));
     const label = f > 0 ? m.classes[1] : m.classes[0];
     return { label, decision: f, proba: { [m.classes[0]]: 1 - pPositive, [m.classes[1]]: pPositive } };
   }
 
-  // ---- 5. Decision tree (late delivery) ----------------------------------------
+  // ---- 4. Decision tree (late delivery) ----------------------------------------
   // sklearn casts inputs to float32 before comparing with thresholds; Math.fround does the same.
-  function predictLate(row) {
-    const m = params("decision_tree");
-    const x = featureVector(m.features, row);
-    let node = 0;
-    while (m.children_left[node] !== -1) {
-      const v = Math.fround(x[m.feature[node]]);
-      node = v <= m.threshold[node] ? m.children_left[node] : m.children_right[node];
-    }
-    const counts = m.value[node];
-    const total = counts.reduce((a, b) => a + b, 0);
-    const proba = {};
-    m.classes.forEach((c, i) => (proba[c] = total > 0 ? counts[i] / total : 0));
-    const idx = argmax(counts);
-    return { label: m.classes[idx], proba, leaf: node, path: tracePath(m, x) };
-  }
-
-  /** Human-readable path (node ids) for the explanation panel. */
   function tracePath(m, x) {
     const steps = [];
     let node = 0;
@@ -190,17 +152,54 @@
       const f = m.feature[node];
       const v = Math.fround(x[f]);
       const goLeft = v <= m.threshold[node];
-      steps.push({ feature: f, spec: m.features[f], threshold: m.threshold[node], value: v, went: goLeft ? "left" : "right" });
+      steps.push({ node, spec: m.features[f], threshold: m.threshold[node], value: x[f], went: goLeft ? "left" : "right" });
       node = goLeft ? m.children_left[node] : m.children_right[node];
     }
-    return steps;
+    return { steps, leaf: node };
   }
 
-  // ---- 6. Neural network (shopper churn) ---------------------------------------
+  // row: { category, seller_rating, courier, distance_km, return_history }
+  function predictLate(row) {
+    const m = params("decision_tree");
+    const x = featureVector(m.features, row);
+    const { steps, leaf } = tracePath(m, x);
+    const counts = m.value[leaf];
+    const total = counts.reduce((a, b) => a + b, 0);
+    const proba = {};
+    m.classes.forEach((c, i) => (proba[c] = total > 0 ? counts[i] / total : 0));
+    const idx = argmax(counts);
+    return { label: m.classes[idx], proba, leaf, steps };
+  }
+
+  /** The whole fitted tree as nested rules, for display. */
+  function treeRules() {
+    const m = params("decision_tree");
+    const names = m.features.map((f) => (f.kind === "onehot" ? f.col + " = " + f.value : f.col));
+    const lines = [];
+    (function walk(node, depth) {
+      const pad = "  ".repeat(depth);
+      if (m.children_left[node] === -1) {
+        const counts = m.value[node];
+        const idx = argmax(counts);
+        const total = counts.reduce((a, b) => a + b, 0);
+        lines.push(pad + "→ " + m.classes[idx] + " (" + Math.round((counts[idx] / total) * 100) + "% of training orders)");
+        return;
+      }
+      const f = m.feature[node];
+      lines.push(pad + "if " + names[f] + " <= " + m.threshold[node].toFixed(2) + ":");
+      walk(m.children_left[node], depth + 1);
+      lines.push(pad + "else:");
+      walk(m.children_right[node], depth + 1);
+    })(0, 0);
+    return lines;
+  }
+
+  // ---- 5. Neural network (shopper churn) ---------------------------------------
   // sklearn: StandardScaler -> MLPClassifier(relu hidden layers, logistic output).
+  // row: { pages_viewed_session, searches_30d, past_purchases, days_since_last_visit }
   function predictChurn(row) {
     const m = params("ann");
-    let h = standardise(featureVector(m.features, row), m.scaler_mean, m.scaler_scale);
+    let h = featureVector(m.features, row);
     const layers = m.coefs.length;
     for (let l = 0; l < layers; l++) {
       const W = m.coefs[l];
@@ -218,13 +217,33 @@
     return { label, proba: { [m.classes[0]]: 1 - p1, [m.classes[1]]: p1 } };
   }
 
+  // ---- demo data (held-out test rows, see export_js.py) -------------------------
+  /** The 60 SVM demo orders, each with the model's fraud probability for it. */
+  function svmDemoOrders() {
+    const all = window.Allonola.modelParams;
+    if (!all || !all.demo) return [];
+    return all.demo.svmOrders.map((o) => {
+      const score = predictFraud(o.row).proba["1"];
+      return { ...o, fraudScore: +score.toFixed(2), fraudProbability: score };
+    });
+  }
+
+  /** Feature row for a demo shopper id ("S-01" .. "S-06"), or null. */
+  function demoShopperRow(id) {
+    const all = window.Allonola.modelParams;
+    const s = all && all.demo && all.demo.shoppers[id];
+    return s ? s.row : null;
+  }
+
   window.Allonola.inference = {
     predictUnits,
     priceElasticity,
     predictReview,
-    predictKnn,
     predictFraud,
     predictLate,
+    treeRules,
     predictChurn,
+    svmDemoOrders,
+    demoShopperRow,
   };
 })();

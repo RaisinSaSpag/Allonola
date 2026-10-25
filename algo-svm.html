@@ -164,10 +164,10 @@
       <header class="algo-header">
         <div class="algo-header__pills">
           <span class="pill pill--coral">Task: Classify with clear boundaries</span>
-          <span class="pill">Used in: Automatic product categories; fraud and trust dashboard</span>
+          <span class="pill">Used in: Order fraud screening; fraud and trust dashboard</span>
         </div>
         <h1>Support Vector Machine (SVM)</h1>
-        <p class="algo-header__question">"Is this order suspicious, and which category does this product belong to?"</p>
+        <p class="algo-header__question">"Is this order suspicious?"</p>
       </header>
 
       <!-- 2. What it is -->
@@ -248,7 +248,7 @@ Kernel Mapping (RBF): K(x, x') = exp(-γ ||x - x'||²)
             </tbody>
           </table>
         </div>
-        <p class="text-small text-muted">Outputs: binary fraud risk flag and target product category.</p>
+        <p class="text-small text-muted">Outputs: binary fraud risk flag and a fraud probability for each order.</p>
       </section>
 
       <!-- 6. Sample datasets -->
@@ -382,9 +382,9 @@ Kernel Mapping (RBF): K(x, x') = exp(-γ ||x - x'||²)
               <div class="form-group">
                 <div class="slider-label-row">
                   <label for="svm-threshold-slider" class="form-label">Decision threshold:</label>
-                  <span id="svm-threshold-val" class="tabular-nums" style="color: var(--teal); font-weight: 700;">0.50</span>
+                  <span id="svm-threshold-val" class="tabular-nums" style="color: var(--teal); font-weight: 700;">0.20</span>
                 </div>
-                <input type="range" id="svm-threshold-slider" class="slider-input" min="0.10" max="0.95" step="0.05" value="0.50">
+                <input type="range" id="svm-threshold-slider" class="slider-input" min="0.05" max="0.60" step="0.05" value="0.20">
                 <div class="slider-label-row text-muted text-small" style="margin-top: 0.25rem;">
                   <span>0.10 (Aggressive flagging)</span>
                   <span>0.95 (Strict / Conservative)</span>
@@ -439,9 +439,9 @@ Kernel Mapping (RBF): K(x, x') = exp(-γ ||x - x'||²)
 
         <!-- Panel 2: Product Category Predictor -->
         <div>
-          <h3 style="font-size: 1.15rem; margin-bottom: 0.5rem;">Panel 2: Product category predictor</h3>
+          <h3 style="font-size: 1.15rem; margin-bottom: 0.5rem;">Panel 2: Product category matcher (rule-based)</h3>
           <p class="text-small text-muted" style="margin-bottom: 1.25rem;">
-            Type a product title below. A keyword-based lookup built from the five sample products serves as a simple stand-in for the SVM text classifier.
+            Type a product title below. This is not one of the trained models: it is a keyword lookup built from the sample products.
           </p>
 
           <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; align-items: start;">
@@ -471,24 +471,24 @@ Kernel Mapping (RBF): K(x, x') = exp(-γ ||x - x'||²)
 
       <!-- 8. Illustrative results and interpretation -->
       <section class="section--compact">
-        <h2>Illustrative results and interpretation</h2>
+        <h2>Test-set results and interpretation</h2>
         <div class="grid-3" style="margin-bottom: 1.5rem;">
           <div class="metric-card">
-            <span class="metric-label">Flagged Order Flag</span>
-            <span class="metric-value tabular-nums">Score 0.91</span>
-            <span class="metric-subtext">Order O-1004 flagged (score 0.91); confirmed as fraud</span>
+            <span class="metric-label">Highest-scoring demo order</span>
+            <span class="metric-value tabular-nums">Score 0.41</span>
+            <span class="metric-subtext">Order O-1053 (confirmed fraud) is the top score among the 60 demo orders</span>
           </div>
 
           <div class="metric-card">
             <span class="metric-label">Fraud Test Set</span>
-            <span class="metric-value tabular-nums">ROC-AUC 0.94</span>
-            <span class="metric-subtext">5,000 orders (90 fraud = 1.8%): F1 = 0.72</span>
+            <span class="metric-value tabular-nums">ROC-AUC 0.78</span>
+            <span class="metric-subtext">800 held-out orders (66 fraud = 8.3%): F1 = 0.35</span>
           </div>
 
           <div class="metric-card">
-            <span class="metric-label">Catalog Accuracy</span>
-            <span class="metric-value tabular-nums">88%</span>
-            <span class="metric-subtext">88% category accuracy on 1,000 held-out listings</span>
+            <span class="metric-label">Flagged at default cut-off</span>
+            <span class="metric-value tabular-nums">133 of 800</span>
+            <span class="metric-subtext">35 of 66 frauds caught (precision 0.26, recall 0.53)</span>
           </div>
         </div>
 
@@ -496,14 +496,14 @@ Kernel Mapping (RBF): K(x, x') = exp(-γ ||x - x'||²)
           <div class="card card--solid">
             <h3 style="font-size: 1.1rem; margin-bottom: 0.5rem;">Interpretation</h3>
             <p class="text-small text-muted" style="margin: 0;">
-              Accuracy alone is misleading: a naive model that never flags any fraud would achieve 98.2% accuracy while letting all fraud through undetected. F1-score and ROC-AUC specifically evaluate performance on rare positive classes. The 32 false alarms represent a deliberate, balanced trade-off because human fraud analysts review each flagged order before action.
+              Accuracy alone is misleading: a model that never flags fraud would score about 92% accuracy on this test set while catching none. F1-score and ROC-AUC evaluate performance on the rare fraud class. The 98 false alarms at the default cut-off are a deliberate trade-off, because analysts can review flagged orders before dispatch.
             </p>
           </div>
 
           <div class="card card--solid">
             <h3 style="font-size: 1.1rem; margin-bottom: 0.5rem;">Business Impact</h3>
             <p class="text-small text-muted" style="margin: 0;">
-              Fraud analysts receive a focused queue of 100 high-risk orders rather than blindly auditing 5,000 transactions, catching approximately three in four fraudulent transactions. Operational thresholds are recalibrated monthly to align analyst bandwidth with transaction volume.
+              At the default cut-off, analysts review 133 flagged orders out of 800 and catch 35 of 66 frauds (53%). Lowering the threshold catches more fraud at the cost of more reviews; the cut-off is a business decision.
             </p>
           </div>
         </div>
@@ -607,6 +607,8 @@ Kernel Mapping (RBF): K(x, x') = exp(-γ ||x - x'||²)
   <script defer src="js/app.js"></script>
   <script defer src="js/charts.js"></script>
   <script defer src="js/table.js"></script>
+  <script defer src="js/ml/model-params.js"></script>
+  <script defer src="js/ml/inference.js"></script>
   <script defer src="js/ml/svm.js"></script>
   <script defer>
     document.addEventListener("DOMContentLoaded", function () {

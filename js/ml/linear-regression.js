@@ -1,7 +1,8 @@
 /**
  * js/ml/linear-regression.js
- * Pure mathematical functions for demand forecasting and price elasticity.
- * No DOM access; suitable for automated testing.
+ * Demand forecasting and price elasticity for the Linear Regression page.
+ * Runs the trained model via js/ml/inference.js (parameters from js/ml/model-params.js).
+ * Pure functions with no DOM access; suitable for automated testing.
  */
 "use strict";
 
@@ -9,62 +10,41 @@
   window.Allonola = window.Allonola || {};
   window.Allonola.ml = window.Allonola.ml || {};
 
-  /**
-   * Calculates predicted units sold based on price elasticity and promotion lift.
-   *
-   * Formula:
-   *   adjusted = base * (1 + (-0.4) * (newPrice - basePrice) / basePrice)
-   *   if (promotionOn && !baselinePromo) adjusted *= 1.15;
-   *   if (!promotionOn && baselinePromo) adjusted *= 0.87;
-   *   clamp to minimum 0, round to integer.
-   *
-   * @param {string} productName - "Ceramic mug", "Running shoes (P-220)", or "Phone stand"
-   * @param {number} newPrice - Evaluated price in ₱
-   * @param {boolean} promotionOn - Whether promotion is active
-   * @returns {number} Predicted units sold (whole number >= 0)
-   */
-  function predictUnits(productName, newPrice, promotionOn) {
-    const data = window.Allonola.data.linearRegression.baselines[productName];
-    if (!data) return 0;
-
-    const base = data.baseUnitsSold;
-    const basePrice = data.basePrice;
-    const baselinePromo = data.baselinePromotion;
-
-    let adjusted = base * (1 + (-0.4) * (newPrice - basePrice) / basePrice);
-
-    if (promotionOn && !baselinePromo) {
-      adjusted *= 1.15;
-    } else if (!promotionOn && baselinePromo) {
-      adjusted *= 0.87;
-    }
-
-    const clamped = Math.max(0, Math.round(adjusted));
-    return clamped;
+  // Build the feature row the trained model expects for one product at one price.
+  // The forecast is for a weekday (is_weekend = 0), as the page does not ask for the day.
+  function rowFor(productName, price, promotionOn) {
+    const b = window.Allonola.data.linearRegression.baselines[productName];
+    if (!b) return null;
+    return {
+      product: productName,
+      category: b.category,
+      price: price,
+      base_price: b.basePrice,
+      promo: promotionOn ? 1 : 0,
+      is_weekend: 0,
+    };
   }
 
   /**
-   * Computes the forecasted delta in units sold resulting from a 10% price cut.
-   *
-   * @param {string} productName
-   * @param {number} currentPrice
-   * @param {boolean} promotionOn
-   * @returns {number} Difference in units (positive or zero)
+   * Predicted units sold for a product at a given price (whole number, >= 0).
+   * @param {string} productName - "Ceramic mug", "Running shoes (P-220)", or "Phone stand"
+   * @param {number} newPrice - price in ₱
+   * @param {boolean} promotionOn - whether a promotion is running
    */
+  function predictUnits(productName, newPrice, promotionOn) {
+    const row = rowFor(productName, newPrice, promotionOn);
+    if (!row) return 0;
+    return Math.max(0, Math.round(window.Allonola.inference.predictUnits(row)));
+  }
+
+  /** Change in units from a 10% price cut (positive number). */
   function calculate10PercentCutImpact(productName, currentPrice, promotionOn) {
     const currentUnits = predictUnits(productName, currentPrice, promotionOn);
-    const discountedPrice = currentPrice * 0.9;
-    const newUnits = predictUnits(productName, discountedPrice, promotionOn);
+    const newUnits = predictUnits(productName, currentPrice * 0.9, promotionOn);
     return Math.abs(newUnits - currentUnits);
   }
 
-  /**
-   * Generates a series of price points and corresponding unit forecasts across +-30% range.
-   *
-   * @param {string} productName
-   * @param {boolean} promotionOn
-   * @returns {{ prices: number[], units: number[] }}
-   */
+  /** Forecast curve across ±30% of the baseline price. */
   function generatePriceCurve(productName, promotionOn) {
     const data = window.Allonola.data.linearRegression.baselines[productName];
     if (!data) return { prices: [], units: [] };
@@ -72,16 +52,13 @@
     const basePrice = data.basePrice;
     const minPrice = Math.round(basePrice * 0.7);
     const maxPrice = Math.round(basePrice * 1.3);
+    const step = basePrice > 1000 ? 50 : 10;
     const prices = [];
     const units = [];
-
-    // Step by 10 or 20 depending on price magnitude
-    const step = basePrice > 1000 ? 50 : 10;
     for (let p = minPrice; p <= maxPrice; p += step) {
       prices.push(p);
       units.push(predictUnits(productName, p, promotionOn));
     }
-
     return { prices, units };
   }
 
@@ -89,5 +66,6 @@
     predictUnits,
     calculate10PercentCutImpact,
     generatePriceCurve,
+    priceElasticity: () => window.Allonola.inference.priceElasticity(),
   };
 })();

@@ -7,10 +7,10 @@ Trains the six models behind the website, evaluates them properly, stores them i
 |---|---|---|---|---|
 | `linear_regression` | Demand forecasting | regression | chronological | RMSE |
 | `naive_bayes` | Review sentiment / spam | 3-class text | stratified | macro-F1 |
-| `knn` | Recommendations | 4-class | stratified | macro-F1 |
-| `svm` | Order fraud | binary, 8 % positives | stratified | F1 |
-| `decision_tree` | Late delivery | binary, 30 % positives | stratified | F1 (simplest within 0.01) |
-| `ann` | Shopper churn | binary, 25 % positives | stratified | ROC-AUC |
+| `knn` | (not on the website) | 4-class | stratified | macro-F1 |
+| `svm` | Order fraud | binary, 8 % positives; payment and location features | stratified | F1 |
+| `decision_tree` | Late delivery | binary, 30 % positives; site categories and couriers | stratified | F1 (simplest within 0.01) |
+| `ann` | Shopper churn | binary, 25 % positives; clickstream, search, purchases, recency | stratified | ROC-AUC |
 
 ## About "20-20-60"
 
@@ -48,14 +48,14 @@ meaningful `explanation.json` (price elasticity, top spam words) or `rules.txt` 
 
 ## Results on the bundled synthetic data (test set, seed 42)
 
-| Model | Test result | Note |
+| Model | Test result (held-out, seed 42) | Note |
 |---|---|---|
-| Linear regression | RMSE 14.9 units, R² 0.905 | elasticity is in `explanation.json` |
-| Naive Bayes | accuracy 0.887, macro-F1 0.887 | 6 % of labels deliberately wrong |
-| KNN | accuracy 0.405 (chance 0.25) | next purchase is inherently noisy |
-| SVM | precision 0.27, recall 0.63, F1 0.38, AUC 0.83 | fraud is rare; accuracy is not the right yardstick |
-| Decision tree | accuracy 0.72, F1 0.48 | depth 3, readable rules |
-| ANN | accuracy 0.82, AUC 0.81 (CV AUC 0.81) | |
+| Linear regression | RMSE 13.8 units, MAE 10.4, R² 0.83 (480 product-days) | 3 products; elasticity ≈ −1.30 in `explanation.json` |
+| Naive Bayes | accuracy 0.887, macro-F1 0.887 (600 reviews) | 6 % of labels deliberately wrong |
+| KNN | accuracy 0.405 (chance 0.25) | trained but not used on the website; the KNN demo is an item recommender |
+| SVM | precision 0.26, recall 0.53, F1 0.35, AUC 0.78 (800 orders) | fraud is rare (8.3 %); numbers at probability cut-off 0.5 |
+| Decision tree | accuracy 0.66, F1 0.54, AUC 0.70 (600 orders) | depth 4, readable rules |
+| ANN | accuracy 0.825, precision 0.75, recall 0.46, AUC 0.82 (600 shoppers) | churn rate 25 % |
 
 **These numbers describe the synthetic data generators, not real shoppers.** The data is
 produced by rules written in `datasets.py`, so a score only shows the pipeline works and how hard
@@ -145,8 +145,9 @@ python -m allonola_ml.export_js artifacts/<run_id>             # 2. write js/ml/
 node tests/js_parity.js                                        # 3. JS vs Python, row by row
 ```
 
-* `allonola_ml/export_js.py` writes the weights, scaler, support vectors, tree nodes,
-  TF-IDF vocabulary and neural-network layers. It also writes `tests/parity_fixture.json`:
+* `allonola_ml/export_js.py` writes the weights, scaler statistics, support vectors, tree nodes,
+  TF-IDF vocabulary and neural-network layers, plus the 60 SVM demo orders and 6 churn shoppers
+  the pages display. The KNN classifier is not exported. It also writes `tests/parity_fixture.json`:
   200 real held-out test rows plus Python's predictions for them.
 * `js/ml/inference.js` re-implements each model's prediction step. It is a classic
   script, so it works from `file://` like the rest of the site.
@@ -154,9 +155,9 @@ node tests/js_parity.js                                        # 3. JS vs Python
   Labels and decision values must match exactly. Probabilities must match within 1e-6,
   except the SVM, which is allowed 5e-3 (see below).
 
-Latest result (run 20261025T080816Z): all six models pass. Labels match on 1,200 of 1,200
-rows, decision values agree to 1e-13, and probabilities agree to 2.5e-3 for the SVM and
-2e-15 for the other models.
+Latest result (run 20261025T082946Z): all checks pass. The labels match on all 1,000 held-out
+rows (five models × 200), the 60 SVM demo orders and the 6 churn shoppers. Decision values agree to
+about 1e-13, and probabilities agree to 2.5e-3 for the SVM and about 2e-15 for the others.
 
 Known gap: `SVC(probability=True)` is deprecated in scikit-learn 1.9. Its `predict_proba` is a
 Platt sigmoid that differs very slightly from the stored (A, B) on this model. The SVM's

@@ -33,7 +33,7 @@
       message += " Words with the strongest influence: " +
         r.topWords.map(function (w) { return '"' + w.word + '"'; }).join(", ") + ".";
     }
-    message += " This is a toy model trained on 8 examples; real systems use thousands of reviews.";
+    message += " The model was trained on 3,000 synthetic reviews; real moderation needs real review data.";
     outputEl.textContent = message;
   }
 

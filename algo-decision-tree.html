@@ -354,89 +354,13 @@ Information Gain: Gain(D, Feature) = Entropy(D) - ∑ (|D_v| / |D|) × Entropy(D
           <span class="demo-badge">Live demo: explainable rule hierarchy</span>
         </div>
 
-        <!-- Flowchart Diagram -->
+        <!-- Trained decision tree: rules are generated from the model when the page loads -->
         <div class="card card--solid" style="padding: 1.5rem; margin-bottom: 2rem;">
-          <h3 style="font-size: 1.05rem; margin-bottom: 0.5rem;">Visual Decision Hierarchy</h3>
-          <p class="text-small text-muted" style="margin-bottom: 1.25rem;">
-            Confidence percentages displayed below are illustrative display values for this teaching diagram. Active evaluation path is highlighted with glowing borders.
+          <h3 style="font-size: 1.05rem; margin-bottom: 0.5rem;">Trained decision tree (depth 4)</h3>
+          <p class="text-small text-muted" style="margin-bottom: 1rem;">
+            These rules come from the trained model. An order is checked from the top down; the rules it passed are listed in the audit trail below.
           </p>
-
-          <div class="tree-diagram">
-            <!-- Root -->
-            <div id="tree-root" class="tree-node tree-node--active">
-              <span class="tree-step-pill pill">Root Check</span>
-              <span class="tree-node__condition">Seller rating below 3.5?</span>
-            </div>
-
-            <div class="tree-branches">
-              <!-- Yes Branch from Root -->
-              <div id="branch-rating-yes" class="tree-branch tree-branch--active">
-                <span class="tree-branch__label" style="color: var(--teal);">Yes (Rating &lt; 3.5)</span>
-                
-                <div id="node-distance" class="tree-node tree-node--active">
-                  <span class="tree-step-pill pill">Step 2</span>
-                  <span class="tree-node__condition">Distance above 25 km?</span>
-                </div>
-
-                <div class="tree-branches" style="grid-template-columns: 1fr 1fr; gap: 0.75rem;">
-                  <div id="branch-dist-yes" class="tree-branch tree-branch--active">
-                    <span class="tree-branch__label" style="color: var(--teal);">Yes (&gt; 25 km)</span>
-                    <div id="node-prod" class="tree-node tree-node--active">
-                      <span class="tree-node__condition" style="font-size: 0.85rem;">Perishable or Fragile?</span>
-                    </div>
-                    <div style="display: flex; flex-direction: column; gap: 0.5rem; margin-top: 0.5rem;">
-                      <div id="leaf-1" class="tree-leaf tree-leaf--late">
-                        <span>Yes → LIKELY LATE</span>
-                        <span class="tabular-nums">82%</span>
-                      </div>
-                      <div id="leaf-2" class="tree-leaf tree-leaf--ontime">
-                        <span>No → ON TIME</span>
-                        <span class="tabular-nums">60%</span>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div id="branch-dist-no" class="tree-branch">
-                    <span class="tree-branch__label" style="color: var(--text-muted);">No (≤ 25 km)</span>
-                    <div id="node-courier" class="tree-node">
-                      <span class="tree-node__condition" style="font-size: 0.85rem;">Courier C?</span>
-                    </div>
-                    <div style="display: flex; flex-direction: column; gap: 0.5rem; margin-top: 0.5rem;">
-                      <div id="leaf-3" class="tree-leaf tree-leaf--late">
-                        <span>Yes → LIKELY LATE</span>
-                        <span class="tabular-nums">55%</span>
-                      </div>
-                      <div id="leaf-4" class="tree-leaf tree-leaf--ontime">
-                        <span>No → ON TIME</span>
-                        <span class="tabular-nums">70%</span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <!-- No Branch from Root -->
-              <div id="branch-rating-no" class="tree-branch">
-                <span class="tree-branch__label" style="color: var(--text-muted);">No (Rating ≥ 3.5)</span>
-                
-                <div id="node-return" class="tree-node">
-                  <span class="tree-step-pill pill">Step 2</span>
-                  <span class="tree-node__condition">Return history 2 or more?</span>
-                </div>
-
-                <div style="display: flex; flex-direction: column; gap: 0.75rem; margin-top: 0.75rem;">
-                  <div id="leaf-5" class="tree-leaf tree-leaf--late">
-                    <span>Yes (≥ 2 returns) → LIKELY LATE</span>
-                    <span class="tabular-nums">58%</span>
-                  </div>
-                  <div id="leaf-6" class="tree-leaf tree-leaf--ontime">
-                    <span>No (&lt; 2 returns) → ON TIME</span>
-                    <span class="tabular-nums">90%</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
+          <pre id="dt-tree-rules" class="text-small" style="overflow-x: auto; white-space: pre; background: var(--surface); padding: 1rem; border-radius: var(--radius-card); margin: 0;"></pre>
         </div>
 
         <!-- Form: Try an Order -->
@@ -487,7 +411,7 @@ Information Gain: Gain(D, Feature) = Entropy(D) - ∑ (|D_v| / |D|) × Entropy(D
             </div>
 
             <button type="button" id="dt-load-r04-btn" class="btn btn--subtle btn--small">
-              Load Sample R-04 Preset
+              Load sample order
             </button>
           </div>
 
@@ -496,13 +420,13 @@ Information Gain: Gain(D, Feature) = Entropy(D) - ∑ (|D_v| / |D|) × Entropy(D
               <div id="dt-prediction-badge" class="demo-big-stat__number" style="font-size: 2.2rem; color: var(--coral);">
                 LIKELY LATE
               </div>
-              <div class="demo-big-stat__label">Predicted Outcome (<span id="dt-confidence-badge">82%</span> confidence)</div>
+              <div class="demo-big-stat__label">Predicted Outcome (<span id="dt-confidence-badge">—</span> confidence)</div>
             </div>
 
             <div class="card card--solid" style="padding: 1.25rem;">
               <h4 style="font-size: 0.95rem; margin-bottom: 0.5rem; color: var(--teal);">Decision Audit Trail:</h4>
               <p id="dt-sentence-path" class="text-small" style="margin-bottom: 0.75rem; color: var(--text);">
-                Order flagged as LIKELY LATE with 82% confidence because seller rating is below 3.5 (3.4), distance is 31 km (>25 km), and product is Perishable.
+                Loading the trained model's prediction…
               </p>
               <div class="card" style="padding: 0.75rem 1rem; background: var(--surface);">
                 <span class="text-small text-muted" style="font-weight: 600;">Sequential rule evaluation steps:</span>
@@ -514,7 +438,7 @@ Information Gain: Gain(D, Feature) = Entropy(D) - ∑ (|D_v| / |D|) × Entropy(D
 
             <div class="card card--solid" style="padding: 1rem;">
               <p class="text-small text-muted" style="margin: 0;">
-                <strong>Explainability Note:</strong> Because tree branches are evaluated hierarchically, if seller rating is below 3.5 and distance exceeds 25 km, customer return history is never evaluated. This explainable structure ensures operations specialists understand precisely why a shipment was flagged.
+                <strong>Explainability Note:</strong> The tree checks its rules in order, so each order follows one path to a single leaf. Rules off that path do not affect the prediction for that order.
               </p>
             </div>
           </div>
@@ -523,31 +447,31 @@ Information Gain: Gain(D, Feature) = Entropy(D) - ∑ (|D_v| / |D|) × Entropy(D
 
       <!-- 8. Illustrative results and interpretation -->
       <section class="section--compact">
-        <h2>Illustrative results and interpretation</h2>
+        <h2>Test-set results and interpretation</h2>
         <div class="grid-3" style="margin-bottom: 1.5rem;">
           <div class="metric-card">
-            <span class="metric-label">Benchmark Order R-04</span>
-            <span class="metric-value tabular-nums" style="color: var(--coral);">82% Late</span>
-            <span class="metric-subtext">R-04 followed rules to "likely late" (arrived 1 day late)</span>
+            <span class="metric-label">Late-class F1</span>
+            <span class="metric-value tabular-nums">0.54</span>
+            <span class="metric-subtext">Balanced accuracy 0.65 on 600 held-out orders</span>
           </div>
 
           <div class="metric-card">
             <span class="metric-label">Model Accuracy</span>
-            <span class="metric-value tabular-nums">85.8%</span>
-            <span class="metric-subtext">Evaluated on test set of 1,200 orders</span>
+            <span class="metric-value tabular-nums">65.8%</span>
+            <span class="metric-subtext">Evaluated on a test set of 600 orders</span>
           </div>
 
           <div class="metric-card">
             <span class="metric-label">Late Recall</span>
-            <span class="metric-value tabular-nums">0.75</span>
-            <span class="metric-subtext">180 of 240 delayed shipments caught early (precision 0.62)</span>
+            <span class="metric-value tabular-nums">0.61</span>
+            <span class="metric-subtext">119 of 194 delayed shipments caught (precision 0.48)</span>
           </div>
         </div>
 
         <!-- Confusion Matrix Table -->
         <div class="table-responsive-wrapper" tabindex="0" role="region" aria-label="Decision tree confusion matrix">
           <table class="data-table">
-            <caption>Confusion matrix on 1,200 held-out test orders (rows = actual, columns = predicted). Illustrative / synthetically generated.</caption>
+            <caption>Confusion matrix on 600 held-out test orders (rows = actual, columns = predicted). Synthetic data.</caption>
             <thead>
               <tr>
                 <th scope="col">Actual Outcome</th>
@@ -559,15 +483,15 @@ Information Gain: Gain(D, Feature) = Entropy(D) - ∑ (|D_v| / |D|) × Entropy(D
             <tbody>
               <tr>
                 <th scope="row">Actually On Time</th>
-                <td class="tabular-nums" style="color: var(--teal); font-weight: 700;">850 (True Negatives)</td>
-                <td class="tabular-nums" style="color: var(--coral);">110 (False Alarms)</td>
-                <td class="tabular-nums">960 orders</td>
+                <td class="tabular-nums" style="color: var(--teal); font-weight: 700;">276 (True Negatives)</td>
+                <td class="tabular-nums" style="color: var(--coral);">130 (False Alarms)</td>
+                <td class="tabular-nums">406 orders</td>
               </tr>
               <tr>
                 <th scope="row">Actually Late</th>
-                <td class="tabular-nums" style="color: var(--coral);">60 (Missed Delays)</td>
-                <td class="tabular-nums" style="color: var(--teal); font-weight: 700;">180 (True Positives)</td>
-                <td class="tabular-nums">240 orders</td>
+                <td class="tabular-nums" style="color: var(--coral);">75 (Missed Delays)</td>
+                <td class="tabular-nums" style="color: var(--teal); font-weight: 700;">119 (True Positives)</td>
+                <td class="tabular-nums">194 orders</td>
               </tr>
             </tbody>
           </table>
@@ -577,14 +501,14 @@ Information Gain: Gain(D, Feature) = Entropy(D) - ∑ (|D_v| / |D|) × Entropy(D
           <div class="card card--solid">
             <h3 style="font-size: 1.1rem; margin-bottom: 0.5rem;">Interpretation</h3>
             <p class="text-small text-muted" style="margin: 0;">
-              Late precision is 0.62 (180 of 290 total warnings correct); late recall is 0.75 (180 of 240 actual late orders caught). The tree is deliberately tuned to favor recall over precision: a missed late delivery hurts the customer far more than an unnecessary warning hurts operational efficiency.
+              Late precision is 0.48 (119 of 249 late warnings correct); late recall is 0.61 (119 of 194 late orders caught). The tree is shallow (depth 4) so staff can read every rule; its warnings are about half false alarms, and the trade-off is set by the training choices in the pipeline.
             </p>
           </div>
 
           <div class="card card--solid">
             <h3 style="font-size: 1.1rem; margin-bottom: 0.5rem;">Business Impact</h3>
             <p class="text-small text-muted" style="margin: 0;">
-              Our logistics operations team reviews 290 flagged high-risk orders rather than blindly auditing all 1,200 shipments, catching 75% of delivery delays in advance. Specific rule trails turn carrier performance reviews into constructive, root-cause conversations.
+              Operations staff would review 249 flagged orders out of 600 and catch 119 of 194 delays (61%) before dispatch. The rule trails help root-cause conversations with couriers and sellers.
             </p>
           </div>
         </div>
@@ -688,6 +612,8 @@ Information Gain: Gain(D, Feature) = Entropy(D) - ∑ (|D_v| / |D|) × Entropy(D
   <script defer src="js/app.js"></script>
   <script defer src="js/charts.js"></script>
   <script defer src="js/table.js"></script>
+  <script defer src="js/ml/model-params.js"></script>
+  <script defer src="js/ml/inference.js"></script>
   <script defer src="js/ml/decision-tree.js"></script>
   <script defer>
     document.addEventListener("DOMContentLoaded", function () {
@@ -707,6 +633,7 @@ Information Gain: Gain(D, Feature) = Entropy(D) - ∑ (|D_v| / |D|) × Entropy(D
       const pathList = document.getElementById("dt-path-steps-list");
 
       const ml = window.Allonola.ml.decisionTree;
+      document.getElementById("dt-tree-rules").textContent = ml.treeRules().join("\n");
 
       function updateDecisionTree() {
         const order = {
@@ -738,54 +665,6 @@ Information Gain: Gain(D, Feature) = Entropy(D) - ∑ (|D_v| / |D|) × Entropy(D
           .map((step, idx) => `<li><strong>Step ${idx + 1}:</strong> ${step}</li>`)
           .join("");
 
-        highlightTreeDiagram(order, result.leafId);
-      }
-
-      function highlightTreeDiagram(order, activeLeafId) {
-        // Reset all classes
-        document.querySelectorAll(".tree-node, .tree-branch, .tree-leaf").forEach((el) => {
-          el.classList.remove("tree-node--active", "tree-branch--active");
-          el.style.boxShadow = "none";
-        });
-
-        // Always highlight root
-        const root = document.getElementById("tree-root");
-        if (root) root.classList.add("tree-node--active");
-
-        const ratingYes = order.sellerRating < 3.5;
-        const branchRatingYes = document.getElementById("branch-rating-yes");
-        const branchRatingNo = document.getElementById("branch-rating-no");
-
-        if (ratingYes) {
-          if (branchRatingYes) branchRatingYes.classList.add("tree-branch--active");
-          const nodeDist = document.getElementById("node-distance");
-          if (nodeDist) nodeDist.classList.add("tree-node--active");
-
-          const distYes = order.distanceKm > 25;
-          const branchDistYes = document.getElementById("branch-dist-yes");
-          const branchDistNo = document.getElementById("branch-dist-no");
-
-          if (distYes) {
-            if (branchDistYes) branchDistYes.classList.add("tree-branch--active");
-            const nodeProd = document.getElementById("node-prod");
-            if (nodeProd) nodeProd.classList.add("tree-node--active");
-          } else {
-            if (branchDistNo) branchDistNo.classList.add("tree-branch--active");
-            const nodeCourier = document.getElementById("node-courier");
-            if (nodeCourier) nodeCourier.classList.add("tree-node--active");
-          }
-        } else {
-          if (branchRatingNo) branchRatingNo.classList.add("tree-branch--active");
-          const nodeReturn = document.getElementById("node-return");
-          if (nodeReturn) nodeReturn.classList.add("tree-node--active");
-        }
-
-        // Highlight active leaf
-        const leaf = document.getElementById(activeLeafId);
-        if (leaf) {
-          leaf.style.boxShadow = "0 0 14px " + (activeLeafId.includes("late") || activeLeafId === "leaf-1" || activeLeafId === "leaf-3" || activeLeafId === "leaf-5" ? "rgba(242, 107, 91, 0.5)" : "rgba(46, 196, 182, 0.5)");
-          leaf.style.transform = "scale(1.02)";
-        }
       }
 
       // Presets
