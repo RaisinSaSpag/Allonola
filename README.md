@@ -30,3 +30,5 @@ Make sure you have Python installed. Then, install the required backend dependen
 cd D:\Projects\allonola
 .\.venv\Scripts\Activate.ps1
 pip install -r requirements.txt
+
+> **Note on SVM:** The interactive scatter plot on this page uses pre-computed fraud scores from the Python model (saved as a JSON file) to avoid sending 60 API requests per second. The `/api/predict/svm` endpoint is fully live and available for single-order predictions.
