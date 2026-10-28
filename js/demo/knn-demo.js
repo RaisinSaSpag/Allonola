@@ -13,22 +13,16 @@
   
   if (!userSel || !kSlider) return;
 
-  // Populate the shopper list from the dataset
+  // Populate the shopper list to match the Python model (U001 to U030)
   if (!userSel.options.length) {
-    window.Allonola.data.knn.matrix.forEach(function (row) {
+    for (let i = 1; i <= 30; i++) {
+      const userId = 'U' + String(i).padStart(3, '0');
       const opt = document.createElement("option");
-      
-      // FIX: Pad the ID with zeros to match the Python model (e.g., U1 -> U001)
-      let paddedId = row.user;
-      if (paddedId.startsWith('U') && paddedId.length < 4) {
-          paddedId = 'U' + paddedId.substring(1).padStart(3, '0');
-      }
-      
-      opt.value = paddedId;
-      opt.textContent = row.user; // Keep the display text as U1 for readability
+      opt.value = userId;
+      opt.textContent = userId;
       userSel.appendChild(opt);
-    });
-    userSel.value = "U001"; // Default to the padded ID
+    }
+    userSel.value = "U001";
   }
 
   async function render() {
@@ -86,5 +80,5 @@
   kSlider.addEventListener("input", render);
   
   // Initial load
-  render();
+  render(); 
 })();

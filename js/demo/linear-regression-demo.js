@@ -106,7 +106,7 @@
 
       // Update the UI
       unitsEl.textContent = units;
-      outputEl.textContent = "At " + formatPeso(price) + " the Python model predicts " + units + " units.";
+      outputEl.innerHTML = "At " + formatPeso(price) + " the Python model predicts " + units + " units.<br><small style='color:var(--text-muted);'>Note: Predictions are floored at 5 units to prevent negative forecasts at extreme prices.</small>";
       
       // Draw a "fake" curve for the chart (since the Python server only returns one prediction at a time)
       const fakeCurve = { prices: [], units: [] };
@@ -133,3 +133,4 @@
   resetControls();
   render();
 })();
+
