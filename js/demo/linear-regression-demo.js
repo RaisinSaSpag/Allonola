@@ -1,11 +1,10 @@
 /**
  * js/demo/linear-regression-demo.js
- * Wires the Linear Regression page controls to the pure functions in js/ml/linear-regression.js.
+ * Connects the Linear Regression page controls to the Python Flask API.
  */
 "use strict";
 
 (function () {
-  const L = window.Allonola && window.Allonola.ml && window.Allonola.ml.linearRegression;
   const productSel = document.getElementById("lr-product");
   const priceSlider = document.getElementById("lr-price");
   const priceVal = document.getElementById("lr-price-val");
@@ -14,7 +13,8 @@
   const outputEl = document.getElementById("lr-output");
   const rangeNote = document.getElementById("lr-range-note");
   const canvas = document.getElementById("lr-chart");
-  if (!L || !productSel || !priceSlider || !promoBox) return;
+  
+  if (!productSel || !priceSlider || !promoBox) return;
 
   let chart = null;
 
@@ -31,7 +31,6 @@
     return v || fallback;
   }
 
-  // Reset the slider to the product's baseline price and promotion status.
   function resetControls() {
     const b = baseline();
     if (!b) return;
@@ -39,7 +38,7 @@
     priceSlider.max = Math.round(b.basePrice * 1.3);
     priceSlider.value = b.basePrice;
     promoBox.checked = b.baselinePromotion;
-    // Observed prices come from the sample dataset, so the note reflects real sample rows.
+    
     const observed = window.Allonola.data.linearRegression.sampleDataset
       .filter(function (row) { return row.product === productSel.value; })
       .map(function (row) { return row.price; });
@@ -79,17 +78,49 @@
     });
   }
 
-  function render() {
+  // ---------------------------------------------------------
+  // NEW: Connect to the Python Flask API
+  // ---------------------------------------------------------
+  async function render() {
     const price = Number(priceSlider.value);
-    const on = promoBox.checked;
-    const units = L.predictUnits(productSel.value, price, on);
-    const impact = L.calculate10PercentCutImpact(productSel.value, price, on);
+    const promo = promoBox.checked ? "Yes" : "No";
+    // We hardcode season to "Normal" because the HTML doesn't have a season dropdown yet.
+    const season = "Normal"; 
+    
     priceVal.textContent = formatPeso(price);
-    unitsEl.textContent = units;
-    outputEl.textContent =
-      "At " + formatPeso(price) + " the model predicts " + units + " units. " +
-      "A 10% price cut would change the forecast by about " + impact + " units.";
-    drawChart(L.generatePriceCurve(productSel.value, on));
+    unitsEl.textContent = "..."; // Show loading state
+    outputEl.textContent = "Asking Python model...";
+
+    try {
+      // Send data to the Python server
+      const response = await fetch('http://127.0.0.1:5000/api/predict/lr', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ price: price, season: season, promo: promo })
+      });
+
+      if (!response.ok) throw new Error("Server error");
+      
+      const result = await response.json();
+      const units = result.prediction;
+
+      // Update the UI
+      unitsEl.textContent = units;
+      outputEl.textContent = "At " + formatPeso(price) + " the Python model predicts " + units + " units.";
+      
+      // Draw a "fake" curve for the chart (since the Python server only returns one prediction at a time)
+      const fakeCurve = { prices: [], units: [] };
+      for(let p = Number(priceSlider.min); p <= Number(priceSlider.max); p += (priceSlider.max - priceSlider.min)/10) {
+          fakeCurve.prices.push(p);
+          fakeCurve.units.push(Math.max(5, units + (price - p) * 0.2)); // Simple visual curve
+      }
+      drawChart(fakeCurve);
+
+    } catch (error) {
+      console.error("Error connecting to Python server:", error);
+      unitsEl.textContent = "Error";
+      outputEl.textContent = "⚠️ Could not connect to the Python ML server. Make sure 'python app.py' is running in your terminal.";
+    }
   }
 
   productSel.addEventListener("change", function () {

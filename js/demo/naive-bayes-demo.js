@@ -1,40 +1,59 @@
 /**
  * js/demo/naive-bayes-demo.js
- * Wires the Naive Bayes page controls to js/ml/naive-bayes.js.
+ * Wires the Naive Bayes page controls to the Python Flask API.
  */
 "use strict";
 
 (function () {
-  const NB = window.Allonola && window.Allonola.ml && window.Allonola.ml.naiveBayes;
   const textEl = document.getElementById("nb-text");
   const runBtn = document.getElementById("nb-run");
   const outputEl = document.getElementById("nb-output");
-  if (!NB || !textEl || !runBtn || !outputEl) return;
+  if (!textEl || !runBtn || !outputEl) return;
 
   function pct(p) {
     return Math.round(p * 100) + "%";
   }
 
-  function run() {
+  async function run() {
     const text = textEl.value.trim();
     if (!text) {
       outputEl.textContent = "Please type a review to classify.";
       return;
     }
-    const r = NB.classify(text);
-    if (r.predictedClass === "Neutral") {
-      outputEl.textContent = "The model found no recognizable words. Try a longer review.";
-      return;
+
+    outputEl.textContent = "Asking Python model...";
+
+    try {
+      // Send text to the Python API
+      const response = await fetch('http://127.0.0.1:5000/api/predict/nb', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text: text })
+      });
+
+      if (!response.ok) throw new Error("Server error");
+      
+      const result = await response.json();
+      
+      // The API returns: { prediction: "Spam", classes: ["Negative", "Positive", "Spam"], probabilities: [0.1, 0.2, 0.7] }
+      
+      // Build a dictionary of probabilities for easy access
+      const probDict = {};
+      result.classes.forEach((cls, index) => {
+        probDict[cls] = result.probabilities[index];
+      });
+
+      let message =
+        "Prediction: " + result.prediction + ". Probabilities: Positive " + pct(probDict["Positive"] || 0) +
+        ", Negative " + pct(probDict["Negative"] || 0) + ", Spam " + pct(probDict["Spam"] || 0) + ".";
+      
+      message += " (Calculated by the Python Scikit-Learn model).";
+      outputEl.textContent = message;
+
+    } catch (error) {
+      console.error("Error connecting to Python server:", error);
+      outputEl.textContent = "⚠️ Could not connect to the Python ML server. Make sure 'python app.py' is running.";
     }
-    let message =
-      "Prediction: " + r.predictedClass + ". Probabilities: Positive " + pct(r.probabilities.Positive) +
-      ", Negative " + pct(r.probabilities.Negative) + ", Spam " + pct(r.probabilities.Spam) + ".";
-    if (r.topWords && r.topWords.length) {
-      message += " Words with the strongest influence: " +
-        r.topWords.map(function (w) { return '"' + w.word + '"'; }).join(", ") + ".";
-    }
-    message += " The model was trained on 3,000 synthetic reviews; real moderation needs real review data.";
-    outputEl.textContent = message;
   }
 
   runBtn.addEventListener("click", run);

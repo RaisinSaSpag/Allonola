@@ -3,3 +3,14 @@ ml_pipeline/client_secret_*.json
 ml_pipeline/credentials.json
 ml_pipeline/token.json
 .env
+
+# Python Virtual Environment
+.venv/
+venv/
+__pycache__/
+*.pyc
+
+
+.venv/
+__pycache__/
+*.pyc
