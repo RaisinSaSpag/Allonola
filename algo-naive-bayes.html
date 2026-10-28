@@ -10,6 +10,7 @@
   <link rel="stylesheet" href="css/layout.css">
   <link rel="stylesheet" href="css/components.css">
   <link rel="stylesheet" href="css/algorithm.css">
+  <link rel="stylesheet" href="css/plain.css">
 </head>
 <body data-page="naive-bayes">
   <a href="#main-content" class="skip-link">Skip to main content</a>
@@ -102,6 +103,27 @@
               <span class="pill pill--teal">Naive Bayes</span>
               <h1>Review moderation and sentiment filtering</h1>
               <p class="lead">The model learns from prior review labels and estimates whether a new message is likely positive, negative, or spam.</p>
+
+            <aside class="plain-box" aria-labelledby="nb-plain">
+              <h2 id="nb-plain">In plain words</h2>
+              <p class="plain-box__answer">It reads a review and estimates whether it is positive, negative, or spam.</p>
+              <p><strong>Think of it like this:</strong> A friend who has read thousands of reviews. After seeing many "free gift card, click now" messages that turned out to be spam, you start to recognize them at a glance.</p>
+              <h3>Try the demo</h3>
+              <ol>
+                <li>Type a review, or click one of the example buttons.</li>
+                <li>Press "Classify review".</li>
+                <li>Read the three percentages. The highest one is the model's answer.</li>
+              </ol>
+              <h3>Words to know</h3>
+              <dl>
+                <dt>Label</dt>
+                <dd>The correct answer from past examples that the model learned from.</dd>
+                <dt>Probability</dt>
+                <dd>How confident the model is, from 0% to 100%.</dd>
+                <dt>Spam</dt>
+                <dd>Unwanted or misleading messages, such as fake prizes.</dd>
+              </dl>
+            </aside>
             </div>
             <div class="grid-2 reveal-on-scroll">
               <article class="card"><h3>Model goal</h3><p>Flag reviews that are suspicious, spammy, or misleading while preserving legitimate product feedback for the marketplace.</p></article>
@@ -115,12 +137,12 @@
               <h2>Interactive demo</h2>
               <label for="nb-text">Review text</label>
               <textarea id="nb-text" rows="4">Amazing quality and super fast delivery, thanks team!</textarea>
-              <div class="action-row"><button class="btn btn--primary" id="nb-run" type="button">Classify review</button>
+              <div class="action-row"><button class="btn btn--primary" id="nb-run" type="button">Classify review</button></div>
               <div class="action-row">
                 <button class="btn" type="button" data-nb-example="Battery lasts all day, great value">Try a positive review</button>
                 <button class="btn" type="button" data-nb-example="Not what I ordered, wrong color.">Try a negative review</button>
                 <button class="btn" type="button" data-nb-example="WIN a free gift card now, click this link!!!">Try a spam review</button>
-              </div></div>
+              </div>
               <div id="nb-output" class="output-box">Ready to classify.</div>
             </div>
           </div>

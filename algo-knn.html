@@ -10,6 +10,7 @@
   <link rel="stylesheet" href="css/layout.css">
   <link rel="stylesheet" href="css/components.css">
   <link rel="stylesheet" href="css/algorithm.css">
+  <link rel="stylesheet" href="css/plain.css">
 </head>
 <body data-page="knn">
   <a href="#main-content" class="skip-link">Skip to main content</a>
@@ -102,6 +103,27 @@
               <span class="pill pill--teal">KNN</span>
               <h1>Collaborative recommendations</h1>
               <p class="lead">This algorithm compares shoppers with similar purchase patterns and recommends products they are likely to buy next.</p>
+
+            <aside class="plain-box" aria-labelledby="knn-plain">
+              <h2 id="knn-plain">In plain words</h2>
+              <p class="plain-box__answer">It finds shoppers with similar buying habits and suggests products they bought.</p>
+              <p><strong>Think of it like this:</strong> Asking friends with similar taste what they bought. If your closest taste-twins all bought a phone charger, you might want one too.</p>
+              <h3>Try the demo</h3>
+              <ol>
+                <li>Pick a shopper from the list.</li>
+                <li>Move the "Number of neighbors (k)" slider to change how many similar shoppers are checked.</li>
+                <li>Read the suggested products and their scores.</li>
+              </ol>
+              <h3>Words to know</h3>
+              <dl>
+                <dt>Shopper</dt>
+                <dd>A customer in our sample data.</dd>
+                <dt>Similar shopper (neighbor)</dt>
+                <dd>A shopper whose past purchases look like the chosen shopper's.</dd>
+                <dt>Score out of 5</dt>
+                <dd>How highly those similar shoppers rated the product, on average.</dd>
+              </dl>
+            </aside>
             </div>
             <div class="grid-2 reveal-on-scroll">
               <article class="card"><h3>Where it helps</h3><p>Homepage discovery, “customers also bought,” and cross-sell suggestions for new and repeat shoppers.</p></article>

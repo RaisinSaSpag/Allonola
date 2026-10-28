@@ -1,0 +1,55 @@
+/* Plain-language layer for non-technical readers.
+   Used on the algorithm pages and the overview. Theme-aware via base.css variables. */
+
+.plain-box {
+  margin: 2rem 0;
+  padding: 1.5rem 1.75rem;
+  max-width: 70ch;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-left: 4px solid var(--teal);
+  border-radius: var(--radius-card);
+}
+.plain-box h2 {
+  font-family: var(--font-heading);
+  font-size: 1.3rem;
+  color: var(--primary);
+  margin: 0 0 0.6rem;
+}
+.plain-box h3 {
+  font-family: var(--font-heading);
+  font-size: 1rem;
+  color: var(--text);
+  margin: 1.25rem 0 0.4rem;
+}
+.plain-box p { margin: 0 0 0.75rem; max-width: none; }
+.plain-box__answer { font-size: 1.15rem; color: var(--text); }
+.plain-box ol { margin: 0 0 0.5rem; padding-left: 1.25rem; }
+.plain-box ol li { margin-bottom: 0.35rem; }
+.plain-box dl { margin: 0; }
+.plain-box dt { font-weight: 700; color: var(--text); margin-top: 0.7rem; }
+.plain-box dd { margin: 0.1rem 0 0; color: var(--text-muted); }
+
+.plain-questions {
+  list-style: none;
+  padding: 0;
+  margin: 1.5rem 0 0;
+  border-top: 2px solid var(--primary);
+}
+.plain-questions li { border-bottom: 1px solid var(--border); }
+.plain-questions a {
+  display: block;
+  padding: 0.9rem 0.5rem 0.9rem 0.25rem;
+  text-decoration: none;
+  color: inherit;
+  transition: background-color var(--transition-speed) ease;
+}
+.plain-questions a:hover,
+.plain-questions a:focus-visible { background: color-mix(in srgb, var(--teal) 10%, transparent); }
+.plain-questions strong {
+  display: block;
+  font-family: var(--font-heading);
+  font-size: 1.1rem;
+  color: var(--text);
+}
+.plain-questions span { color: var(--text-muted); font-size: 0.95rem; }

@@ -1,0 +1,496 @@
+From 6b57833e470e7c88370612ac5197312de0f15c6e Mon Sep 17 00:00:00 2001
+From: Claude <noreply@anthropic.com>
+Date: Thu, 29 Oct 2026 04:56:31 +0800
+Subject: [PATCH] Apply the "six questions" home page concept
+
+- Hero lists the six ML features as plain questions linking to each algorithm page.
+- Roles section (buyers, sellers, team) with line illustrations.
+- "How Allonola uses machine learning" strip and data notice.
+- New css/home.css uses the existing theme variables, so light and dark mode both work.
+- Header, footer, navigation and theme toggle are unchanged.
+
+Co-Authored-By: Claude Haiku 5.5 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_011R9w2nkswYGc5P1TkM11Vo
+---
+ css/home.css | 108 +++++++++++++++++
+ index.html   | 320 +++++++++++++++------------------------------------
+ 2 files changed, 199 insertions(+), 229 deletions(-)
+ create mode 100644 css/home.css
+
+diff --git a/css/home.css b/css/home.css
+new file mode 100644
+index 0000000..e8915bb
+--- /dev/null
++++ b/css/home.css
+@@ -0,0 +1,108 @@
++/* Home page: "six questions" concept.
++   Uses the theme variables from base.css, so it works in light and dark mode. */
++
++.home-hero { padding: 3.5rem 0 2.5rem; }
++.home-hero h1 {
++  font-family: var(--font-heading);
++  font-size: clamp(2.2rem, 5vw, 3.6rem);
++  font-weight: 800;
++  line-height: 1.12;
++  color: var(--primary);
++  max-width: 16ch;
++  margin: 0;
++}
++.home-hero .lead { margin-top: 1.25rem; max-width: 52ch; }
++
++.home-questions {
++  margin-top: 3rem;
++  border-top: 2px solid var(--primary);
++}
++.home-question {
++  display: grid;
++  grid-template-columns: minmax(0, 1fr) auto;
++  gap: 0.5rem 2rem;
++  align-items: center;
++  padding: 1.4rem 0.75rem 1.4rem 0.25rem;
++  border-bottom: 1px solid var(--border);
++  color: inherit;
++  text-decoration: none;
++  transition: background-color var(--transition-speed) ease;
++}
++.home-question:hover,
++.home-question:focus-visible { background: color-mix(in srgb, var(--teal) 10%, transparent); }
++.home-question h3 {
++  font-family: var(--font-heading);
++  font-size: clamp(1.25rem, 2.4vw, 1.7rem);
++  font-weight: 700;
++  color: var(--text);
++  margin: 0;
++  line-height: 1.2;
++}
++.home-question p { grid-column: 1; font-size: 0.98rem; color: var(--text-muted); margin: 0; }
++.home-question .home-try {
++  grid-column: 2; grid-row: 1 / span 2;
++  font-family: var(--font-heading); font-weight: 600; font-size: 0.9rem;
++  color: var(--teal); white-space: nowrap;
++}
++
++/* One orchestrated moment on load. */
++@media (prefers-reduced-motion: no-preference) {
++  .home-question { animation: home-settle 620ms ease both; }
++  .home-question:nth-child(2) { animation-delay: 70ms; }
++  .home-question:nth-child(3) { animation-delay: 140ms; }
++  .home-question:nth-child(4) { animation-delay: 210ms; }
++  .home-question:nth-child(5) { animation-delay: 280ms; }
++  .home-question:nth-child(6) { animation-delay: 350ms; }
++}
++@keyframes home-settle {
++  from { opacity: 0; transform: translateX(-8px); }
++  to   { opacity: 1; transform: none; }
++}
++
++.home-roles { padding: 4.5rem 0 3rem; }
++.home-roles h2 {
++  font-family: var(--font-heading);
++  font-size: clamp(1.6rem, 3vw, 2.2rem);
++  color: var(--primary);
++  max-width: 22ch;
++  margin: 0;
++}
++.home-roles-grid {
++  margin-top: 2.5rem;
++  display: grid;
++  grid-template-columns: repeat(3, minmax(0, 1fr));
++  gap: 2.5rem;
++}
++.home-role svg { width: 96px; height: 96px; display: block; margin-bottom: 1rem; color: var(--primary); }
++.home-role svg .accent { stroke: var(--teal); }
++.home-role h3 { font-family: var(--font-heading); font-size: 1.2rem; color: var(--primary); margin: 0 0 0.5rem; }
++.home-role p { font-size: 0.98rem; color: var(--text-muted); margin: 0; max-width: 40ch; }
++
++.home-strip {
++  padding: 2.75rem 0;
++  background: color-mix(in srgb, var(--primary) 10%, var(--bg));
++  border-top: 1px solid var(--border);
++  border-bottom: 1px solid var(--border);
++}
++.home-strip .container { display: grid; grid-template-columns: 1fr 1.3fr; gap: 2.5rem; align-items: start; }
++.home-strip h2 { font-family: var(--font-heading); font-size: 1.6rem; color: var(--primary); margin: 0; }
++.home-strip p + p { margin-top: 0.85rem; }
++
++.home-notice {
++  margin: 2.5rem 0 0;
++  padding: 1rem 1.2rem;
++  font-size: 0.92rem;
++  background: var(--surface);
++  border-left: 4px solid var(--teal);
++  border-radius: var(--radius-input);
++  max-width: 70ch;
++}
++
++@media (max-width: 820px) {
++  .home-roles-grid { grid-template-columns: 1fr; gap: 2rem; }
++  .home-strip .container { grid-template-columns: 1fr; }
++}
++@media (max-width: 560px) {
++  .home-question { grid-template-columns: 1fr; }
++  .home-question .home-try { grid-column: 1; grid-row: auto; }
++}
+diff --git a/index.html b/index.html
+index 8590533..24a3841 100644
+--- a/index.html
++++ b/index.html
+@@ -9,6 +9,7 @@
+   <link rel="stylesheet" href="css/base.css">
+   <link rel="stylesheet" href="css/layout.css">
+   <link rel="stylesheet" href="css/components.css">
++  <link rel="stylesheet" href="css/home.css">
+ </head>
+ <body data-page="home">
+   <!-- Accessible Skip Link -->
+@@ -148,257 +149,118 @@
+ 
+   <!-- Main Content -->
+   <main id="main-content">
+-    <!-- a) Hero Section -->
+-    <section class="hero">
+-      <div class="hero-glow-bg"></div>
++    <!-- Hero: the six ML features as plain questions -->
++    <section class="home-hero">
+       <div class="container">
+-        <div class="content-reading">
+-          <div class="pill pill--teal" style="margin-bottom: 1.25rem;">Online-Only Retail Marketplace</div>
+-          <h1>Shop smarter. Sell with confidence.</h1>
+-          <p class="lead">
+-            Allonola is an online-only marketplace where machine learning helps every shopper, seller, and courier make better decisions.
+-          </p>
+-          <div class="hero-actions">
+-            <a href="algorithms.html" class="btn btn--primary">
+-              <span>Explore the algorithms</span>
+-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+-                <line x1="5" y1="12" x2="19" y2="12"></line>
+-                <polyline points="12 5 19 12 12 19"></polyline>
+-              </svg>
+-            </a>
+-            <a href="dashboard.html" class="btn btn--secondary">See the dashboards</a>
+-          </div>
+-        </div>
+-      </div>
+-    </section>
+-
+-    <!-- b) How Allonola Works -->
+-    <section class="section section--compact reveal-on-scroll">
+-      <div class="container">
+-        <div class="section-header">
+-          <div class="pill" style="margin-bottom: 0.5rem;">Connected Ecosystem</div>
+-          <h2>How Allonola works</h2>
+-          <p class="text-muted">A pure marketplace platform connecting independent retail participants without physical stores or platform warehouses.</p>
+-        </div>
+-
+-        <div class="grid-4">
+-          <div class="card">
+-            <div class="card-icon">
+-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+-                <circle cx="9" cy="21" r="1"></circle>
+-                <circle cx="20" cy="21" r="1"></circle>
+-                <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+-              </svg>
+-            </div>
+-            <h3 class="card-title">Buyers</h3>
+-            <p class="text-small text-muted">
+-              Discover relevant products faster, browse verified ratings, and checkout with e-wallet, card, or cash on delivery.
+-            </p>
+-          </div>
+-
+-          <div class="card">
+-            <div class="card-icon">
+-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+-                <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+-                <polyline points="9 22 9 12 15 12 15 22"></polyline>
+-              </svg>
+-            </div>
+-            <h3 class="card-title">Sellers</h3>
+-            <p class="text-small text-muted">
+-              Independent sellers keep and pack their own inventory, using demand forecasts to avoid stockouts and overstock holding costs.
+-            </p>
+-          </div>
+-
+-          <div class="card">
+-            <div class="card-icon">
+-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+-                <rect x="1" y="3" width="15" height="13"></rect>
+-                <polygon points="16 8 20 8 23 11 23 16 16 16 16 8"></polygon>
+-                <circle cx="5.5" cy="18.5" r="2.5"></circle>
+-                <circle cx="18.5" cy="18.5" r="2.5"></circle>
+-              </svg>
+-            </div>
+-            <h3 class="card-title">Couriers</h3>
+-            <p class="text-small text-muted">
+-              Third-party logistics partners pick up packed parcels directly from sellers and carry last-mile deliveries across regions.
+-            </p>
+-          </div>
++        <h1>Find what you need. Pay with confidence. Get it on time.</h1>
++        <p class="lead">
++          Allonola is an online marketplace where small sellers and everyday shoppers meet.
++          Machine learning does the quiet work in the background, so you spend less time guessing.
++          Pick a question below to see how it works.
++        </p>
+ 
+-          <div class="card">
+-            <div class="card-icon">
+-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+-                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+-              </svg>
+-            </div>
+-            <h3 class="card-title">Allonola Staff</h3>
+-            <p class="text-small text-muted">
+-              Admins, support agents, and fraud analysts monitor platform integrity, audit flagged disputes, and inspect anomaly queues.
+-            </p>
+-          </div>
++        <div class="home-questions" role="list">
++          <a class="home-question" role="listitem" href="algo-knn.html">
++            <h3>What should I look at next?</h3>
++            <p>Customers also bought, based on shoppers with similar tastes.</p>
++            <span class="home-try">Try it</span>
++          </a>
++          <a class="home-question" role="listitem" href="algo-naive-bayes.html">
++            <h3>Is this review real?</h3>
++            <p>Sorts reviews into positive, negative, or spam before buyers see them.</p>
++            <span class="home-try">Try it</span>
++          </a>
++          <a class="home-question" role="listitem" href="algo-svm.html">
++            <h3>Is this order risky?</h3>
++            <p>Flags unusual orders so a person can check them first.</p>
++            <span class="home-try">Try it</span>
++          </a>
++          <a class="home-question" role="listitem" href="algo-decision-tree.html">
++            <h3>Will this delivery be late?</h3>
++            <p>Warns sellers and staff early, while there is still time to act.</p>
++            <span class="home-try">Try it</span>
++          </a>
++          <a class="home-question" role="listitem" href="algo-linear-regression.html">
++            <h3>How many units will sell?</h3>
++            <p>Helps sellers choose a price and keep the right amount of stock.</p>
++            <span class="home-try">Try it</span>
++          </a>
++          <a class="home-question" role="listitem" href="algo-ann.html">
++            <h3>Is this shopper about to leave?</h3>
++            <p>Shapes each shopper's homepage around what they actually use.</p>
++            <span class="home-try">Try it</span>
++          </a>
+         </div>
+       </div>
+     </section>
+ 
+-    <hr class="section-divider">
+-
+-    <!-- c) Six Problems, Six Algorithms Grid -->
+-    <section class="section reveal-on-scroll">
++    <!-- Roles -->
++    <section class="home-roles">
+       <div class="container">
+-        <div class="section-header">
+-          <div class="pill" style="margin-bottom: 0.5rem;">Targeted Solutions</div>
+-          <h2>Six problems, six algorithms</h2>
+-          <p class="text-muted">Explore how each machine learning algorithm answers a distinct, practical business question for the marketplace.</p>
+-        </div>
+-
+-        <div class="grid-3">
+-          <!-- Problem 1 -->
+-          <article class="card card--interactive">
+-            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.75rem;">
+-              <span class="pill pill--teal">KNN, ANN</span>
+-              <span class="text-muted text-small">Discovery</span>
+-            </div>
+-            <h3 class="card-title">Too many choices</h3>
+-            <p class="text-small text-muted" style="flex-grow: 1;">
+-              Shoppers spend too much time searching through endless listings. Collaborative filtering and deep embeddings surface relevant items immediately.
+-            </p>
+-            <div style="margin-top: 1rem; padding-top: 0.75rem; border-top: 1px solid var(--border);">
+-              <span class="text-small" style="color: var(--teal); font-weight: 600; display: block; margin-bottom: 0.5rem;">
+-                Question: "Which items do shoppers like this one also buy?"
+-              </span>
+-              <a href="algo-knn.html" class="btn btn--subtle btn--small" style="width: 100%;">Explore KNN Recommender</a>
+-            </div>
+-          </article>
+-
+-          <!-- Problem 2 -->
+-          <article class="card card--interactive">
+-            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.75rem;">
+-              <span class="pill">Linear Regression</span>
+-              <span class="text-muted text-small">Forecasting</span>
+-            </div>
+-            <h3 class="card-title">Guesswork for sellers</h3>
+-            <p class="text-small text-muted" style="flex-grow: 1;">
+-              Merchants overstock or run out because demand shifts unexpectedly. Elasticity regression models predict unit volume against proposed price points.
+-            </p>
+-            <div style="margin-top: 1rem; padding-top: 0.75rem; border-top: 1px solid var(--border);">
+-              <span class="text-small" style="color: var(--teal); font-weight: 600; display: block; margin-bottom: 0.5rem;">
+-                Question: "How many units will sell, and at what price?"
+-              </span>
+-              <a href="algo-linear-regression.html" class="btn btn--subtle btn--small" style="width: 100%;">Explore Linear Regression</a>
+-            </div>
+-          </article>
+-
+-          <!-- Problem 3 -->
+-          <article class="card card--interactive">
+-            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.75rem;">
+-              <span class="pill pill--coral">Naive Bayes, SVM</span>
+-              <span class="text-muted text-small">Trust & Safety</span>
+-            </div>
+-            <h3 class="card-title">Trust issues: fake reviews and fraud</h3>
+-            <p class="text-small text-muted" style="flex-grow: 1;">
+-              Spam ratings and suspicious payment patterns erode marketplace credibility. Probabilistic text filtering and boundary margins intercept high risks.
+-            </p>
+-            <div style="margin-top: 1rem; padding-top: 0.75rem; border-top: 1px solid var(--border);">
+-              <span class="text-small" style="color: var(--teal); font-weight: 600; display: block; margin-bottom: 0.5rem;">
+-                Question: "Is this review genuine, negative, or spam?"
+-              </span>
+-              <a href="algo-naive-bayes.html" class="btn btn--subtle btn--small" style="width: 100%;">Explore Naive Bayes</a>
+-            </div>
+-          </article>
+-
+-          <!-- Problem 4 -->
+-          <article class="card card--interactive">
+-            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.75rem;">
+-              <span class="pill">Decision Tree</span>
+-              <span class="text-muted text-small">Operations</span>
+-            </div>
+-            <h3 class="card-title">Delivery and return problems</h3>
+-            <p class="text-small text-muted" style="flex-grow: 1;">
+-              Unpredictable courier delays and high return rates harm customer goodwill. Explainable rule branches flag delivery vulnerabilities before dispatch.
+-            </p>
+-            <div style="margin-top: 1rem; padding-top: 0.75rem; border-top: 1px solid var(--border);">
+-              <span class="text-small" style="color: var(--teal); font-weight: 600; display: block; margin-bottom: 0.5rem;">
+-                Question: "Will this order be late or returned, and why?"
+-              </span>
+-              <a href="algo-decision-tree.html" class="btn btn--subtle btn--small" style="width: 100%;">Explore Decision Tree</a>
+-            </div>
++        <h2>Built for the people on both sides of the order.</h2>
++        <div class="home-roles-grid">
++          <article class="home-role">
++            <svg viewBox="0 0 96 96" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
++              <circle cx="48" cy="28" r="11"/>
++              <path d="M28 88 C28 62 36 50 48 50 C60 50 68 62 68 88"/>
++              <path class="accent" d="M36 42 L60 42 L58 60 L38 60 Z"/>
++              <path class="accent" d="M42 42 C42 34 54 34 54 42"/>
++            </svg>
++            <h3>For buyers</h3>
++            <p>Clear prices, reviews you can trust, and a checkout that does not surprise you.</p>
+           </article>
+ 
+-          <!-- Problem 5 -->
+-          <article class="card card--interactive">
+-            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.75rem;">
+-              <span class="pill">Dashboards & Logs</span>
+-              <span class="text-muted text-small">Visibility</span>
+-            </div>
+-            <h3 class="card-title">Weak security and poor visibility</h3>
+-            <p class="text-small text-muted" style="flex-grow: 1;">
+-              Lack of consolidated dashboards and audit controls leaves teams blind. Unified dashboards track revenue, returns, and model drift in real time.
+-            </p>
+-            <div style="margin-top: 1rem; padding-top: 0.75rem; border-top: 1px solid var(--border);">
+-              <span class="text-small" style="color: var(--teal); font-weight: 600; display: block; margin-bottom: 0.5rem;">
+-                Question: "What is platform health and where are anomalies occurring?"
+-              </span>
+-              <a href="dashboard.html" class="btn btn--subtle btn--small" style="width: 100%;">View Dashboard Demo</a>
+-            </div>
++          <article class="home-role">
++            <svg viewBox="0 0 96 96" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
++              <path d="M18 40 L24 18 L72 18 L78 40"/>
++              <path d="M18 40 C18 48 28 48 30 40 C32 48 42 48 44 40 C46 48 56 48 58 40 C60 48 70 48 72 40 C74 48 78 44 78 40"/>
++              <path d="M24 48 L24 80 L72 80 L72 48"/>
++              <path class="accent" d="M42 80 L42 62 L54 62 L54 80"/>
++            </svg>
++            <h3>For sellers</h3>
++            <p>Your own online shop, with simple charts that show what is selling and what to restock.</p>
+           </article>
+ 
+-          <!-- Problem 6 -->
+-          <article class="card card--interactive">
+-            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.75rem;">
+-              <span class="pill">SVM, Naive Bayes</span>
+-              <span class="text-muted text-small">Automation</span>
+-            </div>
+-            <h3 class="card-title">Too much manual work</h3>
+-            <p class="text-small text-muted" style="flex-grow: 1;">
+-              Categorizing millions of new listings and moderating comments drains staff. High-dimensional classifiers automate taxonomy and text screening.
+-            </p>
+-            <div style="margin-top: 1rem; padding-top: 0.75rem; border-top: 1px solid var(--border);">
+-              <span class="text-small" style="color: var(--teal); font-weight: 600; display: block; margin-bottom: 0.5rem;">
+-                Question: "Which category does this listing belong to automatically?"
+-              </span>
+-              <a href="algo-svm.html" class="btn btn--subtle btn--small" style="width: 100%;">Explore SVM Classifier</a>
+-            </div>
++          <article class="home-role">
++            <svg viewBox="0 0 96 96" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
++              <path d="M22 36 L48 24 L74 36 L74 64 L48 76 L22 64 Z"/>
++              <path class="accent" d="M22 36 L48 48 L74 36"/>
++              <path class="accent" d="M48 48 L48 76"/>
++              <path class="accent" d="M34 30 L60 42" stroke-dasharray="3 4"/>
++            </svg>
++            <h3>For the team</h3>
++            <p>See delivery and trust problems early, before customers have to report them.</p>
+           </article>
+         </div>
+       </div>
+     </section>
+ 
+-    <!-- d) How Allonola uses ML strip -->
+-    <section class="section section--compact reveal-on-scroll" style="background: var(--surface);">
++    <!-- How ML is used, with the responsible-use promise -->
++    <section class="home-strip" aria-labelledby="home-how">
+       <div class="container">
+-        <div class="grid-3 text-center">
+-          <div style="padding: 1rem;">
+-            <div class="pill pill--teal mx-auto" style="margin-bottom: 0.75rem;">Suggest Products</div>
+-            <h3 style="font-size: 1.15rem; margin-bottom: 0.5rem;">Personalized Discovery</h3>
+-            <p class="text-small text-muted">Recommends items based on neighborhood similarities and click habits to cut browsing time.</p>
+-          </div>
+-          <div style="padding: 1rem;">
+-            <div class="pill pill--coral mx-auto" style="margin-bottom: 0.75rem;">Flag Risk</div>
+-            <h3 style="font-size: 1.15rem; margin-bottom: 0.5rem;">Proactive Protection</h3>
+-            <p class="text-small text-muted">Screens suspicious orders, deceptive reviews, and high-risk delivery bottlenecks before damage occurs.</p>
+-          </div>
+-          <div style="padding: 1rem;">
+-            <div class="pill mx-auto" style="margin-bottom: 0.75rem;">Forecast Demand</div>
+-            <h3 style="font-size: 1.15rem; margin-bottom: 0.5rem;">Merchant Enablement</h3>
+-            <p class="text-small text-muted">Empowers independent sellers with data-backed price elasticity and seasonal inventory forecasts.</p>
+-          </div>
++        <h2 id="home-how">How Allonola uses machine learning</h2>
++        <div>
++          <p>
++            Our models learn from past purchases, searches, and reviews. They make suggestions
++            and raise warnings. They do not make final decisions about people or payments.
++          </p>
++          <p>
++            When a model is unsure, we say so. Every prediction on this site comes with a
++            plain-language explanation of what it means.
++          </p>
+         </div>
+       </div>
+     </section>
+ 
+-    <!-- e) CTA Band -->
+-    <section class="section reveal-on-scroll text-center">
+-      <div class="container content-reading--narrow">
+-        <h2>Curious how it works? Start with the overview.</h2>
+-        <p class="text-muted mx-auto" style="margin-bottom: 1.75rem;">
+-          Compare strengths, limitations, and operational tasks across all six algorithms in our interactive matrix.
++    <section class="section">
++      <div class="container">
++        <p class="home-notice">
++          Data notice: every dataset and result shown on Allonola is illustrative and synthetically
++          generated for teaching purposes. No real customer, seller, or transaction data is used.
+         </p>
+-        <a href="algorithms.html" class="btn btn--primary">
+-          <span>Explore Algorithms Overview</span>
+-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+-            <line x1="5" y1="12" x2="19" y2="12"></line>
+-            <polyline points="12 5 19 12 12 19"></polyline>
+-          </svg>
+-        </a>
++        <div style="margin-top: 1.75rem;">
++          <a href="algorithms.html" class="btn btn--primary">Explore the algorithms</a>
++        </div>
+       </div>
+     </section>
+   </main>
+-- 
+2.43.0
+

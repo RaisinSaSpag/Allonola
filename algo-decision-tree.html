@@ -10,6 +10,7 @@
   <link rel="stylesheet" href="css/layout.css">
   <link rel="stylesheet" href="css/components.css">
   <link rel="stylesheet" href="css/algorithm.css">
+  <link rel="stylesheet" href="css/plain.css">
   <script defer src="js/chart.umd.min.js"></script>
 </head>
 <body data-page="decision-tree">
@@ -168,6 +169,30 @@
         <h1>Decision Tree</h1>
         <p class="algo-header__question">"Will this order be late?"</p>
       </header>
+<section class="section--compact">
+  <div class="container">
+    <aside class="plain-box" aria-labelledby="dt-plain">
+      <h2 id="dt-plain">In plain words</h2>
+      <p class="plain-box__answer">It predicts whether a delivery will be late by asking a short list of yes-or-no questions.</p>
+      <p><strong>Think of it like this:</strong> A checklist a dispatcher might use. Is the courier a slow one? Is the distance long? Each answer leads to the next question, until there is a final answer.</p>
+      <h3>Try the demo</h3>
+      <ol>
+        <li>Choose the product type, courier, seller rating, and distance.</li>
+        <li>Read the result and the percentage shown.</li>
+        <li>Use the path to see which answers led to the result.</li>
+      </ol>
+      <h3>Words to know</h3>
+      <dl>
+        <dt>Late delivery</dt>
+        <dd>A delivery that arrives after the promised date.</dd>
+        <dt>Seller rating</dt>
+        <dd>How customers have rated the seller, from 1 to 5.</dd>
+        <dt>Chance</dt>
+        <dd>An estimate based on past deliveries. It is not a certainty.</dd>
+      </dl>
+    </aside>
+  </div>
+</section>
 
       <section class="section--compact content-reading">
         <h2>What it is</h2>

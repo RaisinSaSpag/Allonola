@@ -1,0 +1,495 @@
+From e3217d8a831dfada8f412677247585ccc8cb9f3a Mon Sep 17 00:00:00 2001
+From: Claude <noreply@anthropic.com>
+Date: Thu, 29 Oct 2026 05:04:36 +0800
+Subject: [PATCH] Add plain-language guides to all pages
+
+- New css/plain.css: "In plain words" box with an everyday comparison,
+  a short demo guide and a glossary of terms.
+- Each algorithm page explains its question in everyday language first.
+- Algorithms overview lists the six questions, each linked to its page.
+- About, Dashboard and Contact get a short plain-language introduction.
+- Fix unbalanced markup in the Naive Bayes demo buttons.
+- Demo steps use the exact control labels on each page.
+
+Co-Authored-By: Claude Haiku 5.5 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_011R9w2nkswYGc5P1TkM11Vo
+---
+ about.html                  | 16 +++++++++++
+ algo-ann.html               | 29 +++++++++++++++++++
+ algo-decision-tree.html     | 25 +++++++++++++++++
+ algo-knn.html               | 22 +++++++++++++++
+ algo-linear-regression.html | 24 ++++++++++++++++
+ algo-naive-bayes.html       | 26 ++++++++++++++++--
+ algo-svm.html               | 27 ++++++++++++++++++
+ algorithms.html             | 15 ++++++++++
+ contact.html                | 13 +++++++++
+ css/plain.css               | 55 +++++++++++++++++++++++++++++++++++++
+ dashboard.html              | 13 +++++++++
+ 11 files changed, 263 insertions(+), 2 deletions(-)
+ create mode 100644 css/plain.css
+
+diff --git a/about.html b/about.html
+index 90e1383..084125f 100644
+--- a/about.html
++++ b/about.html
+@@ -9,6 +9,7 @@
+   <link rel="stylesheet" href="css/base.css">
+   <link rel="stylesheet" href="css/layout.css">
+   <link rel="stylesheet" href="css/components.css">
++  <link rel="stylesheet" href="css/plain.css">
+ </head>
+ <body data-page="about">
+   <a href="#main-content" class="skip-link">Skip to main content</a>
+@@ -162,6 +163,21 @@
+         <p class="lead">
+           Allonola is an online-only retail marketplace. We have no physical stores, warehouses, or offices.
+         </p>
++
++        <aside class="plain-box" aria-labelledby="about-plain">
++          <h2 id="about-plain">In plain words</h2>
++          <p class="plain-box__answer">Allonola is an online shop where you buy from many small sellers in one place. There are no physical stores.</p>
++          <p><strong>Think of it like this:</strong> A busy market hall that runs entirely online. Independent sellers run their own stalls, couriers deliver the orders, and Allonola keeps the hall safe and fair.</p>
++          <h3>Words to know</h3>
++          <dl>
++            <dt>Marketplace</dt>
++            <dd>A website where many independent sellers offer their products.</dd>
++            <dt>Courier</dt>
++            <dd>A delivery partner who carries orders from sellers to buyers.</dd>
++            <dt>Machine learning</dt>
++            <dd>Computer programs that learn patterns from past activity, such as purchases and reviews, instead of following only fixed rules.</dd>
++          </dl>
++        </aside>
+         <p>
+           Independent sellers keep and pack their own stock; delivery partners (couriers) carry orders. Allonola runs the platform connecting buyers, sellers, and couriers. It uses machine learning to suggest products, flag fake reviews and suspicious orders, and warn staff about likely late deliveries or returns.
+         </p>
+diff --git a/algo-ann.html b/algo-ann.html
+index 326150d..f119ebc 100644
+--- a/algo-ann.html
++++ b/algo-ann.html
+@@ -10,6 +10,7 @@
+   <link rel="stylesheet" href="css/layout.css">
+   <link rel="stylesheet" href="css/components.css">
+   <link rel="stylesheet" href="css/algorithm.css">
++  <link rel="stylesheet" href="css/plain.css">
+   <script defer src="js/chart.umd.min.js"></script>
+ </head>
+ <body data-page="ann">
+@@ -127,6 +128,34 @@
+         <h1>Artificial Neural Network (ANN)</h1>
+         <p class="algo-header__question">"Will this shopper stop using Allonola?"</p>
+       </header>
++<section class="section--compact">
++  <div class="container">
++    <aside class="plain-box" aria-labelledby="ann-plain">
++      <h2 id="ann-plain">In plain words</h2>
++      <p class="plain-box__answer">It estimates how likely a shopper is to stop using Allonola, based on how they behave.</p>
++      <p><strong>Think of it like this:</strong> A shop assistant who has seen many customers. They notice small signs, like fewer visits and fewer searches, that together suggest someone is losing interest.</p>
++      <h3>Try the demo</h3>
++      <ol>
++        <li>Pick a sample shopper.</li>
++        <li>Press "Predict Churn Risk".</li>
++        <li>Read the churn risk. A higher percentage means a higher chance the shopper leaves.</li>
++      </ol>
++      <h3>Words to know</h3>
++      <dl>
++        <dt>Churn</dt>
++        <dd>A customer who stops coming back.</dd>
++        <dt>Neural network</dt>
++        <dd>A model made of layers of simple calculations that learns patterns from examples.</dd>
++        <dt>Training</dt>
++        <dd>Learning from past shoppers.</dd>
++        <dt>Loss</dt>
++        <dd>How wrong the model is during training. Lower is better.</dd>
++        <dt>Epoch</dt>
++        <dd>One full pass through the training examples.</dd>
++      </dl>
++    </aside>
++  </div>
++</section>
+ 
+       <section class="section--compact content-reading">
+         <h2>What it is</h2>
+diff --git a/algo-decision-tree.html b/algo-decision-tree.html
+index c703076..2ac3ed3 100644
+--- a/algo-decision-tree.html
++++ b/algo-decision-tree.html
+@@ -10,6 +10,7 @@
+   <link rel="stylesheet" href="css/layout.css">
+   <link rel="stylesheet" href="css/components.css">
+   <link rel="stylesheet" href="css/algorithm.css">
++  <link rel="stylesheet" href="css/plain.css">
+   <script defer src="js/chart.umd.min.js"></script>
+ </head>
+ <body data-page="decision-tree">
+@@ -168,6 +169,30 @@
+         <h1>Decision Tree</h1>
+         <p class="algo-header__question">"Will this order be late?"</p>
+       </header>
++<section class="section--compact">
++  <div class="container">
++    <aside class="plain-box" aria-labelledby="dt-plain">
++      <h2 id="dt-plain">In plain words</h2>
++      <p class="plain-box__answer">It predicts whether a delivery will be late by asking a short list of yes-or-no questions.</p>
++      <p><strong>Think of it like this:</strong> A checklist a dispatcher might use. Is the courier a slow one? Is the distance long? Each answer leads to the next question, until there is a final answer.</p>
++      <h3>Try the demo</h3>
++      <ol>
++        <li>Choose the product type, courier, seller rating, and distance.</li>
++        <li>Read the result and the percentage shown.</li>
++        <li>Use the path to see which answers led to the result.</li>
++      </ol>
++      <h3>Words to know</h3>
++      <dl>
++        <dt>Late delivery</dt>
++        <dd>A delivery that arrives after the promised date.</dd>
++        <dt>Seller rating</dt>
++        <dd>How customers have rated the seller, from 1 to 5.</dd>
++        <dt>Chance</dt>
++        <dd>An estimate based on past deliveries. It is not a certainty.</dd>
++      </dl>
++    </aside>
++  </div>
++</section>
+ 
+       <section class="section--compact content-reading">
+         <h2>What it is</h2>
+diff --git a/algo-knn.html b/algo-knn.html
+index 7fb2594..e1a4180 100644
+--- a/algo-knn.html
++++ b/algo-knn.html
+@@ -10,6 +10,7 @@
+   <link rel="stylesheet" href="css/layout.css">
+   <link rel="stylesheet" href="css/components.css">
+   <link rel="stylesheet" href="css/algorithm.css">
++  <link rel="stylesheet" href="css/plain.css">
+ </head>
+ <body data-page="knn">
+   <a href="#main-content" class="skip-link">Skip to main content</a>
+@@ -102,6 +103,27 @@
+               <span class="pill pill--teal">KNN</span>
+               <h1>Collaborative recommendations</h1>
+               <p class="lead">This algorithm compares shoppers with similar purchase patterns and recommends products they are likely to buy next.</p>
++
++            <aside class="plain-box" aria-labelledby="knn-plain">
++              <h2 id="knn-plain">In plain words</h2>
++              <p class="plain-box__answer">It finds shoppers with similar buying habits and suggests products they bought.</p>
++              <p><strong>Think of it like this:</strong> Asking friends with similar taste what they bought. If your closest taste-twins all bought a phone charger, you might want one too.</p>
++              <h3>Try the demo</h3>
++              <ol>
++                <li>Pick a shopper from the list.</li>
++                <li>Move the "Number of neighbors (k)" slider to change how many similar shoppers are checked.</li>
++                <li>Read the suggested products and their scores.</li>
++              </ol>
++              <h3>Words to know</h3>
++              <dl>
++                <dt>Shopper</dt>
++                <dd>A customer in our sample data.</dd>
++                <dt>Similar shopper (neighbor)</dt>
++                <dd>A shopper whose past purchases look like the chosen shopper's.</dd>
++                <dt>Score out of 5</dt>
++                <dd>How highly those similar shoppers rated the product, on average.</dd>
++              </dl>
++            </aside>
+             </div>
+             <div class="grid-2 reveal-on-scroll">
+               <article class="card"><h3>Where it helps</h3><p>Homepage discovery, “customers also bought,” and cross-sell suggestions for new and repeat shoppers.</p></article>
+diff --git a/algo-linear-regression.html b/algo-linear-regression.html
+index 9b3e512..e0c11df 100644
+--- a/algo-linear-regression.html
++++ b/algo-linear-regression.html
+@@ -10,6 +10,7 @@
+   <link rel="stylesheet" href="css/layout.css">
+   <link rel="stylesheet" href="css/components.css">
+   <link rel="stylesheet" href="css/algorithm.css">
++  <link rel="stylesheet" href="css/plain.css">
+ </head>
+ <body data-page="linear-regression">
+   <a href="#main-content" class="skip-link">Skip to main content</a>
+@@ -102,6 +103,29 @@
+               <span class="pill pill--teal">Linear Regression</span>
+               <h1>Demand forecasting and price elasticity</h1>
+               <p class="lead">A simple regression model uses price and promotion variables to estimate how many units a product may sell.</p>
++
++            <aside class="plain-box" aria-labelledby="lr-plain">
++              <h2 id="lr-plain">In plain words</h2>
++              <p class="plain-box__answer">It estimates how many units of a product will sell at a given price.</p>
++              <p><strong>Think of it like this:</strong> A shop owner who has noticed that when an item goes on sale, more people buy it. The model finds the straight-line pattern behind past sales and uses it to estimate the next one.</p>
++              <h3>Try the demo</h3>
++              <ol>
++                <li>Choose a product from the list.</li>
++                <li>Move the price slider and watch the estimated units change.</li>
++                <li>Tick "Promotion on" to see how a sale changes the estimate.</li>
++              </ol>
++              <h3>Words to know</h3>
++              <dl>
++                <dt>Prediction</dt>
++                <dd>The model's best estimate. It is not a promise.</dd>
++                <dt>Price sensitivity</dt>
++                <dd>How much sales change when the price changes.</dd>
++                <dt>Promotion</dt>
++                <dd>A sale or discount that the seller runs.</dd>
++                <dt>Trend line</dt>
++                <dd>The straight-line pattern the model found in past sales.</dd>
++              </dl>
++            </aside>
+             </div>
+             <div class="grid-2 reveal-on-scroll">
+               <article class="card"><h3>Use case</h3><p>Seller teams use these forecasts to decide how much inventory to keep in stock and whether a price cut will increase volume.</p></article>
+diff --git a/algo-naive-bayes.html b/algo-naive-bayes.html
+index 1ddd7c6..f13d64a 100644
+--- a/algo-naive-bayes.html
++++ b/algo-naive-bayes.html
+@@ -10,6 +10,7 @@
+   <link rel="stylesheet" href="css/layout.css">
+   <link rel="stylesheet" href="css/components.css">
+   <link rel="stylesheet" href="css/algorithm.css">
++  <link rel="stylesheet" href="css/plain.css">
+ </head>
+ <body data-page="naive-bayes">
+   <a href="#main-content" class="skip-link">Skip to main content</a>
+@@ -102,6 +103,27 @@
+               <span class="pill pill--teal">Naive Bayes</span>
+               <h1>Review moderation and sentiment filtering</h1>
+               <p class="lead">The model learns from prior review labels and estimates whether a new message is likely positive, negative, or spam.</p>
++
++            <aside class="plain-box" aria-labelledby="nb-plain">
++              <h2 id="nb-plain">In plain words</h2>
++              <p class="plain-box__answer">It reads a review and estimates whether it is positive, negative, or spam.</p>
++              <p><strong>Think of it like this:</strong> A friend who has read thousands of reviews. After seeing many "free gift card, click now" messages that turned out to be spam, you start to recognize them at a glance.</p>
++              <h3>Try the demo</h3>
++              <ol>
++                <li>Type a review, or click one of the example buttons.</li>
++                <li>Press "Classify review".</li>
++                <li>Read the three percentages. The highest one is the model's answer.</li>
++              </ol>
++              <h3>Words to know</h3>
++              <dl>
++                <dt>Label</dt>
++                <dd>The correct answer from past examples that the model learned from.</dd>
++                <dt>Probability</dt>
++                <dd>How confident the model is, from 0% to 100%.</dd>
++                <dt>Spam</dt>
++                <dd>Unwanted or misleading messages, such as fake prizes.</dd>
++              </dl>
++            </aside>
+             </div>
+             <div class="grid-2 reveal-on-scroll">
+               <article class="card"><h3>Model goal</h3><p>Flag reviews that are suspicious, spammy, or misleading while preserving legitimate product feedback for the marketplace.</p></article>
+@@ -115,12 +137,12 @@
+               <h2>Interactive demo</h2>
+               <label for="nb-text">Review text</label>
+               <textarea id="nb-text" rows="4">Amazing quality and super fast delivery, thanks team!</textarea>
+-              <div class="action-row"><button class="btn btn--primary" id="nb-run" type="button">Classify review</button>
++              <div class="action-row"><button class="btn btn--primary" id="nb-run" type="button">Classify review</button></div>
+               <div class="action-row">
+                 <button class="btn" type="button" data-nb-example="Battery lasts all day, great value">Try a positive review</button>
+                 <button class="btn" type="button" data-nb-example="Not what I ordered, wrong color.">Try a negative review</button>
+                 <button class="btn" type="button" data-nb-example="WIN a free gift card now, click this link!!!">Try a spam review</button>
+-              </div></div>
++              </div>
+               <div id="nb-output" class="output-box">Ready to classify.</div>
+             </div>
+           </div>
+diff --git a/algo-svm.html b/algo-svm.html
+index 9435bc3..6741d70 100644
+--- a/algo-svm.html
++++ b/algo-svm.html
+@@ -10,6 +10,7 @@
+   <link rel="stylesheet" href="css/layout.css">
+   <link rel="stylesheet" href="css/components.css">
+   <link rel="stylesheet" href="css/algorithm.css">
++  <link rel="stylesheet" href="css/plain.css">
+   <script defer src="js/chart.umd.min.js"></script>
+ </head>
+ <body data-page="svm">
+@@ -171,6 +172,32 @@
+       </header>
+ 
+       <!-- 2. What it is -->
++<section class="section--compact">
++  <div class="container">
++    <aside class="plain-box" aria-labelledby="svm-plain">
++      <h2 id="svm-plain">In plain words</h2>
++      <p class="plain-box__answer">It sorts orders into normal and suspicious, so a person can check the risky ones first.</p>
++      <p><strong>Think of it like this:</strong> A security guard who draws a line between ordinary orders and unusual ones. Orders that fall on the risky side get a flag.</p>
++      <h3>Try the demo</h3>
++      <ol>
++        <li>Move the "Decision threshold" slider.</li>
++        <li>A higher threshold means fewer, stricter flags. A lower one means more flags.</li>
++        <li>Look at the chart. Flagged orders are the ones to check.</li>
++      </ol>
++      <h3>Words to know</h3>
++      <dl>
++        <dt>Flag</dt>
++        <dd>A warning that an order should be checked by a person.</dd>
++        <dt>Threshold</dt>
++        <dd>How strict the guard is. Higher means stricter.</dd>
++        <dt>False alarm</dt>
++        <dd>A safe order that was flagged by mistake.</dd>
++        <dt>Missed fraud</dt>
++        <dd>A risky order that was not flagged.</dd>
++      </dl>
++    </aside>
++  </div>
++</section>
+       <section class="section--compact content-reading">
+         <h2>What it is</h2>
+         <p>
+diff --git a/algorithms.html b/algorithms.html
+index d229d10..a91eecc 100644
+--- a/algorithms.html
++++ b/algorithms.html
+@@ -9,6 +9,7 @@
+   <link rel="stylesheet" href="css/base.css">
+   <link rel="stylesheet" href="css/layout.css">
+   <link rel="stylesheet" href="css/components.css">
++  <link rel="stylesheet" href="css/plain.css">
+   <link rel="stylesheet" href="css/algorithm.css">
+   <style>
+     .filter-btn-group {
+@@ -188,6 +189,20 @@
+         </p>
+       </div>
+ 
++            <!-- Plain-language overview -->
++      <section class="content-reading" aria-labelledby="plain-overview">
++        <h2 id="plain-overview">Which question does each one answer?</h2>
++        <p>Each method is a different kind of helper. Pick the question you care about to read its plain-language guide.</p>
++        <ul class="plain-questions">
++          <li><a href="algo-linear-regression.html"><strong>How many units will sell?</strong><span>Estimates sales for a price and promotion. Used by sellers to plan prices and stock.</span></a></li>
++          <li><a href="algo-naive-bayes.html"><strong>Is this review real?</strong><span>Sorts reviews into positive, negative, or spam so buyers see honest feedback.</span></a></li>
++          <li><a href="algo-knn.html"><strong>What should I look at next?</strong><span>Suggests products that shoppers with similar tastes bought.</span></a></li>
++          <li><a href="algo-svm.html"><strong>Is this order risky?</strong><span>Flags unusual orders so a person can check them first.</span></a></li>
++          <li><a href="algo-decision-tree.html"><strong>Will this delivery be late?</strong><span>Uses a checklist of simple questions to warn about late deliveries.</span></a></li>
++          <li><a href="algo-ann.html"><strong>Is this shopper about to leave?</strong><span>Estimates how likely a shopper is to stop using Allonola.</span></a></li>
++        </ul>
++      </section>
++
+       <!-- Filter Buttons -->
+       <div class="filter-btn-group" role="group" aria-label="Filter algorithms by task type">
+         <button type="button" class="btn btn--primary btn--small filter-btn active" data-filter="all">All</button>
+diff --git a/contact.html b/contact.html
+index 3eac4a0..2e67761 100644
+--- a/contact.html
++++ b/contact.html
+@@ -9,6 +9,7 @@
+   <link rel="stylesheet" href="css/base.css">
+   <link rel="stylesheet" href="css/layout.css">
+   <link rel="stylesheet" href="css/components.css">
++  <link rel="stylesheet" href="css/plain.css">
+ </head>
+ <body data-page="contact">
+   <a href="#main-content" class="skip-link">Skip to main content</a>
+@@ -162,6 +163,18 @@
+         <p class="lead">
+           Questions, feedback, or a partnership idea? Send us a message.
+         </p>
++
++        <aside class="plain-box" aria-labelledby="contact-plain">
++          <h2 id="contact-plain">In plain words</h2>
++          <p class="plain-box__answer">Use this page to send us a question, a problem, or feedback.</p>
++          <p><strong>Think of it like this:</strong> Like asking at a shop counter. Choose the closest description of your question, so the right team can help you faster.</p>
++          <h3>How to send a message</h3>
++          <ol>
++            <li>Choose who you are: buyer, seller, courier, or other.</li>
++            <li>Describe what you need in a few sentences.</li>
++            <li>Send the form. You will see a confirmation message. This is a demo, so no real message is sent.</li>
++          </ol>
++        </aside>
+       </div>
+ 
+       <div class="grid-2" style="align-items: start; gap: 3rem;">
+diff --git a/css/plain.css b/css/plain.css
+new file mode 100644
+index 0000000..d36793c
+--- /dev/null
++++ b/css/plain.css
+@@ -0,0 +1,55 @@
++/* Plain-language layer for non-technical readers.
++   Used on the algorithm pages and the overview. Theme-aware via base.css variables. */
++
++.plain-box {
++  margin: 2rem 0;
++  padding: 1.5rem 1.75rem;
++  max-width: 70ch;
++  background: var(--surface);
++  border: 1px solid var(--border);
++  border-left: 4px solid var(--teal);
++  border-radius: var(--radius-card);
++}
++.plain-box h2 {
++  font-family: var(--font-heading);
++  font-size: 1.3rem;
++  color: var(--primary);
++  margin: 0 0 0.6rem;
++}
++.plain-box h3 {
++  font-family: var(--font-heading);
++  font-size: 1rem;
++  color: var(--text);
++  margin: 1.25rem 0 0.4rem;
++}
++.plain-box p { margin: 0 0 0.75rem; max-width: none; }
++.plain-box__answer { font-size: 1.15rem; color: var(--text); }
++.plain-box ol { margin: 0 0 0.5rem; padding-left: 1.25rem; }
++.plain-box ol li { margin-bottom: 0.35rem; }
++.plain-box dl { margin: 0; }
++.plain-box dt { font-weight: 700; color: var(--text); margin-top: 0.7rem; }
++.plain-box dd { margin: 0.1rem 0 0; color: var(--text-muted); }
++
++.plain-questions {
++  list-style: none;
++  padding: 0;
++  margin: 1.5rem 0 0;
++  border-top: 2px solid var(--primary);
++}
++.plain-questions li { border-bottom: 1px solid var(--border); }
++.plain-questions a {
++  display: block;
++  padding: 0.9rem 0.5rem 0.9rem 0.25rem;
++  text-decoration: none;
++  color: inherit;
++  transition: background-color var(--transition-speed) ease;
++}
++.plain-questions a:hover,
++.plain-questions a:focus-visible { background: color-mix(in srgb, var(--teal) 10%, transparent); }
++.plain-questions strong {
++  display: block;
++  font-family: var(--font-heading);
++  font-size: 1.1rem;
++  color: var(--text);
++}
++.plain-questions span { color: var(--text-muted); font-size: 0.95rem; }
+diff --git a/dashboard.html b/dashboard.html
+index 8e9a1e7..b29cdc1 100644
+--- a/dashboard.html
++++ b/dashboard.html
+@@ -9,6 +9,7 @@
+   <link rel="stylesheet" href="css/base.css">
+   <link rel="stylesheet" href="css/layout.css">
+   <link rel="stylesheet" href="css/components.css">
++  <link rel="stylesheet" href="css/plain.css">
+   <script defer src="js/chart.umd.min.js"></script>
+ </head>
+ <body data-page="dashboard">
+@@ -163,6 +164,18 @@
+           <div class="pill pill--teal" style="margin-bottom: 0.5rem;">Operations Console</div>
+           <h1>Dashboard demo</h1>
+           <p class="text-muted" style="margin: 0;">Interactive analytics for independent sellers, platform administrators, and model telemetry.</p>
++
++        <aside class="plain-box" aria-labelledby="dash-plain">
++          <h2 id="dash-plain">In plain words</h2>
++          <p class="plain-box__answer">These are example dashboards that show what sellers and staff would see day to day.</p>
++          <p><strong>Think of it like this:</strong> Like a car dashboard: a few clear gauges tell you what matters, so you do not need to understand the engine to drive.</p>
++          <h3>Try it</h3>
++          <ol>
++            <li>Read the title of each chart. It says what is being measured.</li>
++            <li>Use any date or chart filters to change the period you are looking at.</li>
++            <li>Remember that every number here is sample data, not real sales.</li>
++          </ol>
++        </aside>
+         </div>
+ 
+         <div class="time-range-bar">
+-- 
+2.43.0
+

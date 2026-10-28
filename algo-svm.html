@@ -10,6 +10,7 @@
   <link rel="stylesheet" href="css/layout.css">
   <link rel="stylesheet" href="css/components.css">
   <link rel="stylesheet" href="css/algorithm.css">
+  <link rel="stylesheet" href="css/plain.css">
   <script defer src="js/chart.umd.min.js"></script>
 </head>
 <body data-page="svm">
@@ -171,6 +172,32 @@
       </header>
 
       <!-- 2. What it is -->
+<section class="section--compact">
+  <div class="container">
+    <aside class="plain-box" aria-labelledby="svm-plain">
+      <h2 id="svm-plain">In plain words</h2>
+      <p class="plain-box__answer">It sorts orders into normal and suspicious, so a person can check the risky ones first.</p>
+      <p><strong>Think of it like this:</strong> A security guard who draws a line between ordinary orders and unusual ones. Orders that fall on the risky side get a flag.</p>
+      <h3>Try the demo</h3>
+      <ol>
+        <li>Move the "Decision threshold" slider.</li>
+        <li>A higher threshold means fewer, stricter flags. A lower one means more flags.</li>
+        <li>Look at the chart. Flagged orders are the ones to check.</li>
+      </ol>
+      <h3>Words to know</h3>
+      <dl>
+        <dt>Flag</dt>
+        <dd>A warning that an order should be checked by a person.</dd>
+        <dt>Threshold</dt>
+        <dd>How strict the guard is. Higher means stricter.</dd>
+        <dt>False alarm</dt>
+        <dd>A safe order that was flagged by mistake.</dd>
+        <dt>Missed fraud</dt>
+        <dd>A risky order that was not flagged.</dd>
+      </dl>
+    </aside>
+  </div>
+</section>
       <section class="section--compact content-reading">
         <h2>What it is</h2>
         <p>
