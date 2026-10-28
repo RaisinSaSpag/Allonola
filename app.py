@@ -4,6 +4,7 @@ import joblib
 import pandas as pd
 from flask import Flask, request, jsonify
 from flask_cors import CORS
+from werkzeug.exceptions import HTTPException
 
 warnings.filterwarnings("ignore", category=UserWarning)
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -61,6 +62,11 @@ def handle_bad_input(err):
 
 @app.errorhandler(Exception)
 def handle_unexpected(err):
+    # Let Flask handle its own HTTP errors (like 404 Not Found, 405 Method Not Allowed)
+    if isinstance(err, HTTPException):
+        return err
+    
+    # For our own custom errors (like a Python crash), return a 500
     app.logger.exception("Unhandled error")
     return jsonify({"error": "Internal server error."}), 500
 
