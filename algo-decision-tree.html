@@ -4,22 +4,13 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Decision Tree | Allonola</title>
-  <meta name="description" content="Explainable Decision Tree rules for delivery risk classification, courier delays, and order return mitigation.">
+  <meta name="description" content="Decision Tree classification for delivery delay risks and return rules.">
   <link rel="stylesheet" href="css/fonts.css">
   <link rel="stylesheet" href="css/base.css">
   <link rel="stylesheet" href="css/layout.css">
   <link rel="stylesheet" href="css/components.css">
   <link rel="stylesheet" href="css/algorithm.css">
-  <style>
-    .tree-step-pill {
-      display: inline-block;
-      padding: 0.2rem 0.6rem;
-      border-radius: var(--radius-pill);
-      font-size: 0.75rem;
-      font-weight: 700;
-      margin-right: 0.4rem;
-    }
-  </style>
+  <script defer src="js/chart.umd.min.js"></script>
 </head>
 <body data-page="decision-tree">
   <a href="#main-content" class="skip-link">Skip to main content</a>
@@ -169,389 +160,95 @@
 
   <main id="main-content" class="section">
     <div class="container">
-      <!-- 1. Header Block -->
       <header class="algo-header">
         <div class="algo-header__pills">
-          <span class="pill">Task: Classify with explainable rules</span>
-          <span class="pill pill--teal">Used in: Admin delivery and return-rate charts; late-delivery warnings</span>
+          <span class="pill pill--coral">Task: Classify with explainable rules</span>
+          <span class="pill">Used in: Return & late-delivery warnings</span>
         </div>
         <h1>Decision Tree</h1>
-        <p class="algo-header__question">"Will this order be late or returned, and why?"</p>
+        <p class="algo-header__question">"Will this order be late?"</p>
       </header>
 
-      <!-- 2. What it is -->
       <section class="section--compact content-reading">
         <h2>What it is</h2>
-        <p>
-          A Decision Tree is a flowchart of yes/no questions—for example, "Is the seller rating below 3.5? Is the shipping distance long?"—that branches systematically down to a clear operational prediction such as "likely late".
-        </p>
+        <p>A Decision Tree works like a flowchart of yes/no questions, for example "Is the seller rating below 3.5? Is the shipping distance long?", ending in an answer such as "likely late."</p>
       </section>
 
-      <!-- 3. Why Allonola uses it -->
       <section class="section--compact content-reading">
         <h2>Why Allonola uses it</h2>
-        <p>
-          Allonola does not operate its own fulfillment trucks; third-party couriers carry orders from independent sellers directly to buyers. When packages are delayed or returned, support staff must know the exact root cause to coordinate constructively with couriers and merchants. Transparent decision branches provide full auditability, advancing Operational Goal #4 (reach 92% on-time delivery) and Operational Goal #5 (keep return rate below 6% of orders).
-        </p>
+        <p>Late deliveries and returns damage buyer trust and cost sellers money. The Decision Tree powers the return and late-delivery warnings in the admin dashboard and the courier performance views. It provides transparent, rule-based predictions that staff can easily audit and act upon.</p>
       </section>
 
-      <!-- 4. How it works -->
       <section class="section--compact content-reading">
         <h2>How it works</h2>
-        <p>
-          The algorithm evaluates candidate features and selects the question split that best separates outcomes by minimizing impurity. Each branch represents a human-readable condition, and each leaf node produces a final prediction with associated confidence.
-        </p>
-
-        <div class="formula-box">
-Gini Impurity: Gini(D) = 1 - ∑ [p_i]²
-
-Information Gain: Gain(D, Feature) = Entropy(D) - ∑ (|D_v| / |D|) × Entropy(D_v)
-        </div>
-
-        <p class="text-small text-muted">
-          The primary strength of decision trees is total explainability: staff can inspect the exact sequence of thresholds that triggered an operational warning. Overfitting is prevented by limiting maximum tree depth and pruning branches with minimal sample support.
-        </p>
+        <p>The tree repeatedly splits the data on the input that best separates the outcomes, measured by Gini impurity or information gain. Each branch is a rule and each end point (leaf) is a prediction. Its main strength is that staff can trace exactly why an order was flagged.</p>
       </section>
 
-      <!-- 5. Data used and why -->
-      <section class="section--compact">
-        <h2>Data used and why</h2>
-        <div class="table-responsive-wrapper" tabindex="0" role="region" aria-label="Decision tree features and reasons">
-          <table class="data-table">
-            <caption>Features used for transit delay and return probability evaluation. Illustrative / synthetically generated.</caption>
-            <thead>
-              <tr>
-                <th scope="col">Feature</th>
-                <th scope="col">Type / Range</th>
-                <th scope="col">Operational Rationale</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <th scope="row">Product type</th>
-                <td>Standard, Fragile, Perishable</td>
-                <td>Sensitive goods encounter careful packing delays and cold-chain constraints.</td>
-              </tr>
-              <tr>
-                <th scope="row">Seller rating</th>
-                <td>1.0 to 5.0 stars</td>
-                <td>Low-rated merchants suffer from dispatch backlogs and packaging errors.</td>
-              </tr>
-              <tr>
-                <th scope="row">Courier partner</th>
-                <td>Courier A, B, or C</td>
-                <td>Reflects regional carrier workload and local distribution hub congestion.</td>
-              </tr>
-              <tr>
-                <th scope="row">Shipping distance</th>
-                <td>Kilometers (km)</td>
-                <td>Cross-zone provincial transit routes have higher vulnerability to delay.</td>
-              </tr>
-              <tr>
-                <th scope="row">Return history</th>
-                <td>Prior return count</td>
-                <td>Signals chronic delivery address ambiguity or buyer availability issues.</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-        <p class="text-small text-muted">Output: late or on time; returned or not; or customer segmentation group.</p>
-      </section>
-
-      <!-- 6. Sample dataset -->
-      <section class="section--compact">
-        <h2>Sample dataset</h2>
-        <div class="table-responsive-wrapper" tabindex="0" role="region" aria-label="Sample delivery records">
-          <table class="data-table">
-            <caption>Sample historical dispatches. Late column indicates actual delayed delivery (1 = late). Illustrative / synthetically generated.</caption>
-            <thead>
-              <tr>
-                <th scope="col">Order</th>
-                <th scope="col">Product type</th>
-                <th scope="col">Seller rating</th>
-                <th scope="col">Courier</th>
-                <th scope="col">Distance (km)</th>
-                <th scope="col">Return history</th>
-                <th scope="col">Late flag</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <th scope="row">R-01</th>
-                <td>Standard</td>
-                <td class="tabular-nums">4.8</td>
-                <td>Courier A</td>
-                <td class="tabular-nums">6</td>
-                <td class="tabular-nums">0</td>
-                <td><span class="pill pill--teal">0 (On time)</span></td>
-              </tr>
-              <tr>
-                <th scope="row">R-02</th>
-                <td>Fragile</td>
-                <td class="tabular-nums">3.2</td>
-                <td>Courier B</td>
-                <td class="tabular-nums">28</td>
-                <td class="tabular-nums">2</td>
-                <td><span class="pill pill--coral">1 (Late)</span></td>
-              </tr>
-              <tr>
-                <th scope="row">R-03</th>
-                <td>Standard</td>
-                <td class="tabular-nums">4.1</td>
-                <td>Courier A</td>
-                <td class="tabular-nums">14</td>
-                <td class="tabular-nums">0</td>
-                <td><span class="pill pill--teal">0 (On time)</span></td>
-              </tr>
-              <tr>
-                <th scope="row">R-04</th>
-                <td>Perishable</td>
-                <td class="tabular-nums">3.4</td>
-                <td>Courier C</td>
-                <td class="tabular-nums">31</td>
-                <td class="tabular-nums">1</td>
-                <td><span class="pill pill--coral">1 (Late)</span></td>
-              </tr>
-              <tr>
-                <th scope="row">R-05</th>
-                <td>Standard</td>
-                <td class="tabular-nums">4.6</td>
-                <td>Courier B</td>
-                <td class="tabular-nums">9</td>
-                <td class="tabular-nums">0</td>
-                <td><span class="pill pill--teal">0 (On time)</span></td>
-              </tr>
-              <tr>
-                <th scope="row">R-06</th>
-                <td>Fragile</td>
-                <td class="tabular-nums">3.9</td>
-                <td>Courier C</td>
-                <td class="tabular-nums">22</td>
-                <td class="tabular-nums">3</td>
-                <td><span class="pill pill--coral">1 (Late)</span></td>
-              </tr>
-              <tr>
-                <th scope="row">R-07</th>
-                <td>Standard</td>
-                <td class="tabular-nums">3.1</td>
-                <td>Courier B</td>
-                <td class="tabular-nums">19</td>
-                <td class="tabular-nums">0</td>
-                <td><span class="pill pill--coral">1 (Late)</span></td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </section>
-
-      <!-- 7. Interactive Demo -->
+      <!-- Interactive Demo -->
       <section class="demo-container">
         <div class="demo-header">
           <div>
             <h2>Interactive demo</h2>
-            <p class="text-muted text-small">Configure order attributes below or click the rules tree to trace the exact decision trail.</p>
+            <p class="text-muted text-small">Adjust order parameters to predict late delivery risk.</p>
           </div>
-          <span class="demo-badge">Live demo: explainable rule hierarchy</span>
+          <span class="demo-badge">Live demo: Decision Tree classifier</span>
         </div>
 
-        <!-- Trained decision tree: rules are generated from the model when the page loads -->
-        <div class="card card--solid" style="padding: 1.5rem; margin-bottom: 2rem;">
-          <h3 style="font-size: 1.05rem; margin-bottom: 0.5rem;">Trained decision tree (depth 4)</h3>
-          <p class="text-small text-muted" style="margin-bottom: 1rem;">
-            These rules come from the trained model. An order is checked from the top down; the rules it passed are listed in the audit trail below.
-          </p>
-          <pre id="dt-tree-rules" class="text-small" style="overflow-x: auto; white-space: pre; background: var(--surface); padding: 1rem; border-radius: var(--radius-card); margin: 0;"></pre>
-        </div>
-
-        <!-- Form: Try an Order -->
         <div class="demo-layout">
           <div class="demo-controls">
-            <h3 style="font-size: 1.1rem;">Try an order</h3>
-            
             <div class="form-group">
-              <label for="dt-product-type" class="form-label">Product type:</label>
+              <label for="dt-product-type" class="form-label">Product Type:</label>
               <select id="dt-product-type" class="form-control">
-                <option value="Perishable" selected>Perishable (e.g., fresh produce, baked goods)</option>
-                <option value="Fragile">Fragile (e.g., glassware, electronics)</option>
-                <option value="Standard">Standard (e.g., apparel, books, phone stand)</option>
+                <option value="Standard" selected>Standard</option>
+                <option value="Perishable">Perishable</option>
               </select>
             </div>
 
             <div class="form-group">
               <div class="slider-label-row">
-                <label for="dt-seller-rating" class="form-label">Seller rating:</label>
-                <span id="dt-seller-rating-val" class="tabular-nums" style="color: var(--teal); font-weight: 700;">3.4</span>
+                <label for="dt-seller-rating" class="form-label">Seller Rating:</label>
+                <span id="dt-rating-val" class="tabular-nums" style="color: var(--teal); font-weight: 700;">3.4</span>
               </div>
               <input type="range" id="dt-seller-rating" class="slider-input" min="1.0" max="5.0" step="0.1" value="3.4">
             </div>
 
             <div class="form-group">
-              <label for="dt-courier" class="form-label">Assigned courier partner:</label>
+              <label for="dt-courier" class="form-label">Courier:</label>
               <select id="dt-courier" class="form-control">
-                <option value="Courier C" selected>Courier C (Regional hub congestion)</option>
-                <option value="Courier A">Courier A (High reliability metric)</option>
-                <option value="Courier B">Courier B (Standard fleet service)</option>
+                <option value="Courier A">Courier A</option>
+                <option value="Courier B">Courier B</option>
+                <option value="Courier C" selected>Courier C</option>
               </select>
             </div>
 
             <div class="form-group">
               <div class="slider-label-row">
-                <label for="dt-distance" class="form-label">Transit distance (km):</label>
-                <span id="dt-distance-val" class="tabular-nums" style="color: var(--teal); font-weight: 700;">31 km</span>
+                <label for="dt-distance" class="form-label">Distance (KM):</label>
+                <span id="dt-distance-val" class="tabular-nums" style="color: var(--teal); font-weight: 700;">31</span>
               </div>
-              <input type="range" id="dt-distance" class="slider-input" min="2" max="60" step="1" value="31">
+              <input type="range" id="dt-distance" class="slider-input" min="2" max="500" step="1" value="31">
             </div>
 
-            <div class="form-group">
-              <div class="slider-label-row">
-                <label for="dt-returns" class="form-label">Buyer past returns:</label>
-                <span id="dt-returns-val" class="tabular-nums" style="color: var(--teal); font-weight: 700;">1</span>
-              </div>
-              <input type="range" id="dt-returns" class="slider-input" min="0" max="5" step="1" value="1">
-            </div>
-
-            <button type="button" id="dt-load-r04-btn" class="btn btn--subtle btn--small">
-              Load sample order
-            </button>
+            <button type="button" id="dt-load-r04-btn" class="btn btn--subtle btn--small">Load Sample R-04</button>
           </div>
 
           <div class="demo-output">
-            <div class="demo-big-stat">
-              <div id="dt-prediction-badge" class="demo-big-stat__number" style="font-size: 2.2rem; color: var(--coral);">
-                LIKELY LATE
-              </div>
-              <div class="demo-big-stat__label">Predicted Outcome (<span id="dt-confidence-badge">—</span> confidence)</div>
-            </div>
-
-            <div class="card card--solid" style="padding: 1.25rem;">
-              <h4 style="font-size: 0.95rem; margin-bottom: 0.5rem; color: var(--teal);">Decision Audit Trail:</h4>
-              <p id="dt-sentence-path" class="text-small" style="margin-bottom: 0.75rem; color: var(--text);">
-                Loading the trained model's prediction…
-              </p>
-              <div class="card" style="padding: 0.75rem 1rem; background: var(--surface);">
-                <span class="text-small text-muted" style="font-weight: 600;">Sequential rule evaluation steps:</span>
-                <ol id="dt-path-steps-list" style="padding-left: 1.25rem; margin-top: 0.35rem; font-size: 0.85rem; color: var(--text-muted); display: flex; flex-direction: column; gap: 0.25rem;">
-                  <!-- Populated dynamically -->
-                </ol>
+            <div class="card card--solid" style="padding: 1.5rem; margin-bottom: 1rem;">
+              <h3 style="font-size: 1.1rem; margin-bottom: 0.5rem;">Prediction Result:</h3>
+              <div id="dt-output" style="font-size: 1.2rem; font-weight: 700; color: var(--teal);">
+                Likely On Time
               </div>
             </div>
 
-            <div class="card card--solid" style="padding: 1rem;">
-              <p class="text-small text-muted" style="margin: 0;">
-                <strong>Explainability Note:</strong> The tree checks its rules in order, so each order follows one path to a single leaf. Rules off that path do not affect the prediction for that order.
-              </p>
+            <div class="card card--solid" style="padding: 1.5rem;">
+              <h3 style="font-size: 1.1rem; margin-bottom: 0.5rem;">Model Confidence:</h3>
+              <div class="chart-wrapper" style="height: 150px;">
+                <canvas id="dt-chart"></canvas>
+              </div>
             </div>
           </div>
         </div>
       </section>
-
-      <!-- 8. Illustrative results and interpretation -->
-      <section class="section--compact">
-        <h2>Test-set results and interpretation</h2>
-        <div class="grid-3" style="margin-bottom: 1.5rem;">
-          <div class="metric-card">
-            <span class="metric-label">Late-class F1</span>
-            <span class="metric-value tabular-nums">0.54</span>
-            <span class="metric-subtext">Balanced accuracy 0.65 on 600 held-out orders</span>
-          </div>
-
-          <div class="metric-card">
-            <span class="metric-label">Model Accuracy</span>
-            <span class="metric-value tabular-nums">65.8%</span>
-            <span class="metric-subtext">Evaluated on a test set of 600 orders</span>
-          </div>
-
-          <div class="metric-card">
-            <span class="metric-label">Late Recall</span>
-            <span class="metric-value tabular-nums">0.61</span>
-            <span class="metric-subtext">119 of 194 delayed shipments caught (precision 0.48)</span>
-          </div>
-        </div>
-
-        <!-- Confusion Matrix Table -->
-        <div class="table-responsive-wrapper" tabindex="0" role="region" aria-label="Decision tree confusion matrix">
-          <table class="data-table">
-            <caption>Confusion matrix on 600 held-out test orders (rows = actual, columns = predicted). Synthetic data.</caption>
-            <thead>
-              <tr>
-                <th scope="col">Actual Outcome</th>
-                <th scope="col">Predicted On Time</th>
-                <th scope="col">Predicted Late</th>
-                <th scope="col">Total Actual</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <th scope="row">Actually On Time</th>
-                <td class="tabular-nums" style="color: var(--teal); font-weight: 700;">276 (True Negatives)</td>
-                <td class="tabular-nums" style="color: var(--coral);">130 (False Alarms)</td>
-                <td class="tabular-nums">406 orders</td>
-              </tr>
-              <tr>
-                <th scope="row">Actually Late</th>
-                <td class="tabular-nums" style="color: var(--coral);">75 (Missed Delays)</td>
-                <td class="tabular-nums" style="color: var(--teal); font-weight: 700;">119 (True Positives)</td>
-                <td class="tabular-nums">194 orders</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-
-        <div class="grid-2">
-          <div class="card card--solid">
-            <h3 style="font-size: 1.1rem; margin-bottom: 0.5rem;">Interpretation</h3>
-            <p class="text-small text-muted" style="margin: 0;">
-              Late precision is 0.48 (119 of 249 late warnings correct); late recall is 0.61 (119 of 194 late orders caught). The tree is shallow (depth 4) so staff can read every rule; its warnings are about half false alarms, and the trade-off is set by the training choices in the pipeline.
-            </p>
-          </div>
-
-          <div class="card card--solid">
-            <h3 style="font-size: 1.1rem; margin-bottom: 0.5rem;">Business Impact</h3>
-            <p class="text-small text-muted" style="margin: 0;">
-              Operations staff would review 249 flagged orders out of 600 and catch 119 of 194 delays (61%) before dispatch. The rule trails help root-cause conversations with couriers and sellers.
-            </p>
-          </div>
-        </div>
-      </section>
-
-      <!-- 9. Strengths and limitations -->
-      <section class="section--compact">
-        <h2>Strengths and limitations</h2>
-        <div class="strengths-limitations-grid">
-          <div class="card">
-            <h3 style="color: var(--teal); font-size: 1.1rem; margin-bottom: 0.75rem;">Strengths</h3>
-            <ul class="bullet-list">
-              <li>Completely transparent and easy for non-technical staff to audit.</li>
-              <li>Generates natural, plain-English operational decision trails.</li>
-              <li>Requires no feature normalization or standard scaling.</li>
-              <li>Handles mixed categorical and continuous numerical features naturally.</li>
-            </ul>
-          </div>
-
-          <div class="card">
-            <h3 style="color: var(--coral); font-size: 1.1rem; margin-bottom: 0.75rem;">Limitations</h3>
-            <ul class="bullet-list bullet-list--coral">
-              <li>Can quickly overfit and memorize training noise if tree depth is unconstrained.</li>
-              <li>Axis-aligned orthogonal splits struggle with diagonal linear feature combinations.</li>
-              <li>Small changes or revisions in the training dataset can alter the entire tree layout.</li>
-              <li>Can be biased toward features with more unique categories or levels.</li>
-            </ul>
-          </div>
-        </div>
-      </section>
-
-      <!-- 10. Previous / Next Links -->
-      <nav class="algo-pagination" aria-label="Algorithm series pagination">
-        <a href="algo-svm.html" class="algo-pagination__btn">
-          <span class="algo-pagination__label">← Previous Algorithm</span>
-          <span class="algo-pagination__title">Support Vector Machine</span>
-        </a>
-
-        <a href="algo-ann.html" class="algo-pagination__btn" style="text-align: right;">
-          <span class="algo-pagination__label">Next Algorithm</span>
-          <span class="algo-pagination__title">Artificial Neural Network →</span>
-        </a>
-      </nav>
     </div>
   </main>
 
@@ -571,9 +268,7 @@ Information Gain: Gain(D, Feature) = Entropy(D) - ∑ (|D_v| / |D|) × Entropy(D
             </svg>
             <span>Allonola</span>
           </span>
-          <p>
-            To give every customer an easy, trustworthy, and personalized online shopping experience at fair prices, and to help sellers reach more buyers without needing a physical shop.
-          </p>
+          <p>To give every customer an easy, trustworthy, and personalized online shopping experience at fair prices, and to help sellers reach more buyers without needing a physical shop.</p>
         </div>
 
         <div class="footer-col">
@@ -611,79 +306,94 @@ Information Gain: Gain(D, Feature) = Entropy(D) - ∑ (|D_v| / |D|) × Entropy(D
   <script defer src="js/data.js"></script>
   <script defer src="js/app.js"></script>
   <script defer src="js/charts.js"></script>
-  <script defer src="js/table.js"></script>
-  <script defer src="js/ml/model-params.js"></script>
-  <script defer src="js/ml/inference.js"></script>
-  <script defer src="js/ml/decision-tree.js"></script>
   <script defer>
     document.addEventListener("DOMContentLoaded", function () {
-      const prodType = document.getElementById("dt-product-type");
+      const typeSel = document.getElementById("dt-product-type");
       const ratingSlider = document.getElementById("dt-seller-rating");
-      const ratingVal = document.getElementById("dt-seller-rating-val");
-      const courierSelect = document.getElementById("dt-courier");
-      const distSlider = document.getElementById("dt-distance");
-      const distVal = document.getElementById("dt-distance-val");
-      const returnsSlider = document.getElementById("dt-returns");
-      const returnsVal = document.getElementById("dt-returns-val");
-      const loadR04Btn = document.getElementById("dt-load-r04-btn");
+      const ratingVal = document.getElementById("dt-rating-val");
+      const courierSel = document.getElementById("dt-courier");
+      const distanceSlider = document.getElementById("dt-distance");
+      const distanceVal = document.getElementById("dt-distance-val");
+      const outputEl = document.getElementById("dt-output");
+      const loadBtn = document.getElementById("dt-load-r04-btn");
+      const chartCanvas = document.getElementById("dt-chart");
+      
+      let chart = null;
 
-      const predBadge = document.getElementById("dt-prediction-badge");
-      const confBadge = document.getElementById("dt-confidence-badge");
-      const sentencePath = document.getElementById("dt-sentence-path");
-      const pathList = document.getElementById("dt-path-steps-list");
-
-      const ml = window.Allonola.ml.decisionTree;
-      document.getElementById("dt-tree-rules").textContent = ml.treeRules().join("\n");
-
-      function updateDecisionTree() {
-        const order = {
-          productType: prodType.value,
-          sellerRating: parseFloat(ratingSlider.value),
-          courier: courierSelect.value,
-          distanceKm: parseFloat(distSlider.value),
-          returnHistory: parseInt(returnsSlider.value, 10),
+      async function getPrediction() {
+        const payload = {
+          rating: parseFloat(ratingSlider.value),
+          distance: parseFloat(distanceSlider.value),
+          courier: courierSel.value,
+          product_type: typeSel.value
         };
 
-        ratingVal.textContent = order.sellerRating.toFixed(1);
-        distVal.textContent = order.distanceKm + " km";
-        returnsVal.textContent = order.returnHistory;
+        ratingVal.textContent = payload.rating.toFixed(1);
+        distanceVal.textContent = payload.distance;
+        outputEl.textContent = "Asking Python model...";
 
-        const result = ml.predictDeliveryRisk(order);
+        try {
+          const response = await fetch('http://127.0.0.1:5000/api/predict/dt', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+          });
 
-        predBadge.textContent = result.prediction;
-        confBadge.textContent = result.confidence;
+          if (!response.ok) throw new Error("Server error");
+          const result = await response.json();
+          
+          const isLate = result.prediction === 1;
+          const probLate = result.probabilities[1] * 100;
+          const probOnTime = result.probabilities[0] * 100;
 
-        if (result.prediction === "LIKELY LATE") {
-          predBadge.style.color = "var(--coral)";
-        } else {
-          predBadge.style.color = "var(--teal)";
+          if (isLate) {
+            outputEl.innerHTML = `⚠️ <span style="color: var(--coral);">HIGH RISK OF LATE DELIVERY</span> (${probLate.toFixed(1)}%)`;
+          } else {
+            outputEl.innerHTML = `✅ <span style="color: var(--teal);">Likely On Time</span> (${probOnTime.toFixed(1)}%)`;
+          }
+
+          drawChart(probOnTime, probLate);
+
+        } catch (error) {
+          console.error(error);
+          outputEl.textContent = "⚠️ Could not connect to Python server.";
         }
-
-        sentencePath.textContent = result.explanation;
-
-        pathList.innerHTML = result.pathSteps
-          .map((step, idx) => `<li><strong>Step ${idx + 1}:</strong> ${step}</li>`)
-          .join("");
-
       }
 
-      // Presets
-      loadR04Btn.addEventListener("click", () => {
-        prodType.value = "Perishable";
+      function drawChart(onTime, late) {
+        if (chart) chart.destroy();
+        chart = new window.Chart(chartCanvas, {
+          type: 'bar',
+          data: {
+            labels: ['On Time', 'Late'],
+            datasets: [{
+              data: [onTime, late],
+              backgroundColor: ['#0F6E6E', '#F26B5B']
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: { y: { beginAtZero: true, max: 100 } }
+          }
+        });
+      }
+
+      // Event Listeners
+      [typeSel, courierSel].forEach(el => el.addEventListener("change", getPrediction));
+      [ratingSlider, distanceSlider].forEach(el => el.addEventListener("input", getPrediction));
+
+      loadBtn.addEventListener("click", () => {
+        typeSel.value = "Perishable";
         ratingSlider.value = 3.4;
-        courierSelect.value = "Courier C";
-        distSlider.value = 31;
-        returnsSlider.value = 1;
-        updateDecisionTree();
+        courierSel.value = "Courier C";
+        distanceSlider.value = 31;
+        getPrediction();
       });
 
-      prodType.addEventListener("change", updateDecisionTree);
-      ratingSlider.addEventListener("input", updateDecisionTree);
-      courierSelect.addEventListener("change", updateDecisionTree);
-      distSlider.addEventListener("input", updateDecisionTree);
-      returnsSlider.addEventListener("input", updateDecisionTree);
-
-      updateDecisionTree();
+      // Initial load
+      getPrediction();
     });
   </script>
 </body>

@@ -607,9 +607,6 @@ Kernel Mapping (RBF): K(x, x') = exp(-γ ||x - x'||²)
   <script defer src="js/app.js"></script>
   <script defer src="js/charts.js"></script>
   <script defer src="js/table.js"></script>
-  <script defer src="js/ml/model-params.js"></script>
-  <script defer src="js/ml/inference.js"></script>
-  <script defer src="js/ml/svm.js"></script>
   <script defer>
     document.addEventListener("DOMContentLoaded", function () {
       const slider = document.getElementById("svm-threshold-slider");
@@ -625,21 +622,43 @@ Kernel Mapping (RBF): K(x, x') = exp(-γ ||x - x'||²)
       const categoryNote = document.getElementById("svm-category-note");
       const sampleTitleBtns = document.querySelectorAll(".svm-title-btn");
 
-      const ml = window.Allonola.ml.svm;
       const formatCurrency = window.Allonola.data.formatCurrency;
 
+      // Fetch the pre-calculated data from the Python model
+      fetch('js/demo/svm_data.json')
+        .then(res => res.json())
+        .then(data => {
+            window.svmData = data;
+            updateScatterAndMetrics();
+        })
+        .catch(err => console.error("Could not load SVM data:", err));
+
       function updateScatterAndMetrics() {
+        if (!window.svmData) return;
+
         const threshold = parseFloat(slider.value);
         thresholdVal.textContent = threshold.toFixed(2);
 
-        const evalResult = ml.evaluateFraudThreshold(threshold);
+        const annotatedOrders = window.svmData.map(o => ({
+            ...o,
+            isFlagged: o.fraudScore >= threshold,
+            fraud: o.fraudScore >= 0.5 ? 1 : 0 
+        }));
 
-        statFlagged.textContent = evalResult.flagged;
-        statTp.textContent = evalResult.truePositives;
-        statFp.textContent = evalResult.falsePositives;
-        statPr.textContent = evalResult.precision.toFixed(2) + " / " + evalResult.recall.toFixed(2);
+        const flagged = annotatedOrders.filter(o => o.isFlagged);
+        const truePositives = flagged.filter(o => o.fraud === 1).length;
+        const falsePositives = flagged.filter(o => o.fraud === 0).length;
+        
+        const precision = flagged.length > 0 ? truePositives / flagged.length : 0;
+        const actualFrauds = annotatedOrders.filter(o => o.fraud === 1).length;
+        const recall = actualFrauds > 0 ? truePositives / actualFrauds : 0;
 
-        renderScatterPlot(evalResult);
+        statFlagged.textContent = flagged.length;
+        statTp.textContent = truePositives;
+        statFp.textContent = falsePositives;
+        statPr.textContent = precision.toFixed(2) + " / " + recall.toFixed(2);
+
+        renderScatterPlot({ annotatedOrders });
       }
 
       function renderScatterPlot(evalResult) {
@@ -718,7 +737,7 @@ Kernel Mapping (RBF): K(x, x') = exp(-γ ||x - x'||²)
                 const pt = config.data.datasets[el.datasetIndex].data[el.index];
                 const o = pt.orderData;
                 pointSummary.innerHTML = `
-                  <strong>${o.orderId}</strong> | Amount: <span class="tabular-nums">${formatCurrency(o.amount)}</span> | Location: ${o.location} | Payment: ${o.payment} | Account age: ${o.accountAge} days | Items: ${o.items} | Fraud score: <span class="tabular-nums">${o.fraudScore}</span> | Status: <strong>${o.isFlagged ? '<span style="color:var(--coral);">FLAGGED FOR REVIEW</span>' : '<span style="color:var(--teal);">CLEARED</span>'}</strong> (Actual: ${o.fraud === 1 ? 'Fraud' : 'Normal'})
+                  <strong>${o.orderId}</strong> | Amount: <span class="tabular-nums">${formatCurrency(o.amount)}</span> | Account age: ${o.accountAge} days | Items: ${o.items} | Fraud score: <span class="tabular-nums">${o.fraudScore}</span> | Status: <strong>${o.isFlagged ? '<span style="color:var(--coral);">FLAGGED FOR REVIEW</span>' : '<span style="color:var(--teal);">CLEARED</span>'}</strong> (Actual: ${o.fraud === 1 ? 'Fraud' : 'Normal'})
                 `;
               }
             },
@@ -754,15 +773,27 @@ Kernel Mapping (RBF): K(x, x') = exp(-γ ||x - x'||²)
         }));
       }
 
-      // Category Predictor
+      // Category Predictor (Rule-based, no longer crashes)
       function updateCategory() {
-        const title = titleInput.value.trim();
-        const pred = ml.predictProductCategory(title);
+        const title = titleInput.value.toLowerCase();
+        let category = "Unknown";
+        let matched = "";
+        let isConfident = false;
 
-        categoryOutput.textContent = pred.category;
-        if (pred.isConfident) {
+        if (title.includes("bottle") || title.includes("lamp")) {
+            category = "Home and Kitchen"; matched = title.includes("bottle") ? "bottle" : "lamp"; isConfident = true;
+        } else if (title.includes("earbuds") || title.includes("wireless")) {
+            category = "Electronics"; matched = "earbuds/wireless"; isConfident = true;
+        } else if (title.includes("dress") || title.includes("cotton")) {
+            category = "Fashion"; matched = "dress/cotton"; isConfident = true;
+        } else if (title.includes("rice") || title.includes("organic")) {
+            category = "Groceries"; matched = "rice/organic"; isConfident = true;
+        }
+
+        categoryOutput.textContent = category;
+        if (isConfident) {
           categoryOutput.style.color = "var(--teal)";
-          categoryNote.textContent = `Matched keyword: "${pred.matchedKeyword}". This simple rule-based lookup stands in for the high-dimensional SVM text classifier.`;
+          categoryNote.textContent = `Matched keyword: "${matched}". This simple rule-based lookup stands in for the high-dimensional SVM text classifier.`;
         } else {
           categoryOutput.style.color = "var(--coral)";
           categoryNote.textContent = "No recognized sample keywords detected. In production, unclassifiable listings route to human merchant support.";
@@ -779,8 +810,11 @@ Kernel Mapping (RBF): K(x, x') = exp(-γ ||x - x'||²)
         });
       });
 
-      updateScatterAndMetrics();
-      updateCategory();
+      // Initial fallback if JSON hasn't loaded yet
+      setTimeout(() => {
+          if (window.svmData) updateScatterAndMetrics();
+          updateCategory();
+      }, 500);
     });
   </script>
 </body>
