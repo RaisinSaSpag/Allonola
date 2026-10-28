@@ -62,11 +62,8 @@ def handle_bad_input(err):
 
 @app.errorhandler(Exception)
 def handle_unexpected(err):
-    # Let Flask handle its own HTTP errors (like 404 Not Found, 405 Method Not Allowed)
     if isinstance(err, HTTPException):
         return err
-    
-    # For our own custom errors (like a Python crash), return a 500
     app.logger.exception("Unhandled error")
     return jsonify({"error": "Internal server error."}), 500
 
@@ -93,16 +90,27 @@ def predict_nb():
 def predict_knn():
     data = get_json()
     user_id = get_field(data, "user_id", str)
+    
+    # NEW: Get k from the frontend (default to 3 if not provided)
+    k_val = int(data.get("k", 3)) 
+    
     matches = knn_users[knn_users.astype(str) == user_id]
     if matches.empty:
         raise BadInput(f"Unknown user_id: '{user_id}'.")
     user_pos = knn_users.index.get_loc(matches.index[0])
     user_ratings = knn_matrix.iloc[user_pos].values.reshape(1, -1)
-    _, indices = model_knn.kneighbors(user_ratings, n_neighbors=4)
-    neighbor_pos = [i for i in indices[0] if i != user_pos][:3]
+    
+    # NEW: Use k_val + 1 to account for the user themselves
+    _, indices = model_knn.kneighbors(user_ratings, n_neighbors=k_val + 1)
+    neighbor_pos = [i for i in indices[0] if i != user_pos][:k_val]
+    
+    if not neighbor_pos:
+        return jsonify({"recommendations": [], "scores": []})
+
     avg_ratings = knn_matrix.iloc[neighbor_pos].mean(axis=0)
     not_bought = knn_matrix.iloc[user_pos] == 0
     recs = avg_ratings[not_bought].sort_values(ascending=False).head(3)
+    
     return jsonify({"recommendations": recs.index.tolist(), "scores": [round(float(s), 3) for s in recs.values]})
 
 @app.route("/api/predict/svm", methods=["POST"])

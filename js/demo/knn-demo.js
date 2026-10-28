@@ -33,11 +33,14 @@
     outputEl.innerHTML = "";
 
     try {
-      // Send the selected user to the Python API
+      // Send the selected user AND the k value to the Python API
       const response = await fetch('http://127.0.0.1:5000/api/predict/knn', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ user_id: userSel.value })
+        body: JSON.stringify({ 
+            user_id: userSel.value,
+            k: k
+        })
       });
 
       if (!response.ok) throw new Error("User not found or server error");
